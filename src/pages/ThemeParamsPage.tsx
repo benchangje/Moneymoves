@@ -17,8 +17,8 @@ export const ThemeParamsPage: FC = () => {
               .entries(tp)
               .map(([title, value]) => ({
                 title: title
-                  .replace(/[A-Z]/g, (m) => `_${m.toUpperCase()}`)
-                  .replace(/background/, 'bg'),
+                  .replace(/[A-Z]/g, (m) => `_${m.toLowerCase()}`)  
+                  .replace(/bg/, "background"),                             
                 value,
               }))
           }
@@ -27,3 +27,4 @@ export const ThemeParamsPage: FC = () => {
     </Page>
   );
 };
+
