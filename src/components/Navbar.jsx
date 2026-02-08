@@ -11,6 +11,9 @@ export default function Navbar() {
                             <span className="text-blue-400 font-bold">Moves</span>
                         </span>
                     </div>
+                    <div>
+                        {/* Future nav items can go here */
+                    </div>
                 </div>
             </div> 
             </nav>
