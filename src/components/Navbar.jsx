@@ -4,6 +4,7 @@ export default function Navbar() {
             <div className="flex items-center justify-between h-14 sm:h-16 md"> 
                 hi there, this is a rental marketplace! 
                 <div>hello!</div>
+                <div>hi there!</div>
             </div>
 
         </div>
