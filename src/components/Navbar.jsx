@@ -1,4 +1,4 @@
-import { Menu } from "lucide-react";
+import { Menu, X } from "lucide-react";
 import { useState } from "react";
 
 export default function Navbar() {
@@ -11,8 +11,8 @@ export default function Navbar() {
                             <img src="/logo.png" alt="logo" className="h-6 w-6 sm:h-8 sm:w-8"/>
                         </div>
                         <span className="text-lg sm:text-xl md:text-2xl font-bold">
-                            <span className="text-white font-bold">Money</span>
-                            <span className="text-blue-400 font-bold">Moves</span>
+                            <span className="text-white font-bold">Rental </span>
+                            <span className="text-blue-400 font-bold">Marketplace</span>
                         </span>
                     </div>
                     <div className="hidden md:flex items-center space-x-6 lg:space-x-8">
@@ -27,10 +27,23 @@ export default function Navbar() {
                         </a>
                     </div>
                     <button className="md:hidden p-2 focus:outline-none text-gray-300 hover:text-white" onClick={() => setMobileMenuIsOpen(!mobileMenuOpen)}>
-                        <Menu className="h-5 w-5 sm:h-6 sm:w-6 "/>
+                        {mobileMenuOpen ? (<X className="h-5 w-5 sm:h-6 sm:w-6"/>) : (<Menu className="h-5 w-5 sm:h-6 sm:w-6"/>)}
                     </button>
-                    {mobileMenuOpen && <p> hello </p>}
                 </div>
             </div> 
+            {mobileMenuOpen && 
+            <div className="md:hidden bg-slate-900/90 backdrop-blur-sm px-4 pt-2 pb-4 space-y-2 slide-in-from-top animate-in duration-400">
+                <div className= "px-3 py-3 sm:px-3 sm:py-3 flex flex-col items-center space-y-3">
+                    <a href="#features" className="block text-gray-300 hover:text-white text-sm lg:text-base font-medium" onClick={() => setMobileMenuIsOpen(false)}>
+                        Features
+                    </a>
+                    <a href="#pricing" className="block text-gray-300 hover:text-white text-sm lg:text-base font-medium" onClick={() => setMobileMenuIsOpen(false)}>
+                        Pricing
+                    </a>
+                    <a href="#testimonials" className="block text-gray-300 hover:text-white text-sm lg:text-base font-medium" onClick={() => setMobileMenuIsOpen(false)}>
+                        Testimonials
+                    </a>
+                </div>
+            </div>}
             </nav>
 }
