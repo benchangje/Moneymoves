@@ -1,6 +1,8 @@
 import { Menu } from "lucide-react";
+import { useState } from "react";
 
 export default function Navbar() {
+    const [mobileMenuOpen, setMobileMenuIsOpen] = useState(false);
     return <nav className="fixed top-0 w-full bg-slate-950/20 backdrop-blur-sm z-50 transition-all duration-300">
            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"> 
                 <div className="flex items-center justify-between h-14 sm:h-16 md"> 
@@ -24,9 +26,10 @@ export default function Navbar() {
                             Testimonials
                         </a>
                     </div>
-                    <button className="md:hidden focus:outline-none">
-                        <Menu className="h-6 w-6 text-gray-300 hover:text-white"/>
+                    <button className="md:hidden p-2 focus:outline-none text-gray-300 hover:text-white" onClick={() => setMobileMenuIsOpen(!mobileMenuOpen)}>
+                        <Menu className="h-5 w-5 sm:h-6 sm:w-6 "/>
                     </button>
+                    {mobileMenuOpen && <p> hello </p>}
                 </div>
             </div> 
             </nav>
