@@ -12,18 +12,21 @@ export default function Navbar() {
                         </div>
                         <span className="text-lg sm:text-xl md:text-2xl font-bold">
                             <span className="text-white font-bold">Rental </span>
-                            <span className="text-blue-400 font-bold">Marketplace hi</span>
+                            <span className="text-blue-400 font-bold">Marketplace</span>
                         </span>
                     </div>
                     <div className="hidden md:flex items-center space-x-6 lg:space-x-8">
-                        <a href="#features" className="text-gray-300 hover:text-white text-sm lg:text-base">
-                            Features
+                        <a href="#create_listing" className="text-gray-300 hover:text-white text-sm lg:text-base">
+                            Create Listing
                         </a>
-                        <a href="#pricing" className="text-gray-300 hover:text-white text-sm lg:text-base">
-                            Pricing
+                        <a href="#view_listings" className="text-gray-300 hover:text-white text-sm lg:text-base">
+                            View Listings
                         </a>
-                        <a href="#testimonials" className="text-gray-300 hover:text-white text-sm lg:text-base">
-                            Testimonials
+                        <a href="#profile" className="text-gray-300 hover:text-white text-sm lg:text-base">
+                            Profile
+                        </a>
+                        <a href="#contact_us" className="text-gray-300 hover:text-white text-sm lg:text-base">
+                            Contact Us
                         </a>
                     </div>
                     <button className="md:hidden p-2 focus:outline-none text-gray-300 hover:text-white" onClick={() => setMobileMenuIsOpen(!mobileMenuOpen)}>
@@ -34,14 +37,17 @@ export default function Navbar() {
             {mobileMenuOpen && 
             <div className="md:hidden bg-slate-900/90 backdrop-blur-sm px-4 pt-2 pb-4 space-y-2 slide-in-from-top animate-in duration-400">
                 <div className= "px-3 py-3 sm:px-3 sm:py-3 flex flex-col items-center space-y-3">
-                    <a href="#features" className="block text-gray-300 hover:text-white text-sm lg:text-base font-medium" onClick={() => setMobileMenuIsOpen(false)}>
-                        Features
+                    <a href="#create_listing" className="block text-gray-300 hover:text-white text-sm lg:text-base font-medium" onClick={() => setMobileMenuIsOpen(false)}>
+                        Create Listing
                     </a>
-                    <a href="#pricing" className="block text-gray-300 hover:text-white text-sm lg:text-base font-medium" onClick={() => setMobileMenuIsOpen(false)}>
-                        Pricing
+                    <a href="#view_listings" className="block text-gray-300 hover:text-white text-sm lg:text-base font-medium" onClick={() => setMobileMenuIsOpen(false)}>
+                        View Listings
                     </a>
-                    <a href="#testimonials" className="block text-gray-300 hover:text-white text-sm lg:text-base font-medium" onClick={() => setMobileMenuIsOpen(false)}>
-                        Testimonials
+                    <a href="#profile" className="block text-gray-300 hover:text-white text-sm lg:text-base font-medium" onClick={() => setMobileMenuIsOpen(false)}>
+                        Profile
+                    </a>
+                    <a href="#contact_us" className="block text-gray-300 hover:text-white text-sm lg:text-base font-medium" onClick={() => setMobileMenuIsOpen(false)}>
+                        Contact Us
                     </a>
                 </div>
             </div>}
