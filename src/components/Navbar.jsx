@@ -12,7 +12,7 @@ export default function Navbar() {
                         </div>
                         <span className="text-lg sm:text-xl md:text-2xl font-bold">
                             <span className="text-white font-bold">Rental </span>
-                            <span className="text-blue-400 font-bold">Marketplace hi</span>
+                            <span className="text-blue-400 font-bold">Marketplace</span>
                         </span>
                     </div>
                     <div className="hidden md:flex items-center space-x-6 lg:space-x-8">
