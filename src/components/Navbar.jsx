@@ -26,6 +26,16 @@ export default function Navbar() {
                             Profile
                         </a>
                         <a href="#contact" className="text-gray-300 hover:text-white text-sm lg:text-base">
+                        <a href="#create_listing" className="text-gray-300 hover:text-white text-sm lg:text-base">
+                            Create Listing
+                        </a>
+                        <a href="#view_listings" className="text-gray-300 hover:text-white text-sm lg:text-base">
+                            View Listings
+                        </a>
+                        <a href="#profile" className="text-gray-300 hover:text-white text-sm lg:text-base">
+                            Profile
+                        </a>
+                        <a href="#contact_us" className="text-gray-300 hover:text-white text-sm lg:text-base">
                             Contact Us
                         </a>
                     </div>
@@ -47,6 +57,16 @@ export default function Navbar() {
                         Profile
                     </a>
                     <a href="#contact" className="block text-gray-300 hover:text-white text-sm lg:text-base font-medium" onClick={() => setMobileMenuIsOpen(false)}>
+                    <a href="#create_listing" className="block text-gray-300 hover:text-white text-sm lg:text-base font-medium" onClick={() => setMobileMenuIsOpen(false)}>
+                        Create Listing
+                    </a>
+                    <a href="#view_listings" className="block text-gray-300 hover:text-white text-sm lg:text-base font-medium" onClick={() => setMobileMenuIsOpen(false)}>
+                        View Listings
+                    </a>
+                    <a href="#profile" className="block text-gray-300 hover:text-white text-sm lg:text-base font-medium" onClick={() => setMobileMenuIsOpen(false)}>
+                        Profile
+                    </a>
+                    <a href="#contact_us" className="block text-gray-300 hover:text-white text-sm lg:text-base font-medium" onClick={() => setMobileMenuIsOpen(false)}>
                         Contact Us
                     </a>
                 </div>
