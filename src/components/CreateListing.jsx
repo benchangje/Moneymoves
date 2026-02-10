@@ -1,3 +1,3 @@
 export default function CreateListing() {
-    return <div></div>
+    return <div>Create Listing Page</div>
 }

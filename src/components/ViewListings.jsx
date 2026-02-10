@@ -1,3 +1,3 @@
 export default function ViewListings() {
-    return <div></div>
+    return <div>View Listings Page</div>
 }
