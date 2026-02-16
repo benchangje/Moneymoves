@@ -1,9 +1,11 @@
-import { ImagePlus, ChevronDown, ChevronRight, PencilLine, Plug2, Shirt, Handbag, CalendarDays } from "lucide-react";
+import { ImagePlus, ChevronDown, ChevronRight, Plug2, Shirt, Handbag, CalendarDays } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 
 export default function CreateListing() {
 
     //STATE AND REFS
+    const [listing_title, setListingTitle] = useState("");
+
     const [categoryIsOpen, setCategoryIsOpen] = useState(false);
     const [selectedCategory, setSelectedCategory] = useState("Select a category");
     const categories = [
@@ -45,24 +47,24 @@ export default function CreateListing() {
                     <input
                         type="text"
                         placeholder="Listing title"
-                        onBlur={(text) => text.target.placeholder = "Listing title"}
-                        onFocus={(text) => text.target.placeholder = "Enter a title for your listing"}
+                        value={listing_title}
+                        onChange={(e) => setListingTitle(e.target.value)}
+                        onBlur={(e) => e.target.placeholder = "Listing title"}
+                        onFocus={(e) => e.target.placeholder = "Enter a title for your listing"}
                         className="w-full bg-gray-200 rounded-2xl px-5 py-3 text-gray-500 placeholder-gray-500 font-medium focus:outline-none focus:placeholder-gray-400 hover:bg-gray-300"
                     />
                 </div>
 
                 {/*CATEGORY DROPDOWN*/}
                 <div className="relative mb-6 hover:scale-101 transition-all duration-400 ease-out" ref={categoryRef}>
-                    <button className={`w-full flex items-center justify-between bg-gray-200 rounded-2xl px-5 py-3 text-base font-medium text-gray-500 hover:bg-gray-300 transition-all duration-400 ease-out`}
+                    <button className={`w-full flex items-center justify-between bg-gray-200 rounded-2xl px-4 py-3 text-base font-medium text-gray-500 hover:bg-gray-300 transition-all duration-400 ease-out`}
                         onClick={() => setCategoryIsOpen(!categoryIsOpen)}>
-                        <div className="flex items-center justify-start space-x-4">
-                            <div> 
-                                {selectedCategory !== "Select a category" && (() => {
-                                    const activeItem = categories.find(pair => pair.label === selectedCategory);
-                                    const ActiveIcon = activeItem ? activeItem.icon : null;
-                                    return ActiveIcon ? <ActiveIcon className={`w-5 h-5 sm:h-5 sm:w-5 ${categoryIsOpen ? "text-black" : "text-gray-500"}`} /> : null;
-                                })()}
-                            </div>
+                        <div className="flex items-center justify-between gap-4">
+                            {selectedCategory !== "Select a category" && (() => {
+                                const activeItem = categories.find(pair => pair.label === selectedCategory);
+                                const ActiveIcon = activeItem ? activeItem.icon : null;
+                                return ActiveIcon ? <ActiveIcon className={`w-5 h-5 sm:h-5 sm:w-5 ${categoryIsOpen ? "text-black" : "text-gray-500"}`} /> : null;
+                            })()}
                             <div className={`${categoryIsOpen ? "text-black" : "text-gray-500"}`}>
                                 {selectedCategory}
                             </div>
@@ -140,8 +142,32 @@ export default function CreateListing() {
                     <input
                         type="text"
                         placeholder={`Number of ${selectedLendingInterval === "Lending interval" ? "day(s)" : selectedLendingInterval.toLowerCase()}`}
-                        onBlur={(text) => text.target.placeholder = `Number of ${selectedLendingInterval === "Lending interval" ? "day(s)" : selectedLendingInterval.toLowerCase()}`}
-                        onFocus={(text) => text.target.placeholder = `Enter the number of ${selectedLendingInterval === "Lending interval" ? "day(s)" : selectedLendingInterval.toLowerCase()}`}
+                        onBlur={(e) => e.target.placeholder = `Number of ${selectedLendingInterval === "Lending interval" ? "day(s)" : selectedLendingInterval.toLowerCase()}`}
+                        onFocus={(e) => e.target.placeholder = `Enter the number of ${selectedLendingInterval === "Lending interval" ? "day(s)" : selectedLendingInterval.toLowerCase()}`}
+                        className="w-full bg-gray-200 rounded-2xl px-5 py-3 text-base text-gray-500 font-medium placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 hover:bg-gray-300"
+                    />
+                </div>
+
+                {/*PRICE INPUT*/}
+                <div className="w-full mt-6 hover:scale-101 transition-all duration-400 ease-out">
+                    <span className="absolute ml-5 mt-3 text-gray-500 text-base font-medium">
+                        S$
+                    </span>
+                    <input
+                        type="text"
+                        placeholder="Rental price"
+                        onBlur={(e) => e.target.placeholder = "Rental price"}
+                        onFocus={(e) => e.target.placeholder = "Enter the rental price for your listing"}
+                        className="w-full bg-gray-200 rounded-2xl px-14 py-3 text-base text-gray-500 font-medium placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 hover:bg-gray-300"
+                    />
+                </div>
+
+                {/*ITEM DESCRIPTION INPUT*/}
+                <div className="w-full mt-6 hover:scale-101 transition-all duration-400 ease-out">
+                    <textarea
+                        placeholder="Item description"
+                        onBlur={(e) => e.target.placeholder = "Item description"}
+                        onFocus={(e) => e.target.placeholder = "Enter a description for your listing"}
                         className="w-full bg-gray-200 rounded-2xl px-5 py-3 text-base text-gray-500 font-medium placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 hover:bg-gray-300"
                     />
                 </div>
