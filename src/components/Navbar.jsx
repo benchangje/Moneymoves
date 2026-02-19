@@ -1,9 +1,10 @@
 import { Menu, X } from "lucide-react";
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 
 export default function Navbar() {
     const [mobileMenuOpen, setMobileMenuIsOpen] = useState(false);
+    const location = useLocation();
     return <nav className="fixed top-0 w-full bg-white backdrop-blur-sm z-50 transition-all duration-400">
            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"> 
                 <div className="flex items-center justify-between h-14 sm:h-16 md"> 
@@ -17,16 +18,16 @@ export default function Navbar() {
                         </span>
                     </div>
                     <div className="hidden md:flex items-center space-x-6 lg:space-x-8">
-                        <Link to="/create_listing" className="text-gray-600 hover:text-gray-300 text-sm lg:text-base font-medium">
+                        <Link to="/create_listing" className={`text-sm lg:text-base font-medium ${location.pathname === '/create_listing' ? 'text-blue-600' : 'text-gray-600 hover:text-gray-300'}`}>
                             Create Listing
                         </Link>
-                        <Link to="/view_listings" className="text-gray-600 hover:text-gray-300 text-sm lg:text-base font-medium">
+                        <Link to="/view_listings" className={`text-sm lg:text-base font-medium ${location.pathname === '/view_listings' ? 'text-blue-600' : 'text-gray-600 hover:text-gray-300'}`}>
                             View Listings
                         </Link>
-                        <Link to="/profile" className="text-gray-600 hover:text-gray-300 text-sm lg:text-base font-medium">
+                        <Link to="/profile" className={`text-sm lg:text-base font-medium ${location.pathname === '/profile' ? 'text-blue-600' : 'text-gray-600 hover:text-gray-300'}`}>
                             Profile
                         </Link>
-                        <Link to="/contact" className="text-gray-600 hover:text-gray-300 text-sm lg:text-base font-medium">
+                        <Link to="/contact" className={`text-sm lg:text-base font-medium ${location.pathname === '/contact' ? 'text-blue-600' : 'text-gray-600 hover:text-gray-300'}`}>
                             Contact Us
                         </Link>
                     </div>
@@ -38,16 +39,16 @@ export default function Navbar() {
             {mobileMenuOpen && 
             <div className="md:hidden bg-gray-100 backdrop-blur-sm px-4 pt-2 pb-4 space-y-2 slide-in-from-top animate-in duration-400">
                 <div className= "px-3 py-3 sm:px-3 sm:py-3 flex flex-col items-center space-y-3">
-                    <Link to="/create_listing" className="block text-gray-600 hover:text-gray-300 text-sm lg:text-base font-medium" onClick={() => setMobileMenuIsOpen(false)}>
+                    <Link to="/create_listing" className={`block text-sm lg:text-base font-medium ${location.pathname === '/create_listing' ? 'text-blue-600' : 'text-gray-600 hover:text-gray-300'}`} onClick={() => setMobileMenuIsOpen(false)}>
                         Create Listing
                     </Link>
-                    <Link to="/view_listings" className="block text-gray-600 hover:text-gray-300 text-sm lg:text-base font-medium" onClick={() => setMobileMenuIsOpen(false)}>
+                    <Link to="/view_listings" className={`block text-sm lg:text-base font-medium ${location.pathname === '/view_listings' ? 'text-blue-600' : 'text-gray-600 hover:text-gray-300'}`} onClick={() => setMobileMenuIsOpen(false)}>
                         View Listings
                     </Link>
-                    <Link to="/profile" className="block text-gray-600 hover:text-gray-300 text-sm lg:text-base font-medium" onClick={() => setMobileMenuIsOpen(false)}>
+                    <Link to="/profile" className={`block text-sm lg:text-base font-medium ${location.pathname === '/profile' ? 'text-blue-600' : 'text-gray-600 hover:text-gray-300'}`} onClick={() => setMobileMenuIsOpen(false)}>
                         Profile
                     </Link>
-                    <Link to="/contact" className="block text-gray-600 hover:text-gray-300 text-sm lg:text-base font-medium" onClick={() => setMobileMenuIsOpen(false)}>
+                    <Link to="/contact" className={`block text-sm lg:text-base font-medium ${location.pathname === '/contact' ? 'text-blue-600' : 'text-gray-600 hover:text-gray-300'}`} onClick={() => setMobileMenuIsOpen(false)}>
                         Contact Us
                     </Link>
                 </div>
