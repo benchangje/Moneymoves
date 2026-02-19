@@ -12,6 +12,8 @@ export default function Profile() {
     const [editImagePreview, setEditImagePreview] = useState(profileImage);
     const [editBio, setEditBio] = useState(bio);
     const [editBanner, setEditBanner] = useState(banner);
+    const [sortOrder, setSortOrder] = useState('newest');
+    const [selectedRating, setSelectedRating] = useState(null);
 
     const reviews = [
         { id: 1, reviewer: "Shree", rating: 5, comment: "Great experience! Item was in perfect condition. Highly recommended!", date: "2026-02-15" },
@@ -95,6 +97,27 @@ export default function Profile() {
         : 0;
     const averageRating = averageRatingNum.toFixed(1);
     const ratedStars = Math.round(averageRatingNum);
+
+    // Sort reviews based on selected order
+    const sortedReviews = [...reviews]
+        .filter(review => selectedRating === null || review.rating === selectedRating)
+        .sort((a, b) => {
+            if (sortOrder === 'worst-to-best') {
+                return a.rating - b.rating;
+            } else if (sortOrder === 'best-to-worst') {
+                return b.rating - a.rating;
+            } else {
+                // newest first (default)
+                return new Date(b.date) - new Date(a.date);
+            }
+        });
+
+    // Calculate rating distribution
+    const ratingCounts = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
+    reviews.forEach(review => {
+        ratingCounts[review.rating]++;
+    });
+    const maxCount = Math.max(...Object.values(ratingCounts), 1);
 
     return (
         <div className="min-h-screen bg-gray-50">
@@ -188,26 +211,89 @@ export default function Profile() {
 
                 {/* Reviews Section */}
                 <div>
-                    <h2 className="text-2xl font-bold text-gray-900 mb-6">Reviews</h2>
+                    <div className="flex justify-between items-center mb-6">
+                        <h2 className="text-2xl font-bold text-gray-900">Reviews</h2>
+                        <select 
+                            value={sortOrder} 
+                            onChange={(e) => setSortOrder(e.target.value)}
+                            className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                        >
+                            <option value="newest">Newest First</option>
+                            <option value="worst-to-best">Worst to Best</option>
+                            <option value="best-to-worst">Best to Worst</option>
+                        </select>
+                    </div>
+                    
+                    {/* Rating Statistics */}
+                    <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+                        <div className="flex justify-between items-center mb-4">
+                            <h3 className="text-lg font-semibold text-gray-900">Rating Distribution</h3>
+                            {selectedRating !== null && (
+                                <button 
+                                    onClick={() => setSelectedRating(null)}
+                                    className="text-sm text-blue-600 hover:text-blue-800 font-medium"
+                                >
+                                    Show All
+                                </button>
+                            )}
+                        </div>
+                        <div className="space-y-3">
+                            {[5, 4, 3, 2, 1].map(rating => {
+                                const count = ratingCounts[rating];
+                                const percentage = reviews.length > 0 ? (count / reviews.length) * 100 : 0;
+                                const isSelected = selectedRating === rating;
+                                return (
+                                    <div 
+                                        key={rating} 
+                                        onClick={() => setSelectedRating(rating)}
+                                        className={`flex items-center gap-3 cursor-pointer rounded-lg p-2 transition-colors ${
+                                            isSelected ? 'bg-blue-50 ring-2 ring-blue-500' : 'hover:bg-gray-50'
+                                        }`}
+                                    >
+                                        <div className="flex items-center gap-1 w-16">
+                                            <span className="text-sm font-medium text-gray-700">{rating}</span>
+                                            <span className="text-yellow-400 text-sm">★</span>
+                                        </div>
+                                        <div className="flex-1 bg-gray-200 rounded-full h-4 overflow-hidden">
+                                            <div 
+                                                className={`h-full transition-all duration-300 ${
+                                                    isSelected ? 'bg-blue-500' : 'bg-yellow-400'
+                                                }`}
+                                                style={{ width: `${percentage}%` }}
+                                            />
+                                        </div>
+                                        <span className="text-sm font-medium text-gray-600 w-12 text-right">{count}</span>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    </div>
+
                     <div className="space-y-4">
-                        {reviews.map((review) => (
-                            <div key={review.id} className="bg-white rounded-lg shadow-md p-6">
-                                <div className="flex justify-between items-start mb-3">
-                                    <div>
-                                        <h3 className="text-lg font-semibold text-gray-900">{review.reviewer}</h3>
-                                        <p className="text-sm text-gray-500">{review.date}</p>
-                                    </div>
-                                    <div className="flex items-center gap-1">
-                                        {[...Array(5)].map((_, i) => (
-                                            <span key={i} className={i < review.rating ? "text-yellow-400" : "text-gray-300"}>
-                                                ★
-                                            </span>
-                                        ))}
-                                    </div>
-                                </div>
-                                <p className="text-gray-700">{review.comment}</p>
+                        {sortedReviews.length === 0 ? (
+                            <div className="bg-white rounded-lg shadow-md p-12 text-center">
+                                <p className="text-gray-500 text-lg">There are currently no reviews</p>
                             </div>
-                        ))}
+                        ) : (
+                            sortedReviews.map((review) => (
+                                <div key={review.id} className="bg-white rounded-lg shadow-md p-6">
+                                    <div className="flex justify-between items-start mb-3">
+                                        <div>
+                                            <h3 className="text-lg font-semibold text-gray-900">{review.reviewer}</h3>
+                                            <p className="text-sm text-gray-500">{review.date}</p>
+                                        </div>
+                                        <div className="flex items-center gap-1">
+                                            {[...Array(5)].map((_, i) => (
+                                                <span key={i} className={i < review.rating ? "text-yellow-400" : "text-gray-300"}>
+                                                    ★
+                                                </span>
+                                            ))}
+                                        </div>
+                                    </div>
+                                    <p className="text-gray-700">{review.comment}</p>
+                                </div>
+                            ))
+                        )}
                     </div>
                 </div>
             </div>
