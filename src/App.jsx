@@ -9,7 +9,8 @@ import { Routes, Route } from 'react-router-dom';
 function App() {
   const [count, setCount] = useState(0)
   return (
-    <div className="min-h-screen bg-white text-gray-600">
+    <div className="min-h-screen bg-white text-gray-600 pt-20">
+      <Navbar />
       <Routes>
         <Route path="/" element={<Navbar />} />
         <Route path="/view_listings" element={<ViewListings />} />
@@ -21,4 +22,4 @@ function App() {
   )
 }
 
-export default App
+export default App;
