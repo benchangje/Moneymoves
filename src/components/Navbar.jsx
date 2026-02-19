@@ -13,16 +13,17 @@ export default function Navbar() {
                             <img src="/logo.png" alt="logo" className="h-6 w-6 sm:h-8 sm:w-8"/>
                         </div>
                         <span className="text-lg sm:text-xl md:text-2xl font-bold">
-                            <span className="text-black font-bold">Rental </span>
-                            <span className="text-blue-600 font-bold">Marketplace</span>
+                            <Link to="/rental_marketplace" className={`text-sm lg:text-base font-medium ${location.pathname === '/rental_marketplace' ? 'text-blue-600' : 'text-gray-600 hover:text-gray-300'}`}>
+                                Rental Marketplace
+                            </Link>
                         </span>
                     </div>
                     <div className="hidden md:flex items-center space-x-6 lg:space-x-8">
+                        <Link to="/rental_marketplace" className={`text-sm lg:text-base font-medium ${location.pathname === '/rental_marketplace' ? 'text-blue-600' : 'text-gray-600 hover:text-gray-300'}`}>
+                            Marketplace
+                        </Link>
                         <Link to="/create_listing" className={`text-sm lg:text-base font-medium ${location.pathname === '/create_listing' ? 'text-blue-600' : 'text-gray-600 hover:text-gray-300'}`}>
                             Create Listing
-                        </Link>
-                        <Link to="/view_listings" className={`text-sm lg:text-base font-medium ${location.pathname === '/view_listings' ? 'text-blue-600' : 'text-gray-600 hover:text-gray-300'}`}>
-                            View Listings
                         </Link>
                         <Link to="/profile" className={`text-sm lg:text-base font-medium ${location.pathname === '/profile' ? 'text-blue-600' : 'text-gray-600 hover:text-gray-300'}`}>
                             Profile
