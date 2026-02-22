@@ -4,7 +4,7 @@ import { useState } from "react";
 import ListingCard from "./ListingCard";
 
 
-export default function ViewListings() {
+export default function RentalMarketplace() {
   const [listings, setListings] = useState([
     { id: 1, title: "iPhone 13", price: 700 },
   ]);

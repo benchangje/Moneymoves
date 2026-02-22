@@ -1,6 +1,6 @@
 import Navbar from './components/Navbar.jsx';
 import CreateListing from './components/CreateListing.jsx';
-import ViewListings from './components/ViewListings.jsx';
+import RentalMarketplace from './components/RentalMarketplace.jsx';
 import Profile from './components/Profile.jsx';
 import ContactUs from './components/ContactUs.jsx';
 import { useState } from 'react';
@@ -12,8 +12,8 @@ function App() {
     <div className="min-h-screen bg-white text-gray-600 pt-20">
       <Navbar />
       <Routes>
-        <Route path="/" element={<Navbar />} />
-        <Route path="/view_listings" element={<ViewListings />} />
+        <Route path="/" element={<RentalMarketplace />} />
+        <Route path="/rental_marketplace" element={<RentalMarketplace />} />
         <Route path="/create_listing" element={<CreateListing />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/contact" element={<ContactUs />} />
