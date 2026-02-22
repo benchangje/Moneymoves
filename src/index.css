@@ -12,12 +12,16 @@
   .duration-400 {
     animation-duration: 400ms;
   }
+
+  .animate-page-blink {
+    animation: page-blink 200ms ease-in-out forwards;
+  }
 }
 
 @keyframes slideInFromTop {
     from {
         opacity: 0;
-        transform: translateY(-15px);
+        transform: translateY(-10px);
     }
 
     to {
@@ -25,5 +29,12 @@
         transform: translateY(0);
     }
 }
+
+@keyframes page-blink {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+
 
 

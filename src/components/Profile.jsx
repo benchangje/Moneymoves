@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import { X } from 'lucide-react';
-import Navbar from './Navbar';
 
 export default function Profile() {
     const [username, setUsername] = useState("Benny Ben");
@@ -121,7 +120,6 @@ export default function Profile() {
 
     return (
         <div className="min-h-screen bg-gray-50">
-            <Navbar />
             <div className="max-w-7xl mx-auto pt-16">
                 {/* Banner */}
                 <div className="relative h-48 bg-gray-200 overflow-hidden">
