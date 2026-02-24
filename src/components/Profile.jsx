@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { X } from 'lucide-react';
+import ListingCard from './ListingCard';
 
 export default function Profile() {
     const [username, setUsername] = useState("Benny Ben");
@@ -11,6 +12,9 @@ export default function Profile() {
     const [editImagePreview, setEditImagePreview] = useState(profileImage);
     const [editBio, setEditBio] = useState(bio);
     const [editBanner, setEditBanner] = useState(banner);
+    const [isImageOpen, setIsImageOpen] = useState(false);
+    const [modalImageSrc, setModalImageSrc] = useState(null);
+    const placeholderImage = "https://via.placeholder.com/900x900.png?text=No+Image";
     const [sortOrder, setSortOrder] = useState('newest');
     const [selectedRating, setSelectedRating] = useState(null);
 
@@ -35,6 +39,56 @@ export default function Profile() {
             }
         }
     }, []);
+
+    // Prevent background scroll and handle Escape key when image viewer OR edit modal is open
+    useEffect(() => {
+        const open = isImageOpen || isEditing;
+        const previousOverflow = document.body.style.overflow;
+        if (open) document.body.style.overflow = 'hidden';
+
+        const onKey = (e) => {
+            if (e.key === 'Escape') {
+                if (isImageOpen) setIsImageOpen(false);
+                if (isEditing) setIsEditing(false);
+            }
+        };
+
+        if (open) document.addEventListener('keydown', onKey);
+
+        return () => {
+            document.body.style.overflow = previousOverflow;
+            if (open) document.removeEventListener('keydown', onKey);
+        };
+    }, [isImageOpen, isEditing]);
+
+    // If the profile or preview image is an external SVG (e.g. DiceBear), try fetching
+    // and embedding it as a data URL so browsers render it reliably when CORS or headers
+    // cause the image to render invisible.
+    useEffect(() => {
+        let cancelled = false;
+
+        const shouldFetch = (url) => {
+            return typeof url === 'string' && url.includes('dicebear.com') && !url.startsWith('data:');
+        };
+
+        const fetchSvgToData = async (url, setter) => {
+            try {
+                const res = await fetch(url);
+                if (!res.ok) return;
+                const text = await res.text();
+                if (!text || !text.trim().startsWith('<svg')) return;
+                const data = `data:image/svg+xml;utf8,${encodeURIComponent(text)}`;
+                if (!cancelled) setter(data);
+            } catch (e) {
+                // ignore fetch errors, keep original URL
+            }
+        };
+
+        if (shouldFetch(profileImage)) fetchSvgToData(profileImage, setProfileImage);
+        if (shouldFetch(editImagePreview)) fetchSvgToData(editImagePreview, setEditImagePreview);
+
+        return () => { cancelled = true; };
+    }, [profileImage, editImagePreview]);
     
     // Listings data
     const listings = [
@@ -119,28 +173,62 @@ export default function Profile() {
     const maxCount = Math.max(...Object.values(ratingCounts), 1);
 
     return (
-        <div className="min-h-screen bg-gray-50">
-            <div className="max-w-7xl mx-auto pt-16">
-                {/* Banner */}
-                <div className="relative h-48 bg-gray-200 overflow-hidden">
-                    <img 
-                        src={banner} 
-                        alt="Profile Banner" 
-                        className="w-full h-full object-cover"
-                    />
+        <>
+            <style>{`
+                /* Global scrollbar for WebKit */
+                body::-webkit-scrollbar { width: 12px; }
+                body::-webkit-scrollbar-track { background: transparent; }
+                body::-webkit-scrollbar-thumb { background-color: rgba(148,163,184,0.18); border-radius: 9999px; border: 3px solid transparent; background-clip: padding-box; }
+                body::-webkit-scrollbar-thumb:hover { background-color: rgba(148,163,184,0.28); }
+
+                /* Modal / custom scroll area */
+                .custom-scroll::-webkit-scrollbar { width: 10px; }
+                .custom-scroll::-webkit-scrollbar-track { background: transparent; }
+                .custom-scroll::-webkit-scrollbar-thumb { background-color: rgba(148,163,184,0.14); border-radius: 9999px; }
+                .custom-scroll::-webkit-scrollbar-thumb:hover { background-color: rgba(148,163,184,0.24); }
+
+                /* Firefox support */
+                body { scrollbar-width: thin; scrollbar-color: rgba(148,163,184,0.18) transparent; }
+                .custom-scroll { scrollbar-width: thin; scrollbar-color: rgba(148,163,184,0.14) transparent; }
+            `}</style>
+
+            <div className="min-h-screen bg-white text-slate-900">
+                {/* Banner - full viewport width */}
+                <div className="relative w-full h-56 bg-gray-200 overflow-hidden">
+                    <button
+                        onClick={() => { setModalImageSrc ? setModalImageSrc(banner) : null; setIsImageOpen(true); }}
+                        className="w-full h-full p-0 m-0 block cursor-pointer"
+                        aria-label="Open banner"
+                    >
+                        <img
+                            src={banner}
+                            alt="Profile Banner"
+                            className="w-full h-full object-cover"
+                            onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = placeholderImage; }}
+                        />
+                    </button>
                 </div>
 
+                <div className="max-w-7xl mx-auto">
                 <div className="px-4 sm:px-6 lg:px-8">
                     {/* Profile Header */}
-                    <div className="bg-white rounded-lg shadow-md p-8 mb-8 -mt-12 relative z-10">
+                    <div className="bg-white rounded-lg shadow-lg p-2 sm:p-4 lg:p-6 mb-8 -mt-20 relative z-10 text-slate-900 border border-gray-200">
                         <div className="flex flex-col sm:flex-row items-center gap-6 justify-between">
                             <div className="flex flex-col sm:flex-row items-center gap-6">
                                 <div className="flex-shrink-0">
-                                    <img 
-                                        src={profileImage} 
-                                        alt="Profile" 
-                                        className="h-24 w-24 rounded-full border-4 border-blue-600 object-cover"
-                                    />
+                                    <button 
+                                        onClick={() => { setModalImageSrc(profileImage); setIsImageOpen(true); }}
+                                        className="h-24 w-24 rounded-full border-4 border-blue-600 overflow-hidden p-0 m-0 cursor-pointer transform transition-transform duration-200 hover:scale-105 active:scale-95"
+                                        aria-label="Open profile picture"
+                                    >
+                                        <img 
+                                            src={profileImage} 
+                                            alt="Profile" 
+                                            className="h-24 w-24 rounded-full object-cover"
+                                            onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = placeholderImage; }}
+                                            onLoad={(e) => { if (!e.currentTarget.naturalWidth || !e.currentTarget.naturalHeight) { e.currentTarget.src = placeholderImage; } }}
+                                        />
+                                    </button>
                                 </div>
                                 <div>
                                     <h1 className="text-3xl font-bold text-gray-900 mb-2">
@@ -165,13 +253,13 @@ export default function Profile() {
                                         </div>
                                         <span className="text-gray-700 font-semibold">{averageRating} ({reviews.length} reviews)</span>
                                     </div>
-                                    <p className="text-gray-600 mb-3">Member since 2024</p>
+                                    <p className="text-gray-500 mb-3">Member since 2024</p>
                                     <p className="text-gray-700 max-w-sm">{bio}</p>
                                 </div>
                             </div>
                             <button 
                                 onClick={() => setIsEditing(true)}
-                                className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors"
+                                className="bg-gradient-to-r from-sky-600 to-blue-600 hover:from-sky-700 hover:to-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors shadow-sm transform transition-transform duration-200 hover:scale-105 active:scale-95"
                             >
                                 Edit Profile
                             </button>
@@ -181,40 +269,21 @@ export default function Profile() {
                 {/* Listings Section */}
                 <div className="mb-12">
                     <h2 className="text-2xl font-bold text-gray-900 mb-6">My Listings</h2>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div className="flex flex-wrap gap-6">
                         {listings.map((listing) => (
-                            <div key={listing.id} className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
-                                <div className="h-48 bg-gray-200 overflow-hidden">
-                                    <img 
-                                        src={listing.image} 
-                                        alt={listing.title} 
-                                        className="w-full h-full object-cover"
-                                    />
-                                </div>
-                                <div className="p-4">
-                                    <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                                        {listing.title}
-                                    </h3>
-                                    <p className="text-blue-600 font-bold text-lg">
-                                        {listing.price}
-                                    </p>
-                                    <button className="w-full mt-4 bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 rounded-lg transition-colors">
-                                        View Details
-                                    </button>
-                                </div>
-                            </div>
+                            <ListingCard key={listing.id} item={listing} />
                         ))}
                     </div>
                 </div>
 
                 {/* Reviews Section */}
                 <div>
-                    <div className="flex justify-between items-center mb-6">
+                    <div className="flex justify-between items-center mb-4">
                         <h2 className="text-2xl font-bold text-gray-900">Reviews</h2>
                         <select 
                             value={sortOrder} 
                             onChange={(e) => setSortOrder(e.target.value)}
-                            className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                            className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm transform transition-transform duration-200 hover:scale-105 active:scale-95"
                         >
                             <option value="newest">Newest First</option>
                             <option value="worst-to-best">Worst to Best</option>
@@ -223,7 +292,7 @@ export default function Profile() {
                     </div>
                     
                     {/* Rating Statistics */}
-                    <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+                    <div className="bg-white rounded-lg shadow-md p-6 mb-6 border border-gray-200">
                         <div className="flex justify-between items-center mb-4">
                             <h3 className="text-lg font-semibold text-gray-900">Rating Distribution</h3>
                             {selectedRating !== null && (
@@ -243,24 +312,24 @@ export default function Profile() {
                                 return (
                                     <div 
                                         key={rating} 
-                                        onClick={() => setSelectedRating(rating)}
+                                        onClick={() => setSelectedRating(prev => prev === rating ? null : rating)}
                                         className={`flex items-center gap-3 cursor-pointer rounded-lg p-2 transition-colors ${
-                                            isSelected ? 'bg-blue-50 ring-2 ring-blue-500' : 'hover:bg-gray-50'
+                                            isSelected ? 'bg-blue-50 ring-2 ring-blue-400' : 'hover:bg-gray-50'
                                         }`}
                                     >
                                         <div className="flex items-center gap-1 w-16">
-                                            <span className="text-sm font-medium text-gray-700">{rating}</span>
-                                            <span className="text-yellow-400 text-sm">★</span>
+                                            <span className="text-sm font-medium text-gray-900">{rating}</span>
+                                            <span className="text-yellow-400 text-xl">★</span>
                                         </div>
                                         <div className="flex-1 bg-gray-200 rounded-full h-4 overflow-hidden">
-                                            <div 
+                                            <div
                                                 className={`h-full transition-all duration-300 ${
-                                                    isSelected ? 'bg-blue-500' : 'bg-yellow-400'
+                                                    isSelected ? 'bg-blue-400' : 'bg-yellow-400'
                                                 }`}
                                                 style={{ width: `${percentage}%` }}
                                             />
                                         </div>
-                                        <span className="text-sm font-medium text-gray-600 w-12 text-right">{count}</span>
+                                        <span className="text-sm font-medium text-gray-900 w-12 text-right">{count}</span>
                                     </div>
                                 );
                             })}
@@ -269,12 +338,12 @@ export default function Profile() {
 
                     <div className="space-y-4">
                         {sortedReviews.length === 0 ? (
-                            <div className="bg-white rounded-lg shadow-md p-12 text-center">
+                            <div className="bg-white rounded-lg shadow-md p-12 text-center border border-gray-200">
                                 <p className="text-gray-500 text-lg">There are currently no reviews</p>
                             </div>
                         ) : (
                             sortedReviews.map((review) => (
-                                <div key={review.id} className="bg-white rounded-lg shadow-md p-6">
+                                <div key={review.id} className="bg-white rounded-lg shadow-md p-6 border border-gray-200">
                                     <div className="flex justify-between items-start mb-3">
                                         <div>
                                             <h3 className="text-lg font-semibold text-gray-900">{review.reviewer}</h3>
@@ -299,29 +368,31 @@ export default function Profile() {
 
             {/* Edit Profile Modal */}
             {isEditing && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-                    <div className="bg-white rounded-lg shadow-lg w-full max-w-md max-h-[90vh] overflow-y-auto flex flex-col">
-                        <div className="flex justify-between items-center mb-6 p-8 pb-4">
-                            <h2 className="text-2xl font-bold text-gray-900">Edit Profile</h2>
+                <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4">
+                    <div className="bg-slate-800 rounded-lg shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto flex flex-col border border-sky-800 text-slate-100">
+                        <div className="flex justify-between items-center mb-6 p-6 pb-4">
+                            <h2 className="text-2xl font-bold text-sky-100">Edit Profile</h2>
                             <button 
                                 onClick={handleCancel}
-                                className="text-gray-500 hover:text-gray-700"
+                                className="text-slate-300 hover:text-slate-100"
                             >
                                 <X size={24} />
                             </button>
                         </div>
 
-                        <div className="overflow-y-auto flex-1 px-8">
+                        <div className="overflow-y-auto flex-1 px-6 custom-scroll">
 
                         {/* Profile Picture Preview */}
                         <div className="mb-6 text-center">
                             <img 
                                 src={editImagePreview} 
                                 alt="Profile Preview" 
-                                className="h-32 w-32 rounded-full border-4 border-blue-600 object-cover mx-auto mb-4"
+                                className="h-32 w-32 rounded-full border-4 border-sky-600 object-cover mx-auto mb-4"
+                                onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = placeholderImage; }}
+                                onLoad={(e) => { if (!e.currentTarget.naturalWidth || !e.currentTarget.naturalHeight) { e.currentTarget.src = placeholderImage; } }}
                             />
                             <label className="block">
-                                <span className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg cursor-pointer transition-colors inline-block">
+                                <span className="bg-gradient-to-r from-sky-600 to-blue-600 hover:from-sky-700 hover:to-blue-700 text-white font-medium py-2 px-4 rounded-lg cursor-pointer transition-colors inline-block">
                                     Change Picture
                                 </span>
                                 <input 
@@ -338,10 +409,10 @@ export default function Profile() {
                             <img 
                                 src={editBanner} 
                                 alt="Banner Preview" 
-                                className="w-full h-24 object-cover rounded-lg mb-4"
+                                className="w-full h-20 object-cover rounded-lg mb-4"
                             />
                             <label className="block">
-                                <span className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg cursor-pointer transition-colors inline-block">
+                                <span className="bg-gradient-to-r from-sky-600 to-blue-600 hover:from-sky-700 hover:to-blue-700 text-white font-medium py-2 px-4 rounded-lg cursor-pointer transition-colors inline-block">
                                     Change Banner
                                 </span>
                                 <input 
@@ -355,27 +426,27 @@ export default function Profile() {
 
                         {/* Name Input */}
                         <div className="mb-6">
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                            <label className="block text-sm font-medium text-slate-300 mb-2">
                                 Name
                             </label>
                             <input 
                                 type="text"
                                 value={editName}
                                 onChange={(e) => setEditName(e.target.value)}
-                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600"
+                                className="w-full px-4 py-2 bg-slate-700 border border-sky-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-400 text-slate-100"
                                 placeholder="Enter your name"
                             />
                         </div>
 
                         {/* Bio Input */}
                         <div className="mb-6">
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                            <label className="block text-sm font-medium text-slate-300 mb-2">
                                 Bio
                             </label>
                             <textarea 
                                 value={editBio}
                                 onChange={(e) => setEditBio(e.target.value)}
-                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 resize-none"
+                                className="w-full px-4 py-2 bg-slate-700 border border-sky-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-400 resize-none text-slate-100"
                                 placeholder="Tell us about yourself"
                                 rows="4"
                             />
@@ -383,16 +454,16 @@ export default function Profile() {
                         </div>
 
                         {/* Action Buttons */}
-                        <div className="flex gap-4 p-8 pt-6 border-t bg-white sticky bottom-0">
+                        <div className="flex gap-4 p-6 pt-4 border-t bg-slate-900 sticky bottom-0">
                             <button 
                                 onClick={handleCancel}
-                                className="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-900 font-medium py-2 rounded-lg transition-colors"
+                                className="flex-1 bg-slate-700 hover:bg-slate-600 text-slate-100 font-medium py-2 rounded-lg transition-colors"
                             >
                                 Cancel
                             </button>
                             <button 
                                 onClick={handleSaveProfile}
-                                className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 rounded-lg transition-colors"
+                                className="flex-1 bg-gradient-to-r from-sky-600 to-blue-600 hover:from-sky-700 hover:to-blue-700 text-white font-medium py-2 rounded-lg transition-colors"
                             >
                                 Save Changes
                             </button>
@@ -400,6 +471,39 @@ export default function Profile() {
                     </div>
                 </div>
             )}
-        </div>
+
+            {/* Image Viewer Modal */}
+            {isImageOpen && (
+                <div
+                    className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50 p-4"
+                    onClick={() => setIsImageOpen(false)}
+                    role="dialog"
+                    aria-modal="true"
+                >
+                    <button
+                        onClick={() => setIsImageOpen(false)}
+                        className="absolute top-6 right-6 z-60 bg-slate-800 rounded-full p-2 text-slate-100 hover:text-white shadow-lg"
+                        aria-label="Close image"
+                    >
+                        <X size={20} />
+                    </button>
+
+                    <div className="relative max-w-[90vw] max-h-[90vh]" onClick={(e) => e.stopPropagation()}>
+                        <div className="bg-slate-900 p-2 rounded-lg flex items-center justify-center">
+                            <div style={{ width: 'min(80vw, 80vh)', height: 'min(80vw, 80vh)' }} className="rounded-lg overflow-hidden bg-white shadow-sm">
+                                <img
+                                    src={modalImageSrc || profileImage}
+                                    alt="Profile Large"
+                                    className="w-full h-full object-cover block"
+                                    onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = placeholderImage; }}
+                                    onLoad={(e) => { if (!e.currentTarget.naturalWidth || !e.currentTarget.naturalHeight) { e.currentTarget.src = placeholderImage; } }}
+                                />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+            </div>
+        </>
     );
 }
