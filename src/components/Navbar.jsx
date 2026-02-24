@@ -6,9 +6,9 @@ export default function Navbar() {
     const [mobileMenuOpen, setMobileMenuIsOpen] = useState(false);
     return <nav className="fixed top-0 w-full bg-white backdrop-blur-sm z-50 transition-all duration-400">
            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"> 
-                <div className="flex items-center justify-between h-24 sm:h-28 md:h-28"> 
+                <div className="flex items-center justify-between h-32 sm:h-40 md:h-48"> 
                     <div className="flex items-center group cursor-pointer">
-                        <img src="/logo2.png" alt="logo" className="h-20 w-20 sm:h-24 sm:w-24 md:h-28 md:w-28 object-contain"/>
+                        <img src="/logo2.png" alt="logo" className="h-28 w-28 sm:h-36 sm:w-36 md:h-44 md:w-44 object-contain"/>
                     </div>
                     <div className="hidden md:flex items-center space-x-6 lg:space-x-8">
                         <Link to="/create_listing" className="text-gray-600 hover:text-gray-300 text-sm lg:text-base font-medium">
