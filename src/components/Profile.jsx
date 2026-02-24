@@ -192,27 +192,27 @@ export default function Profile() {
                 .custom-scroll { scrollbar-width: thin; scrollbar-color: rgba(148,163,184,0.14) transparent; }
             `}</style>
 
-            <div className="min-h-screen bg-gradient-to-b from-sky-900 via-slate-900 to-slate-800 text-slate-100">
-                <div className="max-w-7xl mx-auto pt-0">
-                {/* Banner */}
-                <div className="relative h-56 bg-gray-200 overflow-hidden">
+            <div className="min-h-screen bg-white text-slate-900">
+                {/* Banner - full viewport width */}
+                <div className="relative w-full h-56 bg-gray-200 overflow-hidden">
                     <button
                         onClick={() => { setModalImageSrc ? setModalImageSrc(banner) : null; setIsImageOpen(true); }}
                         className="w-full h-full p-0 m-0 block cursor-pointer"
                         aria-label="Open banner"
                     >
-                        <img 
-                            src={banner} 
-                            alt="Profile Banner" 
+                        <img
+                            src={banner}
+                            alt="Profile Banner"
                             className="w-full h-full object-cover"
                             onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = placeholderImage; }}
                         />
                     </button>
                 </div>
 
+                <div className="max-w-7xl mx-auto">
                 <div className="px-4 sm:px-6 lg:px-8">
                     {/* Profile Header */}
-                    <div className="bg-slate-800 rounded-lg shadow-lg p-6 mb-8 -mt-20 relative z-10 text-slate-100 border border-sky-800">
+                    <div className="bg-white rounded-lg shadow-lg p-2 sm:p-4 lg:p-6 mb-8 -mt-20 relative z-10 text-slate-900 border border-gray-200">
                         <div className="flex flex-col sm:flex-row items-center gap-6 justify-between">
                             <div className="flex flex-col sm:flex-row items-center gap-6">
                                 <div className="flex-shrink-0">
@@ -231,7 +231,7 @@ export default function Profile() {
                                     </button>
                                 </div>
                                 <div>
-                                    <h1 className="text-3xl font-bold text-sky-100 mb-2">
+                                    <h1 className="text-3xl font-bold text-gray-900 mb-2">
                                         {username}
                                     </h1>
                                     <div className="flex items-center gap-2 mb-3">
@@ -251,10 +251,10 @@ export default function Profile() {
                                                 );
                                             })}
                                         </div>
-                                        <span className="text-slate-200 font-semibold">{averageRating} ({reviews.length} reviews)</span>
+                                        <span className="text-gray-700 font-semibold">{averageRating} ({reviews.length} reviews)</span>
                                     </div>
-                                    <p className="text-slate-300 mb-3">Member since 2024</p>
-                                    <p className="text-slate-200 max-w-sm">{bio}</p>
+                                    <p className="text-gray-500 mb-3">Member since 2024</p>
+                                    <p className="text-gray-700 max-w-sm">{bio}</p>
                                 </div>
                             </div>
                             <button 
@@ -268,7 +268,7 @@ export default function Profile() {
 
                 {/* Listings Section */}
                 <div className="mb-12">
-                    <h2 className="text-2xl font-bold text-sky-200 mb-6">My Listings</h2>
+                    <h2 className="text-2xl font-bold text-gray-900 mb-6">My Listings</h2>
                     <div className="flex flex-wrap gap-6">
                         {listings.map((listing) => (
                             <ListingCard key={listing.id} item={listing} />
@@ -279,7 +279,7 @@ export default function Profile() {
                 {/* Reviews Section */}
                 <div>
                     <div className="flex justify-between items-center mb-4">
-                        <h2 className="text-2xl font-bold text-sky-200">Reviews</h2>
+                        <h2 className="text-2xl font-bold text-gray-900">Reviews</h2>
                         <select 
                             value={sortOrder} 
                             onChange={(e) => setSortOrder(e.target.value)}
@@ -292,9 +292,9 @@ export default function Profile() {
                     </div>
                     
                     {/* Rating Statistics */}
-                    <div className="bg-slate-800 rounded-lg shadow-md p-6 mb-6 border border-sky-800">
+                    <div className="bg-white rounded-lg shadow-md p-6 mb-6 border border-gray-200">
                         <div className="flex justify-between items-center mb-4">
-                            <h3 className="text-lg font-semibold text-sky-200">Rating Distribution</h3>
+                            <h3 className="text-lg font-semibold text-gray-900">Rating Distribution</h3>
                             {selectedRating !== null && (
                                 <button 
                                     onClick={() => setSelectedRating(null)}
@@ -314,22 +314,22 @@ export default function Profile() {
                                         key={rating} 
                                         onClick={() => setSelectedRating(prev => prev === rating ? null : rating)}
                                         className={`flex items-center gap-3 cursor-pointer rounded-lg p-2 transition-colors ${
-                                            isSelected ? 'bg-sky-700/20 ring-2 ring-sky-500' : 'hover:bg-slate-700/50'
+                                            isSelected ? 'bg-blue-50 ring-2 ring-blue-400' : 'hover:bg-gray-50'
                                         }`}
                                     >
                                         <div className="flex items-center gap-1 w-16">
-                                            <span className="text-sm font-medium text-slate-100">{rating}</span>
-                                            <span className="text-yellow-400 text-sm">★</span>
+                                            <span className="text-sm font-medium text-gray-900">{rating}</span>
+                                            <span className="text-yellow-400 text-xl">★</span>
                                         </div>
-                                        <div className="flex-1 bg-slate-700 rounded-full h-4 overflow-hidden">
-                                            <div 
+                                        <div className="flex-1 bg-gray-200 rounded-full h-4 overflow-hidden">
+                                            <div
                                                 className={`h-full transition-all duration-300 ${
-                                                    isSelected ? 'bg-sky-500' : 'bg-yellow-400'
+                                                    isSelected ? 'bg-blue-400' : 'bg-yellow-400'
                                                 }`}
                                                 style={{ width: `${percentage}%` }}
                                             />
                                         </div>
-                                        <span className="text-sm font-medium text-slate-100 w-12 text-right">{count}</span>
+                                        <span className="text-sm font-medium text-gray-900 w-12 text-right">{count}</span>
                                     </div>
                                 );
                             })}
@@ -338,26 +338,26 @@ export default function Profile() {
 
                     <div className="space-y-4">
                         {sortedReviews.length === 0 ? (
-                            <div className="bg-slate-800 rounded-lg shadow-md p-12 text-center border border-sky-800">
-                                <p className="text-slate-300 text-lg">There are currently no reviews</p>
+                            <div className="bg-white rounded-lg shadow-md p-12 text-center border border-gray-200">
+                                <p className="text-gray-500 text-lg">There are currently no reviews</p>
                             </div>
                         ) : (
                             sortedReviews.map((review) => (
-                                <div key={review.id} className="bg-slate-800 rounded-lg shadow-md p-6 border border-sky-800">
+                                <div key={review.id} className="bg-white rounded-lg shadow-md p-6 border border-gray-200">
                                     <div className="flex justify-between items-start mb-3">
                                         <div>
-                                            <h3 className="text-lg font-semibold text-sky-100">{review.reviewer}</h3>
-                                            <p className="text-sm text-slate-400">{review.date}</p>
+                                            <h3 className="text-lg font-semibold text-gray-900">{review.reviewer}</h3>
+                                            <p className="text-sm text-gray-500">{review.date}</p>
                                         </div>
                                         <div className="flex items-center gap-1">
                                             {[...Array(5)].map((_, i) => (
-                                                <span key={i} className={i < review.rating ? "text-yellow-400" : "text-slate-600"}>
+                                                <span key={i} className={i < review.rating ? "text-yellow-400" : "text-gray-300"}>
                                                     ★
                                                 </span>
                                             ))}
                                         </div>
                                     </div>
-                                    <p className="text-slate-200">{review.comment}</p>
+                                    <p className="text-gray-700">{review.comment}</p>
                                 </div>
                             ))
                         )}
