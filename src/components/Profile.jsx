@@ -119,8 +119,8 @@ export default function Profile() {
     const maxCount = Math.max(...Object.values(ratingCounts), 1);
 
     return (
-        <div className="min-h-screen bg-gray-50">
-            <div className="max-w-7xl mx-auto pt-16">
+        <div className="min-h-screen bg-gray-50 pb-6">
+            <div className="max-w-7xl mx-auto">
                 {/* Banner */}
                 <div className="relative h-48 bg-gray-200 overflow-hidden">
                     <img 
@@ -130,7 +130,7 @@ export default function Profile() {
                     />
                 </div>
 
-                <div className="px-4 sm:px-6 lg:px-8">
+                <div className="px-6 sm:px-6 lg:px-8">
                     {/* Profile Header */}
                     <div className="bg-white rounded-lg shadow-md p-8 mb-8 -mt-12 relative z-10">
                         <div className="flex flex-col sm:flex-row items-center gap-6 justify-between">

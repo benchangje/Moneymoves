@@ -20,7 +20,7 @@ export default function Navbar({ onLinkClick }) {
                             <span className="group text-3xl lg:text-3xl font-bold hover:text-gray-300 transition-all duration-200">
                                 <Link to="/" className="group flex gap-1 text-2xl lg:text-3xl font-bold transition-all duration-150 ease-in-out active:scale-99 inline-flex" onClick={() => handleLinkClick()}>
                                     <span className="flex text-gray-600 group-hover:text-gray-300 transition-colors items-center gap-1"> 
-                                        <div className="sm:w-42 sm:h-16 w-32 h-14 overflow-hidden bg-white flex items-center justify-center hover:scale-101 hover:opacity-50 transition-all duration-300 rounded-lg pt-2">
+                                        <div className="sm:w-36 sm:h-16 w-32 h-14 overflow-hidden bg-white flex items-center justify-center hover:scale-101 hover:opacity-50 transition-all duration-300 rounded-lg pt-2">
                                             <img src="/rentlalogonew.jpg" className=""/>
                                         </div>
                                     </span>
