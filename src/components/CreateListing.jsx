@@ -1,4 +1,4 @@
-import { ChevronDown, ChevronRight, Plug2, Shirt, Handbag, CalendarDays } from "lucide-react";
+import { ChevronDown, ChevronRight, Plug2, Shirt, Handbag, CalendarDays, MapPinPen } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 import ImageDropzone from "./ImageDropzone";
 import Confetti from "react-confetti";
@@ -26,8 +26,22 @@ export default function CreateListing() {
     const lendingRef = useRef(null);
 
     const [price, setPrice] = useState("");
-
+    const [deposit, setDeposit] = useState("");
     const [description, setDescription] = useState("");
+
+    const existingLocations = [
+        "COM1 Level 2 (SoC)",
+        "UTown Starbucks",
+        "Central Library Forum"
+    ];
+
+    const [locationIsOpen, setLocationIsOpen] = useState(false);
+    const [selectedLocationOption, setSelectedLocationOption] = useState('Select a meet-up location');
+    const locationRef = useRef(null);
+
+    const isLocationValid = selectedLocationOption.trim() !== "";
+
+    const finalLocation = selectedLocationOption;
 
     const isFormValid = 
         listingTitle.trim() !== "" &&
@@ -35,9 +49,13 @@ export default function CreateListing() {
         imageFile && imageFile.length > 0 &&
         selectedLendingInterval !== "Lending interval" &&
         price.trim() !== "" &&
-        description.trim() !== "";
+        deposit.trim() !== "" &&
+        description.trim() !== "" &&
+        isLocationValid;
 
     const [submit, setSubmit] = useState(false);
+
+    const [isUploading, setIsUploading] = useState(false);
 
     // This translates the image file into a Base64 text string
     const fileToBase64 = (file) => {
@@ -51,30 +69,53 @@ export default function CreateListing() {
 
     const handleUpload = async (e) => {
         e.preventDefault(); 
+        setIsUploading(true);
+
+        try {
+        // 1. Loop through ALL uploaded images and convert them to Base64
+        // Promise.all ensures we wait for every single image to finish converting before moving on
+        const processedImages = await Promise.all(
+            imageFile.map(async (file) => {
+                const base64String = await fileToBase64(file);
+                return {
+                    name: file.name,
+                    mimeType: file.type,
+                    base64: base64String
+                };
+            })
+        );
         
-        // 1. Packaging all states into a FormData object
+        // 2. Packaging all states into a FormData object
         const formData = new FormData();
         formData.append("title", listingTitle);
         formData.append("category", selectedCategory);
         formData.append("interval", selectedLendingInterval);
         formData.append("price", price);
+        formData.append("deposit", deposit);
+        formData.append("location", finalLocation);
         formData.append("description", description);
 
-        try {
-            await fetch("https://script.google.com/macros/s/AKfycby7owvdgvKQklhhqhXIuQrxATRlB0OGS9wUc872jfZ_OszT-ddCHEYxxhty-AWGKs7n1w/exec", {
-                method: "POST",
-                body: formData,
-                mode: "no-cors" // To stop the browser from blocking the request
-            });
-            
-            // Trigger the confetti and success screen only AFTER the data sends
-            setSubmit(true);
-            
-            } catch (error) {
-                console.error("Error saving to Google Sheets:", error);
-                alert("Something went wrong! Please try again.");
-                }
-        };
+        // 3. Append the processed images as a JSON string
+        formData.append("images", JSON.stringify(processedImages));
+
+        // 4. Send the POST request to the Google Apps Script endpoint
+        await fetch("https://script.google.com/macros/s/AKfycbwL5usnGqzMPuZycFp7jhPwwGCfcECWu_BQ12Eem6_HLfCH9AAPJg2OFjfKxiGUQv--sw/exec", {
+            method: "POST",
+            body: formData,
+            mode: "no-cors" 
+        });
+
+        // 5. Show the confetti and success message
+        setSubmit(true);
+
+        // Catch errors
+        } catch (error) {
+            console.error("Error saving data:", error);
+            alert("There was an issue uploading your images. Please try again.");
+        } finally {
+            setIsUploading(false); 
+        }
+    };
 
     //CLICK OUTSIDE LOGIC FOR DROPDOWNS
     useEffect(() => {
@@ -85,6 +126,9 @@ export default function CreateListing() {
             if (lendingRef.current && !lendingRef.current.contains(event.target)) {
                 setLendingIntervalIsOpen(false);
             }
+            if (locationRef.current && !locationRef.current.contains(event.target)) {
+                setLocationIsOpen(false);
+            }
         }
         document.addEventListener("mousedown", handleClickOutside);
         return () => {
@@ -92,12 +136,12 @@ export default function CreateListing() {
         };}, []);
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-green-300 to-blue-300 p-8">
+        <div className="min-h-screen bg-white p-4 sm:p-6 lg:p-8">
             <div className="max-w-7xl mx-auto">
-                <h1 className="text-3xl font-semibold mb-6">
+                <h1 className="text-3xl pl-2 sm:pl-4 lg:pl-6 text-gray-600 font-semibold mb-2">
                     Create Listing
                 </h1>
-                <div className="bg-white shadow-md rounded-3xl p-8 sm:p-8 lg:p-10">
+                <div className="bg-white rounded-3xl p-2 sm:p-4 lg:p-6">
                 <form onSubmit={handleUpload} className="w-full">
                     {/*TITLE INPUT*/}
                     <div className="pb-6 hover:scale-101 transition-all duration-400 ease-out">
@@ -123,13 +167,13 @@ export default function CreateListing() {
                                 {selectedCategory !== "Select a category" && (() => {
                                     const activeItem = categories.find(pair => pair.label === selectedCategory);
                                     const ActiveIcon = activeItem ? activeItem.icon : null;
-                                    return ActiveIcon ? <ActiveIcon className={`w-5 h-5 sm:h-5 sm:w-5 ${categoryIsOpen ? "text-black" : "text-gray-500"}`} /> : null;
+                                    return ActiveIcon ? <ActiveIcon className={`w-5 h-5 sm:h-5 sm:w-5 ${categoryIsOpen ? "text-gray-700" : "text-gray-500"}`} /> : null;
                                 })()}
-                                <div className={`${categoryIsOpen ? "text-black" : "text-gray-500"}`}>
+                                <div className={`${categoryIsOpen ? "text-gray-700" : "text-gray-500"}`}>
                                     {selectedCategory}
                                 </div>
                             </div>
-                            {categoryIsOpen ? (<ChevronDown className="h-5 w-5 sm:h-6 sm:w-6 text-black"/>) : (<ChevronRight className="h-5 w-5 sm:h-6 sm:w-6 text-gray-500"/>)}
+                            {categoryIsOpen ? (<ChevronDown className="h-5 w-5 sm:h-6 sm:w-6 text-gray-700"/>) : (<ChevronRight className="h-5 w-5 sm:h-6 sm:w-6 text-gray-500"/>)}
                         </button>
                         <div className={`absolute top-full left-0  w-full mt-2 bg-gray-200 rounded-2xl font-medium overflow-hidden transition-all shadow-md duration-400 ease-out
                             ${categoryIsOpen ? "opacity-100 translate-y-0 pointer-events-auto" : "opacity-0 -translate-y-2 pointer-events-none"}`}>
@@ -142,7 +186,7 @@ export default function CreateListing() {
                                                 setSelectedCategory(category.label); 
                                                 setCategoryIsOpen(false);              
                                             }}
-                                            className="w-full text-left px-4 py-3 text-gray-500 hover:bg-gray-50 hover:text-black transition-colors">
+                                            className="w-full text-left px-4 py-3 text-gray-500 hover:bg-gray-50 hover:text-gray-700 transition-colors">
                                             {category.label}
                                         </button>
                                     </li>
@@ -167,12 +211,12 @@ export default function CreateListing() {
                                 onClick={() => setLendingIntervalIsOpen(!lendingIntervalIsOpen)}
                             >
                                 <div className="flex items-center justify-start space-x-4">
-                                    <CalendarDays className={`w-5 h-5 sm:h-5 sm:w-5 ${lendingIntervalIsOpen ? "text-black" : "text-gray-500"}`} />
-                                    <div className={`${lendingIntervalIsOpen ? "text-black" : "text-gray-500"}`}>
+                                    <CalendarDays className={`w-5 h-5 sm:h-5 sm:w-5 ${lendingIntervalIsOpen ? "text-gray-700" : "text-gray-500"}`} />
+                                    <div className={`${lendingIntervalIsOpen ? "text-gray-700" : "text-gray-500"}`}>
                                         {selectedLendingInterval}
                                     </div>
                                 </div>
-                                {lendingIntervalIsOpen ? (<ChevronDown className="h-5 w-5 sm:h-6 sm:w-6 text-black"/>) : (<ChevronRight className="h-5 w-5 sm:h-6 sm:w-6 text-gray-500"/>)}
+                                {lendingIntervalIsOpen ? (<ChevronDown className="h-5 w-5 sm:h-6 sm:w-6 text-gray-700"/>) : (<ChevronRight className="h-5 w-5 sm:h-6 sm:w-6 text-gray-500"/>)}
                             </button>
                             <div className={`absolute top-full left-0 z-10 w-full mt-2 bg-gray-200 rounded-2xl font-medium overflow-hidden transition-all shadow-md duration-400 
                                 ${lendingIntervalIsOpen ? "opacity-100 translate-y-0 pointer-events-auto" : "opacity-0 -translate-y-2 pointer-events-none"}`}>
@@ -185,7 +229,7 @@ export default function CreateListing() {
                                                     setSelectedLendingInterval(interval); 
                                                     setLendingIntervalIsOpen(false);              
                                                 }}
-                                                className="w-full text-left px-4 py-3 text-gray-500 hover:bg-gray-50 hover:text-black transition-colors">
+                                                className="w-full text-left px-4 py-3 text-gray-500 hover:bg-gray-50 hover:text-gray-700 transition-colors">
                                                 {interval}
                                             </button>
                                         </li>
@@ -206,10 +250,64 @@ export default function CreateListing() {
                             onChange={(e) => setPrice(e.target.value)}
                             placeholder={`Rental price per ${selectedLendingInterval === "Lending interval" ? "Day" : selectedLendingInterval}`}
                             onBlur={(e) => e.target.placeholder = `Rental price per ${selectedLendingInterval === "Lending interval" ? "Day" : selectedLendingInterval}`}
-                            onFocus={(e) => e.target.placeholder = `Enter the rental price per ${selectedLendingInterval === "Lending interval" ? "Day" : selectedLendingInterval} for your listing`}
+                            onFocus={(e) => e.target.placeholder = `Enter a rental price per ${selectedLendingInterval === "Lending interval" ? "Day" : selectedLendingInterval} for your listing`}
                             onKeyDown={(e) => ["e", "E", "+", "-"].includes(e.key) && e.preventDefault()}
                             className="w-full bg-gray-200 rounded-2xl px-14 py-3 text-base text-gray-500 font-medium placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 hover:bg-gray-300 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                         />
+                    </div>
+
+                    {/*DEPOSIT AMOUNT*/}
+                    <div className="w-full mt-6 hover:scale-101 transition-all duration-400 ease-out">
+                        <span className="absolute ml-5 mt-3 text-gray-500 text-base font-medium">
+                            S$
+                        </span>
+                        <input
+                            type="number"
+                            value={deposit}
+                            onChange={(e) => setDeposit(e.target.value)}
+                            placeholder={`Deposit amount`}
+                            onBlur={(e) => e.target.placeholder = `Deposit amount`}
+                            onFocus={(e) => e.target.placeholder = `Enter a deposit amount for your listing`}
+                            onKeyDown={(e) => ["e", "E", "+", "-"].includes(e.key) && e.preventDefault()}
+                            className="w-full bg-gray-200 rounded-2xl px-14 py-3 text-base text-gray-500 font-medium placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 hover:bg-gray-300 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                        />
+                    </div>
+
+                    {/*MEET-UP LOCATION DROPDOWN*/}
+                    <div className="w-full flex-col space-x-8">
+                        <div className="relative hover:scale-101 transition-all duration-400 ease-out z-10 text-gray-600 mt-6 font-medium text-base" ref={locationRef}>
+                            <button 
+                                type="button" 
+                                className={`w-full flex items-center justify-between bg-gray-200 rounded-2xl px-4 py-3 text-base font-medium text-gray-500 hover:bg-gray-300 transition-all duration-400 ease-out`} 
+                                onClick={() => setLocationIsOpen(!locationIsOpen)}
+                            >
+                                <div className="flex items-center justify-start space-x-4">
+                                    <MapPinPen className={`w-5 h-5 sm:h-5 sm:w-5 ${locationIsOpen ? "text-gray-700" : "text-gray-500"}`} />
+                                    <div className={`${locationIsOpen ? "text-gray-700" : "text-gray-500"}`}>
+                                        {selectedLocationOption}
+                                    </div>
+                                </div>
+                                {locationIsOpen ? (<ChevronDown className="h-5 w-5 sm:h-6 sm:w-6 text-gray-700"/>) : (<ChevronRight className="h-5 w-5 sm:h-6 sm:w-6 text-gray-500"/>)}
+                            </button>
+                        <div className={`absolute top-full left-0 z-10 w-full mt-2 bg-gray-200 rounded-2xl font-medium overflow-hidden transition-all shadow-md duration-400 
+                                ${locationIsOpen ? "opacity-100 translate-y-0 pointer-events-auto" : "opacity-0 -translate-y-2 pointer-events-none"}`}>
+                                <ul className="flex flex-col">
+                                    {existingLocations.map((interval) => (
+                                        <li key={interval}>
+                                            <button
+                                                type="button"
+                                                onClick={() => {
+                                                    setSelectedLocationOption(interval); 
+                                                    setLocationIsOpen(false);              
+                                                }}
+                                                className="w-full text-left px-4 py-3 text-gray-500 hover:bg-gray-50 hover:text-gray-700 transition-colors">
+                                                {interval}
+                                            </button>
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
+                        </div>
                     </div>
 
                     {/*ITEM DESCRIPTION INPUT*/}
@@ -221,24 +319,24 @@ export default function CreateListing() {
                             maxLength={2000}
                             onBlur={(e) => e.target.placeholder = "Item description"}
                             onFocus={(e) => e.target.placeholder = "Enter a description for your listing"}
-                            className="w-full bg-gray-200 rounded-2xl px-5 py-3 text-base text-gray-500 font-medium placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 hover:bg-gray-300 resize-none h-32"
+                            className="w-full block bg-gray-200 rounded-2xl px-5 py-3 text-base text-gray-500 font-medium placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 hover:bg-gray-300 resize-none h-48"
                         />
                     </div>
-
+                        
                     {/*UPLOAD LISTING BUTTON*/}
                     <div className="w-full mt-6 hover:scale-101 transition-all duration-400 ease-out">
                         <button 
-                            disabled={!isFormValid}
+                            disabled={!isFormValid || isUploading}
                             type="submit"
-                            className={`w-full ${isFormValid ? "bg-blue-500 hover:bg-blue-400" : "bg-gray-400 cursor-not-allowed"} text-white font-medium p-3 rounded-2xl transition-colors`}
+                            className={`w-full ${isFormValid && !isUploading ? "bg-blue-500 hover:bg-blue-400" : "bg-gray-400 cursor-not-allowed"} text-white font-medium px-5 py-3 rounded-2xl transition-colors`}
                         >
-                            Upload Listing
+                            {isUploading ? "Uploading..." : "Upload Listing"}
                         </button>
                     </div>
                     </form>
 
                     {submit &&
-                        <div className="fixed inset-0 h-full z-40 flex flex-col items-center justify-center bg-white/40 backdrop-blur-sm transition-all duration-400">
+                        <div className="fixed inset-0 w-full h-full z-40 flex flex-col items-center justify-center bg-white/40 backdrop-blur-sm transition-all duration-400">
                             <Confetti 
                                 recycle={false} 
                                 numberOfPieces={300} 
