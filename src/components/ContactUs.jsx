@@ -53,23 +53,23 @@ export default function ContactUs() {
 
     return (
         <div className="bg-gray-50 min-h-screen">
-            <div className="max-w-6xl mx-auto px-6 pt-16 pb-12">
+            <div className="max-w-6xl mx-auto p-6 sm:p-6 lg:p-8">
                 <div className="mb-6 flex items-center justify-between gap-4">
-                    <div>
+                    <div className="max-w-xl px-2">
                         <h1 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-3">Get in Touch</h1>
                         <p className="text-gray-600 mt-3 max-w-xl leading-relaxed">Need help with a listing, partnership, or time-sensitive issue?
                         Our team typically responds within 24 hours — and within 8 hours for urgent requests.</p>
                     </div>
 
-                    <div className="flex items-center gap-4">
-                        <label className="flex items-center space-x-3">
+                    <div className="flex items-center gap-2">
+                        <label className="flex items-center">
                             <span className="text-sm text-gray-700">Contact Urgently</span>
                             <button
                                 type="button"
                                 role="switch"
                                 aria-checked={urgent}
                                 onClick={() => setUrgent((v) => !v)}
-                                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 ${urgent ? 'bg-blue-600' : 'bg-gray-300'}`}
+                                className={`relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition-colors focus:outline-none ${urgent ? 'bg-blue-600' : 'bg-gray-300'}`}
                                 aria-label="Contact urgently toggle"
                             >
                                 <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${urgent ? 'translate-x-6' : 'translate-x-1'}`} />
@@ -80,7 +80,7 @@ export default function ContactUs() {
 
                 {/* Compact priority panel shown under the header when urgent is ON */}
                 {urgent && (
-                    <div className="mt-8 mb-6">
+                    <div className="mt-6 mb-6">
                         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                             <a href="mailto:support@example.com" className="group flex items-center gap-3 rounded-xl bg-white shadow-sm p-3 transform transition hover:scale-[1.02]">
                                 <svg className="h-6 w-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 12H8m0 0l4-4m-4 4l4 4"></path></svg>
@@ -111,7 +111,7 @@ export default function ContactUs() {
 
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-start">
                     <div className="bg-white rounded-2xl shadow-xl p-8">
-                        <p className="text-sm text-gray-500">{urgent ? 'You are requesting priority support — use this for urgent issues only.' : 'Fill out the form and we’ll respond within 24 hours.'}</p>
+                        <p className="text-sm text-gray-500">{urgent ? 'You are requesting priority support — use this for urgent issues only.' : 'Fill out the form and we will respond within 24 hours.'}</p>
 
                         {submitted && (
                             <div className="mt-6 rounded-lg bg-emerald-50 border border-emerald-100 p-4 text-emerald-700" role="status" aria-live="polite">

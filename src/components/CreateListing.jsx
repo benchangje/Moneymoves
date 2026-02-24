@@ -91,8 +91,8 @@ export default function CreateListing() {
         formData.append("category", selectedCategory);
         formData.append("interval", selectedLendingInterval);
         formData.append("price", price);
-        formData.append("deposit", deposit);
         formData.append("location", finalLocation);
+        formData.append("deposit", deposit);
         formData.append("description", description);
 
         // 3. Append the processed images as a JSON string
@@ -136,9 +136,9 @@ export default function CreateListing() {
         };}, []);
 
     return (
-        <div className="min-h-screen bg-white p-4 sm:p-6 lg:p-8">
+        <div className="min-h-screen bg-white p-6 sm:p-6 lg:p-8">
             <div className="max-w-7xl mx-auto">
-                <h1 className="text-3xl pl-2 sm:pl-4 lg:pl-6 text-gray-600 font-semibold mb-2">
+                <h1 className="text-3xl px-2 sm:px-4 lg:px-6 text-gray-900 font-semibold mb-2">
                     Create Listing
                 </h1>
                 <div className="bg-white rounded-3xl p-2 sm:p-4 lg:p-6">
@@ -256,23 +256,6 @@ export default function CreateListing() {
                         />
                     </div>
 
-                    {/*DEPOSIT AMOUNT*/}
-                    <div className="w-full mt-6 hover:scale-101 transition-all duration-400 ease-out">
-                        <span className="absolute ml-5 mt-3 text-gray-500 text-base font-medium">
-                            S$
-                        </span>
-                        <input
-                            type="number"
-                            value={deposit}
-                            onChange={(e) => setDeposit(e.target.value)}
-                            placeholder={`Deposit amount`}
-                            onBlur={(e) => e.target.placeholder = `Deposit amount`}
-                            onFocus={(e) => e.target.placeholder = `Enter a deposit amount for your listing`}
-                            onKeyDown={(e) => ["e", "E", "+", "-"].includes(e.key) && e.preventDefault()}
-                            className="w-full bg-gray-200 rounded-2xl px-14 py-3 text-base text-gray-500 font-medium placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 hover:bg-gray-300 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                        />
-                    </div>
-
                     {/*MEET-UP LOCATION DROPDOWN*/}
                     <div className="w-full flex-col space-x-8">
                         <div className="relative hover:scale-101 transition-all duration-400 ease-out z-10 text-gray-600 mt-6 font-medium text-base" ref={locationRef}>
@@ -308,6 +291,24 @@ export default function CreateListing() {
                                 </ul>
                             </div>
                         </div>
+                    </div>
+
+
+                    {/*DEPOSIT AMOUNT*/}
+                    <div className="w-full mt-6 hover:scale-101 transition-all duration-400 ease-out">
+                        <span className="absolute ml-5 mt-3 text-gray-500 text-base font-medium">
+                            S$
+                        </span>
+                        <input
+                            type="number"
+                            value={deposit}
+                            onChange={(e) => setDeposit(e.target.value)}
+                            placeholder={`Deposit amount`}
+                            onBlur={(e) => e.target.placeholder = `Deposit amount`}
+                            onFocus={(e) => e.target.placeholder = `Enter a deposit amount for your listing`}
+                            onKeyDown={(e) => ["e", "E", "+", "-"].includes(e.key) && e.preventDefault()}
+                            className="w-full bg-gray-200 rounded-2xl px-14 py-3 text-base text-gray-500 font-medium placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 hover:bg-gray-300 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                        />
                     </div>
 
                     {/*ITEM DESCRIPTION INPUT*/}
