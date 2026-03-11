@@ -69,10 +69,10 @@ export default function ImageDropzone({ onImageSelect }) {
             ) : (
             <div className="group flex flex-col items-center transition-all duration-400 ease-in-out justify-center w-full h-full pt-5 pb-6 ">
                 <UploadCloud className={`h-18 w-18 mb-4 ${isDragActive ? "text-blue-400" : "text-gray-400 group-hover:text-blue-400 transition-all duration-400"}`} />
-                <p className="mb-2 text-base font-medium">
+                <p className="mb-2 text-base ">
                     <span className="text-blue-500 hover:underline">Click to upload</span> or drag and drop
                 </p>
-                <p className="text-sm font-medium text-gray-400">
+                <p className="text-sm text-gray-500">
                     PNG, JPG, or WEBP (MAX. 5MB)
                 </p>
             </div>
