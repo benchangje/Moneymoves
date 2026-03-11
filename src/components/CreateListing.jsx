@@ -152,7 +152,7 @@ export default function CreateListing() {
                             onChange={(e) => setListingTitle(e.target.value)}
                             onBlur={(e) => e.target.placeholder = "Listing title"}
                             onFocus={(e) => e.target.placeholder = "Enter a title for your listing"}
-                            className="w-full bg-gray-200 rounded-2xl px-5 py-3 text-gray-500 placeholder-gray-500 font-medium focus:outline-none focus:placeholder-gray-400 hover:bg-gray-300"
+                            className="w-full bg-gray-200 rounded-2xl px-5 py-3 text-gray-500 placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 hover:bg-gray-300"
                         />
                     </div>
 
@@ -160,7 +160,7 @@ export default function CreateListing() {
                     <div className="relative z-30 mb-6 hover:scale-101 transition-all duration-400 ease-out" ref={categoryRef}>
                         <button 
                             type="button"
-                            className={`w-full flex items-center justify-between bg-gray-200 rounded-2xl px-4 py-3 text-base font-medium text-gray-500 hover:bg-gray-300 transition-all duration-400 ease-out`}
+                            className={`w-full flex items-center justify-between bg-gray-200 rounded-2xl px-4 py-3 text-base text-gray-500 hover:bg-gray-300 transition-all duration-400 ease-out`}
                             onClick={() => setCategoryIsOpen(!categoryIsOpen)}
                         >
                             <div className="flex items-center justify-between gap-4">
@@ -175,7 +175,7 @@ export default function CreateListing() {
                             </div>
                             {categoryIsOpen ? (<ChevronDown className="h-5 w-5 sm:h-6 sm:w-6 text-gray-700"/>) : (<ChevronRight className="h-5 w-5 sm:h-6 sm:w-6 text-gray-500"/>)}
                         </button>
-                        <div className={`absolute top-full left-0  w-full mt-2 bg-gray-200 rounded-2xl font-medium overflow-hidden transition-all shadow-md duration-400 ease-out
+                        <div className={`absolute top-full left-0  w-full mt-2 bg-gray-200 rounded-2xl overflow-hidden transition-all shadow-md duration-400 ease-out
                             ${categoryIsOpen ? "opacity-100 translate-y-0 pointer-events-auto" : "opacity-0 -translate-y-2 pointer-events-none"}`}>
                             <ul className="flex flex-col">
                                 {categories.map((category) => (
@@ -207,7 +207,7 @@ export default function CreateListing() {
                         <div className="relative z-20 w-full hover:scale-101 transition-all duration-400 ease-out" ref={lendingRef}>
                             <button 
                                 type="button"
-                                className={`w-full bg-gray-200 flex items-center justify-between text-left mt-6 text-gray-500 rounded-2xl px-5 py-3 text-base font-medium hover:bg-gray-300 transition-colors ${lendingIntervalIsOpen ? "border-gray-500" : "border-gray-400"}`} 
+                                className={`w-full bg-gray-200 flex items-center justify-between text-left mt-6 text-gray-500 rounded-2xl px-5 py-3 text-base hover:bg-gray-300 transition-colors ${lendingIntervalIsOpen ? "border-gray-500" : "border-gray-400"}`} 
                                 onClick={() => setLendingIntervalIsOpen(!lendingIntervalIsOpen)}
                             >
                                 <div className="flex items-center justify-start space-x-4">
@@ -218,7 +218,7 @@ export default function CreateListing() {
                                 </div>
                                 {lendingIntervalIsOpen ? (<ChevronDown className="h-5 w-5 sm:h-6 sm:w-6 text-gray-700"/>) : (<ChevronRight className="h-5 w-5 sm:h-6 sm:w-6 text-gray-500"/>)}
                             </button>
-                            <div className={`absolute top-full left-0 z-10 w-full mt-2 bg-gray-200 rounded-2xl font-medium overflow-hidden transition-all shadow-md duration-400 
+                            <div className={`absolute top-full left-0 z-10 w-full mt-2 bg-gray-200 rounded-2xl overflow-hidden transition-all shadow-md duration-400 
                                 ${lendingIntervalIsOpen ? "opacity-100 translate-y-0 pointer-events-auto" : "opacity-0 -translate-y-2 pointer-events-none"}`}>
                                 <ul className="flex flex-col">
                                     {lendingIntervals.map((interval) => (
@@ -241,7 +241,7 @@ export default function CreateListing() {
 
                     {/*PRICE INPUT*/}
                     <div className="w-full mt-6 hover:scale-101 transition-all duration-400 ease-out">
-                        <span className="absolute ml-5 mt-3 text-gray-500 text-base font-medium">
+                        <span className="absolute ml-5 mt-3 text-gray-500 text-base">
                             S$
                         </span>
                         <input
@@ -252,16 +252,16 @@ export default function CreateListing() {
                             onBlur={(e) => e.target.placeholder = `Rental price per ${selectedLendingInterval === "Lending interval" ? "Day" : selectedLendingInterval}`}
                             onFocus={(e) => e.target.placeholder = `Enter a rental price per ${selectedLendingInterval === "Lending interval" ? "Day" : selectedLendingInterval} for your listing`}
                             onKeyDown={(e) => ["e", "E", "+", "-"].includes(e.key) && e.preventDefault()}
-                            className="w-full bg-gray-200 rounded-2xl px-14 py-3 text-base text-gray-500 font-medium placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 hover:bg-gray-300 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                            className="w-full bg-gray-200 rounded-2xl px-14 py-3 text-base text-gray-500 placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 hover:bg-gray-300 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                         />
                     </div>
 
                     {/*MEET-UP LOCATION DROPDOWN*/}
                     <div className="w-full flex-col space-x-8">
-                        <div className="relative hover:scale-101 transition-all duration-400 ease-out z-10 text-gray-600 mt-6 font-medium text-base" ref={locationRef}>
+                        <div className="relative hover:scale-101 transition-all duration-400 ease-out z-10 text-gray-600 mt-6 text-base" ref={locationRef}>
                             <button 
                                 type="button" 
-                                className={`w-full flex items-center justify-between bg-gray-200 rounded-2xl px-4 py-3 text-base font-medium text-gray-500 hover:bg-gray-300 transition-all duration-400 ease-out`} 
+                                className={`w-full flex items-center justify-between bg-gray-200 rounded-2xl px-4 py-3 text-base text-gray-500 hover:bg-gray-300 transition-all duration-400 ease-out`} 
                                 onClick={() => setLocationIsOpen(!locationIsOpen)}
                             >
                                 <div className="flex items-center justify-start space-x-4">
@@ -272,7 +272,7 @@ export default function CreateListing() {
                                 </div>
                                 {locationIsOpen ? (<ChevronDown className="h-5 w-5 sm:h-6 sm:w-6 text-gray-700"/>) : (<ChevronRight className="h-5 w-5 sm:h-6 sm:w-6 text-gray-500"/>)}
                             </button>
-                        <div className={`absolute top-full left-0 z-10 w-full mt-2 bg-gray-200 rounded-2xl font-medium overflow-hidden transition-all shadow-md duration-400 
+                        <div className={`absolute top-full left-0 z-10 w-full mt-2 bg-gray-200 rounded-2xl overflow-hidden transition-all shadow-md duration-400 
                                 ${locationIsOpen ? "opacity-100 translate-y-0 pointer-events-auto" : "opacity-0 -translate-y-2 pointer-events-none"}`}>
                                 <ul className="flex flex-col">
                                     {existingLocations.map((interval) => (
@@ -296,7 +296,7 @@ export default function CreateListing() {
 
                     {/*DEPOSIT AMOUNT*/}
                     <div className="w-full mt-6 hover:scale-101 transition-all duration-400 ease-out">
-                        <span className="absolute ml-5 mt-3 text-gray-500 text-base font-medium">
+                        <span className="absolute ml-5 mt-3 text-gray-500 text-base">
                             S$
                         </span>
                         <input
@@ -307,7 +307,7 @@ export default function CreateListing() {
                             onBlur={(e) => e.target.placeholder = `Deposit amount`}
                             onFocus={(e) => e.target.placeholder = `Enter a deposit amount for your listing`}
                             onKeyDown={(e) => ["e", "E", "+", "-"].includes(e.key) && e.preventDefault()}
-                            className="w-full bg-gray-200 rounded-2xl px-14 py-3 text-base text-gray-500 font-medium placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 hover:bg-gray-300 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                            className="w-full bg-gray-200 rounded-2xl px-14 py-3 text-base text-gray-500 placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 hover:bg-gray-300 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                         />
                     </div>
 
@@ -320,7 +320,7 @@ export default function CreateListing() {
                             maxLength={2000}
                             onBlur={(e) => e.target.placeholder = "Item description"}
                             onFocus={(e) => e.target.placeholder = "Enter a description for your listing"}
-                            className="w-full block bg-gray-200 rounded-2xl px-5 py-3 text-base text-gray-500 font-medium placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 hover:bg-gray-300 resize-none h-48"
+                            className="w-full block bg-gray-200 rounded-2xl px-5 py-3 text-base text-gray-500 placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 hover:bg-gray-300 resize-none h-48"
                         />
                     </div>
                         
@@ -329,7 +329,7 @@ export default function CreateListing() {
                         <button 
                             disabled={!isFormValid || isUploading}
                             type="submit"
-                            className={`w-full ${isFormValid && !isUploading ? "bg-blue-500 hover:bg-blue-400" : "bg-gray-400 cursor-not-allowed"} text-white font-medium px-5 py-3 rounded-2xl transition-colors`}
+                            className={`w-full ${isFormValid && !isUploading ? "bg-blue-500 hover:bg-blue-400" : "bg-gray-400 cursor-not-allowed"} text-white px-5 py-3 rounded-2xl transition-colors`}
                         >
                             {isUploading ? "Uploading..." : "Upload Listing"}
                         </button>
