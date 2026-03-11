@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { X } from 'lucide-react';
+import { X, Star} from 'lucide-react';
 
 export default function Profile() {
     const [username, setUsername] = useState("Benny Ben");
@@ -119,21 +119,20 @@ export default function Profile() {
     const maxCount = Math.max(...Object.values(ratingCounts), 1);
 
     return (
-        <div className="min-h-screen bg-gray-50">
-            <div className="max-w-7xl mx-auto pt-16">
-                {/* Banner */}
-                <div className="relative h-48 bg-gray-200 overflow-hidden">
+        <div className="min-h-screen bg-gray-50 pb-6">
+            <div className="max-w-7xl mx-auto">
+                {/* Banner with profile block inside */}
+                <div className="relative bg-gray-200 shadow-2xl overflow-hidden">
                     <img 
                         src={banner} 
                         alt="Profile Banner" 
-                        className="w-full h-full object-cover"
+                        className="absolute inset-0 w-full h-full object-cover"
                     />
-                </div>
 
-                <div className="px-4 sm:px-6 lg:px-8">
-                    {/* Profile Header */}
-                    <div className="bg-white rounded-lg shadow-md p-8 mb-8 -mt-12 relative z-10">
-                        <div className="flex flex-col sm:flex-row items-center gap-6 justify-between">
+                    <div className="relative z-10 p-6">
+                        {/* Profile Header */}
+                        <div className="bg-white rounded-lg shadow-md p-8">
+                            <div className="flex flex-col sm:flex-row items-center gap-6 justify-between">
                             <div className="flex flex-col sm:flex-row items-center gap-6">
                                 <div className="flex-shrink-0">
                                     <img 
@@ -171,16 +170,19 @@ export default function Profile() {
                             </div>
                             <button 
                                 onClick={() => setIsEditing(true)}
-                                className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors"
+                                className="shrink-0 bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors"
                             >
                                 Edit Profile
                             </button>
                         </div>
                     </div>
+                    </div>
+                </div>
 
+                <div className="px-6 sm:px-6 lg:px-8">
                 {/* Listings Section */}
-                <div className="mb-12">
-                    <h2 className="text-2xl font-bold text-gray-900 mb-6">My Listings</h2>
+                <div className="mt-6 mb-12">
+                    <h1 className="text-3xl font-bold text-gray-900 mb-6">My Listings</h1>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         {listings.map((listing) => (
                             <div key={listing.id} className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
