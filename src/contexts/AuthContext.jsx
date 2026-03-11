@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 import { auth, db } from '../firebase';
-import { onAuthStateChanged, getRedirectResult } from 'firebase/auth';
-import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
+import { onAuthStateChanged } from 'firebase/auth';
+import { doc, getDoc } from 'firebase/firestore';
 
 const AuthContext = createContext();
 
@@ -14,49 +14,55 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     let isMounted = true;
 
-    const initializeAuth = async () => {
+    // Check if user has a profile document in Firestore
+    const checkUserHasProfile = async (firebaseUser) => {
       try {
-        // Check for redirect result first (handles sign-in redirects)
-        try {
-          const result = await getRedirectResult(auth);
-          if (isMounted && result?.user) {
-            console.log('Redirect result user found:', result.user.email);
-            setUser(result.user);
-            await createUserProfileIfNew(result.user);
-          }
-        } catch (err) {
-          if (err.code !== 'auth/no-redirect-result') {
-            console.error('Redirect result error:', err);
-            if (isMounted) {
-              setError(err.message);
-            }
-          }
-        }
+        const userDocRef = doc(db, 'users', firebaseUser.uid);
+        const docSnap = await getDoc(userDocRef);
+        return docSnap.exists();
       } catch (err) {
-        console.error('Error checking redirect result:', err);
+        console.error('Error checking user profile:', err);
+        return false; // Assume no profile on error → show setup
       }
     };
 
-    // Initialize redirect result check
-    initializeAuth();
+    // Safety timeout: ensure app loads even if Firebase auth hangs
+    const safetyTimeout = setTimeout(() => {
+      if (isMounted) {
+        console.warn('Auth initialization timed out, forcing load...');
+        setLoading(false);
+      }
+    }, 5000);
 
     // Set up auth state listener
     const unsubscribe = onAuthStateChanged(
       auth,
       async (currentUser) => {
         console.log('Auth state changed:', currentUser?.email || 'No user');
-        if (isMounted) {
+
+        if (currentUser) {
+          // Check profile BEFORE updating any state, so React can batch
+          // all state changes into a single render
+          const hasProfile = await checkUserHasProfile(currentUser);
+          if (!isMounted) return;
+
+          console.log('Profile check result — hasProfile:', hasProfile);
           setUser(currentUser);
-          if (currentUser) {
-            await createUserProfileIfNew(currentUser);
-          }
-          setLoading(false);
+          setNeedsProfileSetup(!hasProfile);
+        } else {
+          if (!isMounted) return;
+          setUser(null);
+          setNeedsProfileSetup(false);
         }
+
+        clearTimeout(safetyTimeout);
+        setLoading(false);
       },
-      (error) => {
-        console.error('Auth state change error:', error);
+      (authError) => {
+        console.error('Auth state change error:', authError);
         if (isMounted) {
-          setError(error.message);
+          setError(authError.message);
+          clearTimeout(safetyTimeout);
           setLoading(false);
         }
       }
@@ -64,35 +70,18 @@ export const AuthProvider = ({ children }) => {
 
     return () => {
       isMounted = false;
+      clearTimeout(safetyTimeout);
       unsubscribe();
     };
   }, []);
 
-  // Create profile for user if it doesn't exist
-  const createUserProfileIfNew = async (user) => {
-    try {
-      const userDocRef = doc(db, 'users', user.uid);
-      const docSnap = await getDoc(userDocRef);
-      
-      if (!docSnap.exists()) {
-        // New user - mark that they need to complete setup
-        console.log('New user detected, needs profile setup:', user.uid);
-        setNeedsProfileSetup(true);
-        return false; // Profile doesn't exist
-      } else {
-        // User has profile
-        console.log('Existing user, profile found:', user.uid);
-        setNeedsProfileSetup(false);
-        return true; // Profile exists
-      }
-    } catch (err) {
-      console.error('Error checking user profile:', err);
-      return false;
-    }
+  // Called by ProfileSetup after profile is created
+  const completeProfileSetup = () => {
+    setNeedsProfileSetup(false);
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, error, needsProfileSetup }}>
+    <AuthContext.Provider value={{ user, loading, error, needsProfileSetup, completeProfileSetup }}>
       {children}
     </AuthContext.Provider>
   );

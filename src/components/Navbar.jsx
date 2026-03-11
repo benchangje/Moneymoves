@@ -2,7 +2,7 @@ import { Menu, X, LogOut, LogIn } from "lucide-react";
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { auth } from "../firebase";
-import { signOut, signInWithRedirect, GoogleAuthProvider } from "firebase/auth";
+import { signOut, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
 import { useAuth } from "../contexts/AuthContext";
 
 export default function Navbar({ onLinkClick }) {
@@ -20,10 +20,11 @@ export default function Navbar({ onLinkClick }) {
         try {
             setSigningIn(true);
             const provider = new GoogleAuthProvider();
-            await signInWithRedirect(auth, provider);
+            await signInWithPopup(auth, provider);
         } catch (error) {
             console.error('Sign in error:', error);
             alert('Sign in failed: ' + error.message);
+        } finally {
             setSigningIn(false);
         }
     };
