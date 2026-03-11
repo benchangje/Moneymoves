@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { Star } from "lucide-react";
 
 const ListingCard = ({ item, onCardClick }) => {
   const defaultPlaceholder =
@@ -6,8 +7,6 @@ const ListingCard = ({ item, onCardClick }) => {
     `https://via.placeholder.com/640x360.png?text=${encodeURIComponent(item.title || "Listing")}`;
 
   const [imgSrc, setImgSrc] = useState(item.image || defaultPlaceholder);
-  const [isHovered, setIsHovered] = useState(false);
-  const [isClicked, setIsClicked] = useState(false);
 
   // update imgSrc when item changes (e.g. when rendering recommendations)
   useEffect(() => {
@@ -19,13 +18,6 @@ const ListingCard = ({ item, onCardClick }) => {
     setImgSrc(defaultPlaceholder);
   };
 
-  const handleClick = () => {
-    if (!isClicked) {
-      onCardClick(item.id);
-      setIsClicked(true);
-    }
-  };
-
   const dateListed =
     item.dateListed ||
     new Date().toLocaleDateString(undefined, {
@@ -34,26 +26,14 @@ const ListingCard = ({ item, onCardClick }) => {
       day: "numeric",
     });
 
-  const rating = typeof item.rating === "number" ? item.rating : 4.0; // placeholder default
+  const rating = typeof item.rating === "number" ? item.rating : 4.5; // placeholder default
   const fullStars = Math.floor(rating);
   const emptyStars = 5 - fullStars;
 
   return (
     <div
-      className="w-full sm:w-1/2 md:w-64 cursor-pointer transition-all"
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-      onClick={handleClick}
-      style={{
-        border: "1px solid rgba(200, 200, 200, 0.3)",
-        borderRadius: "10px",
-        padding: "16px",
-        margin: "12px",
-        background: isHovered || isClicked ? "#e0f2fe" : "transparent",
-        boxShadow: isHovered || isClicked ? "0 8px 24px rgba(14, 165, 233, 0.2)" : "none",
-        color: "#1a1a1a",
-        transition: "all 0.2s ease-in-out",
-      }}
+      className="w-full sm:w-1/2 md:w-64 cursor-pointer border-1 border-gray-200 transition-all shadow-sm hover:shadow-lg hover:scale-101 hover:bg-gray-200 rounded-lg p-4"
+      onClick={() => onCardClick(item.id)}
     >
       <img
         src={imgSrc}
@@ -70,40 +50,36 @@ const ListingCard = ({ item, onCardClick }) => {
         }}
       />
 
-      <h3 style={{ fontSize: "1.15rem", fontWeight: 700, marginBottom: "8px", color: "#1a1a1a" }}>
+      <h3 className="text-[1.15rem] font-bold mb-2 text-gray-900 line-clamp-1">
         {item.title}
       </h3>
 
-      <p style={{ fontSize: "0.9rem", color: "#555555", marginBottom: "6px" }}>
+      <p className="text-sm text-gray-600 mb-1.5 flex items-center gap-1">
         📍 {item.location}
       </p>
 
-      <p style={{ fontSize: "1rem", color: "#1a1a1a", fontWeight: 600 }}>
+      <p className="text-sm font-semibold mb-1.5 text-gray-900">
         ${item.pricePerDay || item.price}/day
       </p>
 
-      <p style={{ fontSize: "0.9rem", color: "#1a1a1a" }}>
+      <p className="text-xs text-gray-700">
         Deposit: ${item.deposit || 50}
       </p>
 
-      <div style={{ display: "flex", alignItems: "center", gap: "8px", marginTop: "8px" }}>
-        <div style={{ display: "flex", gap: "4px", alignItems: "center" }}>
+      <div className="flex items-center gap-2 mt-2">
+        <div className="flex gap-1 items-center">
           {Array.from({ length: fullStars }).map((_, i) => (
-            <svg key={`f-${i}`} width="14" height="14" viewBox="0 0 20 20" fill="#facc15" xmlns="http://www.w3.org/2000/svg">
-              <path d="M10 1.5l2.4 4.86 5.36.78-3.88 3.78.92 5.34L10 14.9 4.2 16.26l.92-5.34L1.24 7.14l5.36-.78L10 1.5z" />
-            </svg>
+            <Star key={`f-${i}`} className="w-3 h-3 fill-yellow-400 stroke-yellow-400" />
           ))}
           {Array.from({ length: emptyStars }).map((_, i) => (
-            <svg key={`e-${i}`} width="14" height="14" viewBox="0 0 20 20" fill="#cccccc" xmlns="http://www.w3.org/2000/svg">
-              <path d="M10 1.5l2.4 4.86 5.36.78-3.88 3.78.92 5.34L10 14.9 4.2 16.26l.92-5.34L1.24 7.14l5.36-.78L10 1.5z" />
-            </svg>
+            <Star key={`e-${i}`} className="w-3 h-3 fill-gray-300 stroke-gray-300" />
           ))}
         </div>
 
-        <span style={{ fontSize: "0.95rem", color: "#1a1a1a" }}>{rating.toFixed(1)}</span>
+        <span className="text-xs text-gray-900">{rating.toFixed(1)}</span>
       </div>
 
-      <p style={{ fontSize: "0.85rem", color: "#666666", marginTop: "8px" }}>Listed: {dateListed}</p>
+      <p className="text-xs text-gray-700 mt-2">Listed: {dateListed}</p>
     </div>
   );
 };

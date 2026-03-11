@@ -53,7 +53,7 @@ export default function ContactUs() {
 
     return (
         <div className="bg-gray-50 min-h-screen">
-            <div className="max-w-6xl mx-auto p-6 sm:p-6 lg:p-8">
+            <div className="max-w-6xl mx-auto p-6">
                 <div className="mb-6 flex items-center justify-between gap-4">
                     <div className="max-w-xl px-2">
                         <h1 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-3">Get in Touch</h1>
@@ -61,8 +61,8 @@ export default function ContactUs() {
                         Our team typically responds within 24 hours — and within 8 hours for urgent requests.</p>
                     </div>
 
-                    <div className="flex items-center gap-2">
-                        <label className="flex items-center">
+                    <div className="flex items-center shrink-0">
+                        <label className="flex items-center justify-center gap-3 cursor-pointer select-none">
                             <span className="text-sm text-gray-700">Contact Urgently</span>
                             <button
                                 type="button"

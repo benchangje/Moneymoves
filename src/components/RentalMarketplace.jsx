@@ -1,6 +1,7 @@
 console.log("ViewListings component mounted");
 
 import { useState, useMemo } from "react";
+import { ChevronDown, Search } from "lucide-react";
 import ListingCard from "./ListingCard";
 
 export default function RentalMarketplace() {
@@ -50,17 +51,16 @@ export default function RentalMarketplace() {
   }, [listings, query]);
 
   return (
-    <div className="p-6 pt-12 min-h-screen bg-white text-slate-900">
-      <h1 className="text-3xl font-bold mb-6 text-sky-700">Current Listings</h1>
-
-      <div className="mb-6 flex flex-col md:flex-row md:items-center gap-4">
+    <div className="p-6 min-h-screen bg-white text-slate-900">
+      <h1 className="text-3xl px-4 sm:px-4 lg:px-6 font-bold mb-6 text-gray-900">
+        Marketplace
+      </h1>
+      <div className="mb-6 flex sm:px-4 lg:px-6 flex-row items-center gap-4">
         {/* Search input with icon */}
-        <div className="relative flex-1 md:w-1/2">
+        <div className="relative flex-1 hover:scale-101 transition-all md:w-1/2">
           <span className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
             {/* search icon - small inline SVG */}
-            <svg className="h-5 w-5 text-sky-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" d="M21 21l-4.35-4.35M11 19a8 8 0 100-16 8 8 0 000 16z" />
-            </svg>
+            <Search className="h-5 w-5 text-gray-400" />
           </span>
 
           <input
@@ -69,29 +69,24 @@ export default function RentalMarketplace() {
             placeholder="Search listings..."
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            className="w-full pl-10 pr-3 py-2 rounded-lg bg-white border border-sky-300 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-400 transition"
+            className="w-full pl-10 pr-3 py-2 rounded-lg bg-white border-gray-300 border-1 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-sky-400 transition"
           />
         </div>
 
         {/* Sort select with styled chevron */}
-        <div className="relative w-full md:w-auto">
+        <div className="relative w-1/6 max-w-40 hover:scale-101 transition-all shrink-0">
           <select
             value={sortOption}
             onChange={(e) => setSortOption(e.target.value)}
             aria-label="Sort listings"
-            className="appearance-none bg-gradient-to-r from-sky-600 to-blue-500 border border-transparent text-white px-4 py-2 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-sky-400 transition"
+            className="w-full appearance-none bg-blue-600 border border-transparent text-white pl-4 pr-10 py-2 rounded-lg shadow-sm focus:outline-none cursor-pointer"
           >
             <option value="cheapest">Cheapest</option>
             <option value="mostRecent">Most recent</option>
             <option value="mostExpensive">Most expensive</option>
             <option value="highestRating">Highest rating</option>
           </select>
-
-          <span className="pointer-events-none absolute inset-y-0 right-2 flex items-center">
-            <svg className="h-4 w-4 text-white" viewBox="0 0 20 20" fill="currentColor">
-              <path fillRule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.292l3.71-4.06a.75.75 0 111.12 1L10.56 13.02a.75.75 0 01-1.12 0L5.21 8.29a.75.75 0 01.02-1.08z" clipRule="evenodd" />
-            </svg>
-          </span>
+          <ChevronDown className="absolute h-5 w-5 right-3 top-1/2 transform -translate-y-1/2 pointer-events-none text-white" />
         </div>
       </div>
 
