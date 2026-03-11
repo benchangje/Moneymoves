@@ -1,14 +1,39 @@
-import { Menu, X } from "lucide-react";
+import { Menu, X, LogOut, LogIn } from "lucide-react";
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
+import { auth } from "../firebase";
+import { signOut, signInWithRedirect, GoogleAuthProvider } from "firebase/auth";
+import { useAuth } from "../contexts/AuthContext";
 
 export default function Navbar({ onLinkClick }) {
     const [mobileMenuOpen, setMobileMenuIsOpen] = useState(false);
+    const [signingIn, setSigningIn] = useState(false);
     const location = useLocation();
+    const { user } = useAuth();
 
     const handleLinkClick = () => {
         if (onLinkClick) onLinkClick();
         setMobileMenuIsOpen(false);
+    };
+
+    const handleGoogleSignIn = async () => {
+        try {
+            setSigningIn(true);
+            const provider = new GoogleAuthProvider();
+            await signInWithRedirect(auth, provider);
+        } catch (error) {
+            console.error('Sign in error:', error);
+            alert('Sign in failed: ' + error.message);
+            setSigningIn(false);
+        }
+    };
+
+    const handleLogout = async () => {
+        try {
+            await signOut(auth);
+        } catch (error) {
+            console.error('Logout error:', error);
+        }
     };
 
     return (
@@ -38,6 +63,28 @@ export default function Navbar({ onLinkClick }) {
                         <Link to="/contact" className={`text-sm lg:text-base font-medium ${location.pathname === '/contact' ? 'text-blue-500 hover:text-blue-300' : 'text-gray-600 hover:text-gray-300'}`} onClick={() => handleLinkClick()}>
                             Contact Us
                         </Link>
+                        
+                        {user ? (
+                            <div className="flex items-center space-x-3 pl-6 border-l border-gray-300">
+                                <span className="text-sm text-gray-600">{user?.email}</span>
+                                <button
+                                    onClick={handleLogout}
+                                    className="flex items-center gap-2 text-sm font-medium text-gray-600 hover:text-red-500 transition-colors"
+                                >
+                                    <LogOut className="h-4 w-4" />
+                                    Logout
+                                </button>
+                            </div>
+                        ) : (
+                            <button
+                                onClick={handleGoogleSignIn}
+                                disabled={signingIn}
+                                className="flex items-center gap-2 px-4 py-2 text-sm font-medium bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors disabled:opacity-50"
+                            >
+                                <LogIn className="h-4 w-4" />
+                                {signingIn ? 'Signing in...' : 'Sign In'}
+                            </button>
+                        )}
                     </div>
                     <button className="md:hidden p-2 focus:outline-none text-gray-600 hover:text-gray-300" onClick={() => setMobileMenuIsOpen(!mobileMenuOpen)}>
                         {mobileMenuOpen ? (<X className="h-5 w-5 sm:h-6 sm:w-6"/>) : (<Menu className="h-5 w-5 sm:h-6 sm:w-6"/>)}
@@ -56,6 +103,33 @@ export default function Navbar({ onLinkClick }) {
                     <Link to="/contact" className={`block text-sm lg:text-base font-medium ${location.pathname === '/contact' ? 'text-blue-500 hover:text-blue-300' : 'text-gray-600 hover:text-gray-300'}`} onClick={() => handleLinkClick()}>
                         Contact Us
                     </Link>
+                    {user ? (
+                        <div className="border-t border-gray-300 pt-3 w-full flex flex-col items-center space-y-2">
+                            <span className="text-sm text-gray-600">{user?.email}</span>
+                            <button
+                                onClick={() => {
+                                    handleLogout();
+                                    handleLinkClick();
+                                }}
+                                className="flex items-center gap-2 text-sm font-medium text-gray-600 hover:text-red-500 transition-colors"
+                            >
+                                <LogOut className="h-4 w-4" />
+                                Logout
+                            </button>
+                        </div>
+                    ) : (
+                        <button
+                            onClick={() => {
+                                handleGoogleSignIn();
+                                handleLinkClick();
+                            }}
+                            disabled={signingIn}
+                            className="flex items-center gap-2 px-4 py-2 text-sm font-medium bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors disabled:opacity-50 w-full justify-center"
+                        >
+                            <LogIn className="h-4 w-4" />
+                            {signingIn ? 'Signing in...' : 'Sign In'}
+                        </button>
+                    )}
                 </div>
             </div>}
         </nav>
