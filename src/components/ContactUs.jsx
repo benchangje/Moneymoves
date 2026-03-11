@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react"
+import { Mail, MessageCircle, Clock } from "lucide-react"
 
 export default function ContactUs() {
     const [name, setName] = useState("")
@@ -82,24 +83,24 @@ export default function ContactUs() {
                 {urgent && (
                     <div className="mt-6 mb-6">
                         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                            <a href="mailto:support@example.com" className="group flex items-center gap-3 rounded-xl bg-white shadow-sm p-3 transform transition hover:scale-[1.02]">
-                                <svg className="h-6 w-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 12H8m0 0l4-4m-4 4l4 4"></path></svg>
+                            <a href="mailto:rentla.management@gmail.com" className="group flex items-center gap-3 rounded-xl bg-white shadow-sm p-3 pl-4 transform transition hover:scale-[1.02]">
+                                <Mail className="h-4 w-4 text-blue-600" />
                                 <div>
                                     <div className="text-sm font-medium text-gray-800">Email</div>
-                                    <div className="text-sm text-blue-600">support@example.com</div>
+                                    <div className="text-sm text-blue-600">rentla.management@gmail.com</div>
                                 </div>
                             </a>
 
-                            <a href="#" className="group flex items-center gap-3 rounded-xl bg-white shadow-sm p-3 transform transition hover:scale-[1.02]">
-                                <svg className="h-6 w-6 text-blue-500" viewBox="0 0 24 24" fill="currentColor"><path d="M21 2L8.5 14.5l-4 1 1-4L22 3z"></path></svg>
+                            <a href="#" className="group flex items-center gap-3 rounded-xl bg-white shadow-sm p-3 pl-4 transform transition hover:scale-[1.02]">
+                                <MessageCircle className="h-4 w-4 text-blue-500" />
                                 <div>
                                     <div className="text-sm font-medium text-gray-800">Telegram</div>
                                     <div className="text-sm text-blue-600">@yourhandle</div>
                                 </div>
                             </a>
 
-                            <div className="group flex items-center gap-3 rounded-xl bg-white shadow-sm p-3 transform transition hover:scale-[1.02]">
-                                <svg className="h-6 w-6 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3"></path><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6a9 9 0 110 18 9 9 0 010-18z"></path></svg>
+                            <div className="group flex items-center gap-3 rounded-xl bg-white shadow-sm p-3 pl-4 transform transition hover:scale-[1.02]">
+                                <Clock className="h-4 w-4 text-gray-500" />
                                 <div>
                                     <div className="text-sm font-medium text-gray-800">Response time</div>
                                     <div className="text-sm text-gray-600">Typically within 8 hours</div>
@@ -152,14 +153,12 @@ export default function ContactUs() {
                             <div>
                                 <label className="block text-sm font-medium text-gray-700">Message</label>
                                 <textarea
-                                    className={`mt-2 block w-full rounded-xl border px-4 py-3 text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-200 hover:border-gray-300 ${errors.message ? 'border-red-300' : 'border-gray-200'}`}
+                                    placeholder="Tell us your needs"
                                     value={message}
                                     onChange={(e) => setMessage(e.target.value)}
-                                    onBlur={() => handleBlur('message')}
-                                    placeholder="Tell us about your needs"
-                                    rows={6}
-                                    aria-invalid={!!errors.message}
-                                    aria-describedby={errors.message ? 'error-message' : undefined}
+                                    maxLength={2000}
+                                    onFocus={(e) => e.target.placeholder = "Enter your message here"}
+                                    className={`mt-2 resize-none h-48 w-full rounded-xl border px-4 py-2 text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-200 hover:border-gray-300 ${errors.message ? 'border-red-300' : 'border-gray-200'}`}
                                 />
                                 {errors.message && <p id="error-message" className="mt-1 text-sm text-red-600">{errors.message}</p>}
                             </div>
@@ -204,24 +203,24 @@ export default function ContactUs() {
                         </div>
 
                         <div className="mt-4 border-t border-gray-100 pt-4 space-y-3">
-                            <a href="mailto:dummy.account@gmail.com" className="flex items-center gap-3 rounded-lg px-3 py-2 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-200">
-                                <svg className="h-5 w-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 12H8m0 0l4-4m-4 4l4 4"></path></svg>
+                            <a href="mailto:rentla.management@gmail.com" className="flex items-center gap-4 rounded-lg px-3 py-2 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-200">
+                                <Mail className="h-4 w-4 text-blue-600" />
                                 <div>
                                     <div className="text-sm font-medium text-gray-800">Email</div>
-                                    <div className="text-sm text-blue-600">dummy.account@gmail.com</div>
+                                    <div className="text-sm text-blue-600">rentla.management@gmail.com</div>
                                 </div>
                             </a>
 
-                            <a href="#" className="flex items-center gap-3 rounded-lg px-3 py-2 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-200">
-                                <svg className="h-5 w-5 text-blue-500" viewBox="0 0 24 24" fill="currentColor"><path d="M21 2L8.5 14.5l-4 1 1-4L22 3z"></path></svg>
+                            <a href="#" className="flex items-center gap-4 rounded-lg px-3 py-2 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-200">
+                                <MessageCircle className="h-4 w-4 text-blue-500" />
                                 <div>
                                     <div className="text-sm font-medium text-gray-800">Telegram</div>
                                     <div className="text-sm text-blue-600">@yourhandle</div>
                                 </div>
                             </a>
 
-                            <div className="flex items-center gap-3 rounded-lg px-3 py-2">
-                                <svg className="h-5 w-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3"></path><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6a9 9 0 110 18 9 9 0 010-18z"></path></svg>
+                            <div className="flex items-center gap-4 rounded-lg px-3 py-2">
+                                <Clock className="h-4 w-4 text-gray-500" />
                                 <div>
                                     <div className="text-sm font-medium text-gray-800">Response time</div>
                                     <div className="text-sm text-gray-600">Typically within 8 hours</div>
