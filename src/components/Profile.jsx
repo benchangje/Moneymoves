@@ -120,16 +120,16 @@ export default function Profile() {
 
     return (
         <div className="min-h-screen bg-gray-50 pb-6">
-            <div className="max-w-7xl mx-auto">
+            <div className="w-full">
                 {/* Banner with profile block inside */}
-                <div className="relative bg-gray-200 shadow-2xl overflow-hidden">
+                <div className="relative bg-gray-200 shadow-2xl overflow-hidden p-2 sm:p-4 lg:p-6">
                     <img 
                         src={banner} 
                         alt="Profile Banner" 
                         className="absolute inset-0 w-full h-full object-cover"
                     />
 
-                    <div className="relative z-10 p-6">
+                    <div className="max-w-7xl mx-auto relative z-10 p-6">
                         {/* Profile Header */}
                         <div className="bg-white rounded-lg shadow-md p-8">
                             <div className="flex flex-col sm:flex-row items-center gap-6 justify-between">
@@ -179,9 +179,9 @@ export default function Profile() {
                     </div>
                 </div>
 
-                <div className="px-6 sm:px-6 lg:px-8">
+                <div className="max-w-7xl mx-auto p-2 sm:p-4 lg:p-6">
                 {/* Listings Section */}
-                <div className="mt-6 mb-12">
+                <div className="p-6 mb-12">
                     <h1 className="text-3xl font-bold text-gray-900 mb-6">My Listings</h1>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         {listings.map((listing) => (
@@ -210,93 +210,95 @@ export default function Profile() {
                 </div>
 
                 {/* Reviews Section */}
-                <div>
-                    <div className="flex justify-between items-center mb-6">
-                        <h2 className="text-2xl font-bold text-gray-900">Reviews</h2>
-                        <select 
-                            value={sortOrder} 
-                            onChange={(e) => setSortOrder(e.target.value)}
-                            className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
-                        >
-                            <option value="newest">Newest First</option>
-                            <option value="worst-to-best">Worst to Best</option>
-                            <option value="best-to-worst">Best to Worst</option>
-                        </select>
-                    </div>
+                <div className="p-2 sm:p-4 lg:p-6">
+                    <div className="p-6">
+                        <div className="flex justify-between items-center mb-6">
+                            <h2 className="text-2xl font-bold text-gray-900">Reviews</h2>
+                            <select 
+                                value={sortOrder} 
+                                onChange={(e) => setSortOrder(e.target.value)}
+                                className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                            >
+                                <option value="newest">Newest First</option>
+                                <option value="worst-to-best">Worst to Best</option>
+                                <option value="best-to-worst">Best to Worst</option>
+                            </select>
+                        </div>
                     
-                    {/* Rating Statistics */}
-                    <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-                        <div className="flex justify-between items-center mb-4">
-                            <h3 className="text-lg font-semibold text-gray-900">Rating Distribution</h3>
-                            {selectedRating !== null && (
-                                <button 
-                                    onClick={() => setSelectedRating(null)}
-                                    className="text-sm text-blue-600 hover:text-blue-800 font-medium"
-                                >
-                                    Show All
-                                </button>
-                            )}
-                        </div>
-                        <div className="space-y-3">
-                            {[5, 4, 3, 2, 1].map(rating => {
-                                const count = ratingCounts[rating];
-                                const percentage = reviews.length > 0 ? (count / reviews.length) * 100 : 0;
-                                const isSelected = selectedRating === rating;
-                                return (
-                                    <div 
-                                        key={rating} 
-                                        onClick={() => setSelectedRating(rating)}
-                                        className={`flex items-center gap-3 cursor-pointer rounded-lg p-2 transition-colors ${
-                                            isSelected ? 'bg-blue-50 ring-2 ring-blue-500' : 'hover:bg-gray-50'
-                                        }`}
+                        {/* Rating Statistics */}
+                        <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+                            <div className="flex justify-between items-center mb-4">
+                                <h3 className="text-lg font-semibold text-gray-900">Rating Distribution</h3>
+                                {selectedRating !== null && (
+                                    <button 
+                                        onClick={() => setSelectedRating(null)}
+                                        className="text-sm text-blue-600 hover:text-blue-800 font-medium"
                                     >
-                                        <div className="flex items-center gap-1 w-16">
-                                            <span className="text-sm font-medium text-gray-700">{rating}</span>
-                                            <span className="text-yellow-400 text-sm">★</span>
-                                        </div>
-                                        <div className="flex-1 bg-gray-200 rounded-full h-4 overflow-hidden">
-                                            <div 
-                                                className={`h-full transition-all duration-300 ${
-                                                    isSelected ? 'bg-blue-500' : 'bg-yellow-400'
-                                                }`}
-                                                style={{ width: `${percentage}%` }}
-                                            />
-                                        </div>
-                                        <span className="text-sm font-medium text-gray-600 w-12 text-right">{count}</span>
-                                    </div>
-                                );
-                            })}
-                        </div>
-                    </div>
-
-                    <div className="space-y-4">
-                        {sortedReviews.length === 0 ? (
-                            <div className="bg-white rounded-lg shadow-md p-12 text-center">
-                                <p className="text-gray-500 text-lg">There are currently no reviews</p>
+                                        Show All
+                                    </button>
+                                )}
                             </div>
-                        ) : (
-                            sortedReviews.map((review) => (
-                                <div key={review.id} className="bg-white rounded-lg shadow-md p-6">
-                                    <div className="flex justify-between items-start mb-3">
-                                        <div>
-                                            <h3 className="text-lg font-semibold text-gray-900">{review.reviewer}</h3>
-                                            <p className="text-sm text-gray-500">{review.date}</p>
+                            <div className="space-y-3">
+                                {[5, 4, 3, 2, 1].map(rating => {
+                                    const count = ratingCounts[rating];
+                                    const percentage = reviews.length > 0 ? (count / reviews.length) * 100 : 0;
+                                    const isSelected = selectedRating === rating;
+                                    return (
+                                        <div 
+                                            key={rating} 
+                                            onClick={() => setSelectedRating(rating)}
+                                            className={`flex items-center gap-3 cursor-pointer rounded-lg p-2 transition-colors ${
+                                                isSelected ? 'bg-blue-50 ring-2 ring-blue-500' : 'hover:bg-gray-50'
+                                            }`}
+                                        >
+                                            <div className="flex items-center gap-1 w-16">
+                                                <span className="text-sm font-medium text-gray-700">{rating}</span>
+                                                <span className="text-yellow-400 text-sm">★</span>
+                                            </div>
+                                            <div className="flex-1 bg-gray-200 rounded-full h-4 overflow-hidden">
+                                                <div 
+                                                    className={`h-full transition-all duration-300 ${
+                                                        isSelected ? 'bg-blue-500' : 'bg-yellow-400'
+                                                    }`}
+                                                    style={{ width: `${percentage}%` }}
+                                                />
+                                            </div>
+                                            <span className="text-sm font-medium text-gray-600 w-12 text-right">{count}</span>
                                         </div>
-                                        <div className="flex items-center gap-1">
-                                            {[...Array(5)].map((_, i) => (
-                                                <span key={i} className={i < review.rating ? "text-yellow-400" : "text-gray-300"}>
-                                                    ★
-                                                </span>
-                                            ))}
-                                        </div>
-                                    </div>
-                                    <p className="text-gray-700">{review.comment}</p>
+                                    );
+                                })}
+                            </div>
+                        </div>
+
+                        <div className="space-y-4">
+                            {sortedReviews.length === 0 ? (
+                                <div className="bg-white rounded-lg shadow-md p-12 text-center">
+                                    <p className="text-gray-500 text-lg">There are currently no reviews</p>
                                 </div>
-                            ))
-                        )}
+                            ) : (
+                                sortedReviews.map((review) => (
+                                    <div key={review.id} className="bg-white rounded-lg shadow-md p-6">
+                                        <div className="flex justify-between items-start mb-3">
+                                            <div>
+                                                <h3 className="text-lg font-semibold text-gray-900">{review.reviewer}</h3>
+                                                <p className="text-sm text-gray-500">{review.date}</p>
+                                            </div>
+                                            <div className="flex items-center gap-1">
+                                                {[...Array(5)].map((_, i) => (
+                                                    <span key={i} className={i < review.rating ? "text-yellow-400" : "text-gray-300"}>
+                                                        ★
+                                                    </span>
+                                                ))}
+                                            </div>
+                                        </div>
+                                        <p className="text-gray-700">{review.comment}</p>
+                                    </div>
+                                    ))
+                                )}
+                            </div>
+                        </div>
                     </div>
                 </div>
-            </div>
             </div>
 
             {/* Edit Profile Modal */}

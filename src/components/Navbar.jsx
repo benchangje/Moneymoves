@@ -1,10 +1,13 @@
 import { Menu, X } from "lucide-react";
 import { useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom"
+import { useAuth } from "./useAuth";
 
 export default function Navbar({ onLinkClick }) {
     const [mobileMenuOpen, setMobileMenuIsOpen] = useState(false);
     const location = useLocation();
+    const navigate = useNavigate();
+    const { user, logout } = useAuth();
 
     const handleLinkClick = () => {
         if (onLinkClick) onLinkClick();
@@ -28,34 +31,74 @@ export default function Navbar({ onLinkClick }) {
                             </span>
                         </span>
                     </div>
-                    <div className="hidden md:flex items-center space-x-6 lg:space-x-8">
-                        <Link to="/create_listing" className={`text-sm lg:text-base font-medium ${location.pathname === '/create_listing' ? 'text-blue-500 hover:text-blue-300' : 'text-gray-600 hover:text-gray-300'}`} onClick={() => handleLinkClick()}>
+                    <div className="hidden lg:flex items-center space-x-8">
+                        <Link to="/create_listing" className={`text-base font-medium ${location.pathname === '/create_listing' ? 'text-blue-500 hover:text-blue-300' : 'text-gray-600 hover:text-gray-300'}`} onClick={() => handleLinkClick()}>
                             Create Listing
                         </Link>
-                        <Link to="/profile" className={`text-sm lg:text-base font-medium ${location.pathname === '/profile' ? 'text-blue-500 hover:text-blue-300' : 'text-gray-600 hover:text-gray-300'}`} onClick={() => handleLinkClick()}>
+                        <Link to="/profile" className={`text-base font-medium ${location.pathname === '/profile' ? 'text-blue-500 hover:text-blue-300' : 'text-gray-600 hover:text-gray-300'}`} onClick={() => handleLinkClick()}>
                             Profile
                         </Link>
-                        <Link to="/contact" className={`text-sm lg:text-base font-medium ${location.pathname === '/contact' ? 'text-blue-500 hover:text-blue-300' : 'text-gray-600 hover:text-gray-300'}`} onClick={() => handleLinkClick()}>
+                        <Link to="/contact" className={`text-base font-medium ${location.pathname === '/contact' ? 'text-blue-500 hover:text-blue-300' : 'text-gray-600 hover:text-gray-300'}`} onClick={() => handleLinkClick()}>
                             Contact Us
                         </Link>
+                        {user ? (
+                            <button 
+                                onClick={async () => {
+                                    await logout();
+                                    navigate("/");
+                                    handleLinkClick();
+                                }}
+                                className="text-base font-medium rounded-lg bg-red-600 hover:bg-red-500 text-white px-4 py-1.5 pb-2 transition-colors duration-300 ease-in-out"
+                            >
+                                Logout
+                            </button>
+                        ) : (
+                            <Link 
+                                to="/login"
+                                onClick={handleLinkClick}
+                                className="text-base font-medium rounded-lg bg-blue-500 hover:bg-blue-400 text-white px-4 py-1.5 pb-2 transition-colors duration-300 ease-in-out"
+                            >
+                                Login
+                            </Link>
+                        )}
                     </div>
-                    <button className="md:hidden p-2 focus:outline-none text-gray-600 hover:text-gray-300" onClick={() => setMobileMenuIsOpen(!mobileMenuOpen)}>
+                    <button className="lg:hidden p-2 focus:outline-none text-gray-600 hover:text-gray-300" onClick={() => setMobileMenuIsOpen(!mobileMenuOpen)}>
                         {mobileMenuOpen ? (<X className="h-5 w-5 sm:h-6 sm:w-6"/>) : (<Menu className="h-5 w-5 sm:h-6 sm:w-6"/>)}
                     </button>
                 </div>
             </div> 
             {mobileMenuOpen && 
-            <div className="absolute w-full md:hidden bg-gray-100 backdrop-blur-sm px-4 pt-2 pb-4 space-y-2 slide-in-from-top shadow-md animate-in duration-400">
+            <div className="absolute w-full lg:hidden bg-gray-100 backdrop-blur-sm px-4 pt-2 pb-4 space-y-2 slide-in-from-top shadow-md animate-in duration-400">
                 <div className= "px-3 py-3 sm:px-3 sm:py-3 flex flex-col items-center space-y-3">
-                    <Link to="/create_listing" className={`block text-sm lg:text-base font-medium ${location.pathname === '/create_listing' ? 'text-blue-500 hover:text-blue-300' : 'text-gray-600 hover:text-gray-300'}`} onClick={() => handleLinkClick()}>
+                    <Link to="/create_listing" className={`block text-base font-medium ${location.pathname === '/create_listing' ? 'text-blue-500 hover:text-blue-300' : 'text-gray-600 hover:text-gray-300'}`} onClick={() => handleLinkClick()}>
                         Create Listing
                     </Link>
-                    <Link to="/profile" className={`block text-sm lg:text-base font-medium ${location.pathname === '/profile' ? 'text-blue-500 hover:text-blue-300' : 'text-gray-600 hover:text-gray-300'}`} onClick={() => handleLinkClick()}>
+                    <Link to="/profile" className={`block text-base font-medium ${location.pathname === '/profile' ? 'text-blue-500 hover:text-blue-300' : 'text-gray-600 hover:text-gray-300'}`} onClick={() => handleLinkClick()}>
                         Profile
                     </Link>
-                    <Link to="/contact" className={`block text-sm lg:text-base font-medium ${location.pathname === '/contact' ? 'text-blue-500 hover:text-blue-300' : 'text-gray-600 hover:text-gray-300'}`} onClick={() => handleLinkClick()}>
+                    <Link to="/contact" className={`block text-base font-medium ${location.pathname === '/contact' ? 'text-blue-500 hover:text-blue-300' : 'text-gray-600 hover:text-gray-300'}`} onClick={() => handleLinkClick()}>
                         Contact Us
                     </Link>
+                    {user ? (
+                        <button 
+                            onClick={async () => {
+                                await logout();
+                                handleLinkClick();
+                                navigate("/");
+                            }}
+                            className="text-base font-medium text-red-600 hover:text-red-500 transition-colors duration-300 ease-in-out"
+                        >
+                            Logout
+                        </button>
+                    ) : (
+                        <Link 
+                            to="/login" 
+                            onClick={handleLinkClick} 
+                            className="text-base font-medium text-blue-500 hover:text-blue-400 transition-colors duration-300 ease-in-out"
+                        >
+                            Login
+                        </Link>
+                    )}
                 </div>
             </div>}
         </nav>

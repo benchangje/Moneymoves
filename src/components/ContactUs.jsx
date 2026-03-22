@@ -54,15 +54,15 @@ export default function ContactUs() {
 
     return (
         <div className="bg-gray-50 min-h-screen">
-            <div className="max-w-6xl mx-auto p-6">
+            <div className="max-w-7xl mx-auto p-6 px-8 lg:p-8 lg:px-10">
                 <div className="mb-6 flex items-center justify-between gap-4">
-                    <div className="max-w-xl px-2">
-                        <h1 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-3">Get in Touch</h1>
+                    <div className="max-w-xl">
+                        <h1 className="text-3xl font-semibold text-gray-900 mb-3">Get in Touch</h1>
                         <p className="text-gray-600 mt-3 max-w-xl leading-relaxed">Need help with a listing, partnership, or time-sensitive issue?
                         Our team typically responds within 24 hours — and within 8 hours for urgent requests.</p>
                     </div>
 
-                    <div className="flex items-center shrink-0">
+                    <div className="flex items-center shrink-0 mt-3 ml-5">
                         <label className="flex items-center justify-center gap-3 cursor-pointer select-none">
                             <span className="text-sm text-gray-700">Contact Urgently</span>
                             <button
@@ -82,25 +82,25 @@ export default function ContactUs() {
                 {/* Compact priority panel shown under the header when urgent is ON */}
                 {urgent && (
                     <div className="mt-6 mb-6">
-                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                            <a href="mailto:rentla.management@gmail.com" className="group flex items-center gap-3 rounded-xl bg-white shadow-sm p-3 pl-4 transform transition hover:scale-[1.02]">
-                                <Mail className="h-4 w-4 text-blue-600" />
+                        <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
+                            <a href="mailto:rentla.management@gmail.com" className="group flex items-center gap-3 rounded-xl bg-white shadow-[0_0_8px_rgba(0,0,0,0.08)] hover:shadow-lg p-3 pl-4 transform transition-all duration-400 hover:scale-102">
+                                <Mail className="h-4 w-4 text-gray-800 flex-shrink-0" />
                                 <div>
                                     <div className="text-sm font-medium text-gray-800">Email</div>
-                                    <div className="text-sm text-blue-600">rentla.management@gmail.com</div>
+                                    <div className="text-sm text-gray-600">rentla.management@gmail.com</div>
                                 </div>
                             </a>
 
-                            <a href="#" className="group flex items-center gap-3 rounded-xl bg-white shadow-sm p-3 pl-4 transform transition hover:scale-[1.02]">
-                                <MessageCircle className="h-4 w-4 text-blue-500" />
+                            <a href="#" className="group flex items-center gap-3 rounded-xl bg-white shadow-[0_0_8px_rgba(0,0,0,0.08)] hover:shadow-lg p-3 pl-4 transform transition-all duration-400 hover:scale-102">
+                                <MessageCircle className="h-4 w-4 text-gray-800 flex-shrink-0" />
                                 <div>
                                     <div className="text-sm font-medium text-gray-800">Telegram</div>
-                                    <div className="text-sm text-blue-600">@yourhandle</div>
+                                    <div className="text-sm text-gray-600">@yourhandle</div>
                                 </div>
                             </a>
 
-                            <div className="group flex items-center gap-3 rounded-xl bg-white shadow-sm p-3 pl-4 transform transition hover:scale-[1.02]">
-                                <Clock className="h-4 w-4 text-gray-500" />
+                            <div className="group flex items-center gap-3 rounded-xl bg-white shadow-[0_0_8px_rgba(0,0,0,0.08)] hover:shadow-lg p-3 pl-4 transform transition-all duration-400 hover:scale-102">
+                                <Clock className="h-4 w-4 text-gray-800 flex-shrink-0" />
                                 <div>
                                     <div className="text-sm font-medium text-gray-800">Response time</div>
                                     <div className="text-sm text-gray-600">Typically within 8 hours</div>
@@ -111,7 +111,7 @@ export default function ContactUs() {
                 )}
 
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-start">
-                    <div className="bg-white rounded-2xl shadow-xl p-8">
+                    <div className="bg-white rounded-2xl shadow-[0_0_8px_rgba(0,0,0,0.08)] p-8">
                         <p className="text-sm text-gray-500">{urgent ? 'You are requesting priority support — use this for urgent issues only.' : 'Fill out the form and we will respond within 24 hours.'}</p>
 
                         {submitted && (
@@ -163,7 +163,7 @@ export default function ContactUs() {
                                 {errors.message && <p id="error-message" className="mt-1 text-sm text-red-600">{errors.message}</p>}
                             </div>
 
-                            <div className="flex items-center gap-3">
+                            <div className="flex items-center gap-6">
                                 <button
                                     type="submit"
                                     disabled={!isValid || loading}
@@ -181,7 +181,7 @@ export default function ContactUs() {
                                 <button
                                     type="button"
                                     onClick={() => { setName(''); setEmail(''); setMessage(''); setTouched({}); setErrors({}); setSubmitted(false); }}
-                                    className="text-sm text-gray-600 hover:underline"
+                                    className="text-sm text-gray-600 hover:text-gray-400 transition"
                                 >
                                     Clear
                                 </button>
@@ -191,7 +191,7 @@ export default function ContactUs() {
 
                     {/* Right-side contact info: animate in/out based on `urgent` */}
                     <aside
-                        className={`bg-white rounded-xl p-6 shadow-sm transform transition-all duration-300 ease-out ${urgent ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-6 pointer-events-none'}`}
+                        className={`bg-white rounded-xl p-6 shadow-[0_0_8px_rgba(0,0,0,0.08)] transform transition-all duration-300 ease-out ${urgent ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-6 pointer-events-none'}`}
                         aria-hidden={!urgent}
                     >
                         <div className="flex items-center justify-between">
@@ -204,23 +204,23 @@ export default function ContactUs() {
 
                         <div className="mt-4 border-t border-gray-100 pt-4 space-y-3">
                             <a href="mailto:rentla.management@gmail.com" className="flex items-center gap-4 rounded-lg px-3 py-2 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-200">
-                                <Mail className="h-4 w-4 text-blue-600" />
+                                <Mail className="h-4 w-4 text-gray-800" />
                                 <div>
                                     <div className="text-sm font-medium text-gray-800">Email</div>
-                                    <div className="text-sm text-blue-600">rentla.management@gmail.com</div>
+                                    <div className="text-sm text-gray-600">rentla.management@gmail.com</div>
                                 </div>
                             </a>
 
                             <a href="#" className="flex items-center gap-4 rounded-lg px-3 py-2 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-200">
-                                <MessageCircle className="h-4 w-4 text-blue-500" />
+                                <MessageCircle className="h-4 w-4 text-gray-800" />
                                 <div>
                                     <div className="text-sm font-medium text-gray-800">Telegram</div>
-                                    <div className="text-sm text-blue-600">@yourhandle</div>
+                                    <div className="text-sm text-gray-600">@yourhandle</div>
                                 </div>
                             </a>
 
                             <div className="flex items-center gap-4 rounded-lg px-3 py-2">
-                                <Clock className="h-4 w-4 text-gray-500" />
+                                <Clock className="h-4 w-4 text-gray-800" />
                                 <div>
                                     <div className="text-sm font-medium text-gray-800">Response time</div>
                                     <div className="text-sm text-gray-600">Typically within 8 hours</div>
