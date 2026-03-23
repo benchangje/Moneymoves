@@ -1,12 +1,11 @@
 import { Menu, X } from "lucide-react";
 import { useState } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom"
+import { Link, useLocation } from "react-router-dom"
 import { useAuth } from "./useAuth";
 
 export default function Navbar({ onLinkClick, onLogoutClick }) {
     const [mobileMenuOpen, setMobileMenuIsOpen] = useState(false);
     const location = useLocation();
-    const navigate = useNavigate();
     const { user } = useAuth();
 
     const handleLinkClick = () => {
@@ -15,9 +14,9 @@ export default function Navbar({ onLinkClick, onLogoutClick }) {
     };
 
     return (
-        <nav className="sticky top-0 w-full bg-white backdrop-blur-sm z-50 transition-all shadow-md duration-400"> 
+        <nav className="sticky top-0 w-full bg-white backdrop-blur-sm z-50 transition-all shadow-md"> 
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"> 
-                <div className="flex items-center justify-between h-14 sm:h-16 md:h-16 relative"> 
+                <div className="flex items-center justify-between h-14 sm:h-16 md:h-16"> 
                     <div className="flex items-center space-x-2 group cursor-pointer">
                         <span className="text-2xl sm:text-2xl md:text-2xl font-bold">
                             <span className="group text-3xl lg:text-3xl font-bold hover:text-gray-300 transition-all duration-200">
@@ -62,38 +61,38 @@ export default function Navbar({ onLinkClick, onLogoutClick }) {
                         {mobileMenuOpen ? (<X className="h-5 w-5 sm:h-6 sm:w-6"/>) : (<Menu className="h-5 w-5 sm:h-6 sm:w-6"/>)}
                     </button>
                 </div>
-                {mobileMenuOpen && 
-                    <div className="absolute w-full lg:hidden bg-gray-100 backdrop-blur-sm px-4 pt-2 pb-4 space-y-2 slide-in-from-top shadow-md animate-in duration-400">
-                        <div className= "px-3 py-3 sm:px-3 sm:py-3 flex flex-col items-center space-y-3">
-                            <Link to="/create_listing" className={`block text-base font-medium hover:text-gray-300 ${location.pathname === '/create_listing' ? 'text-black' : 'text-gray-600'}`} onClick={() => handleLinkClick()}>
-                                Create Listing
-                            </Link>
-                            <Link to="/profile" className={`block text-base font-medium hover:text-gray-300 ${location.pathname === '/profile' ? 'text-black' : 'text-gray-600'}`} onClick={() => handleLinkClick()}>
-                                Profile
-                            </Link>
-                            <Link to="/contact" className={`block text-base font-medium hover:text-gray-300 ${location.pathname === '/contact' ? 'text-black' : 'text-gray-600'}`} onClick={() => handleLinkClick()}>
-                                Contact Us
-                            </Link>
-                            {user ? (
-                                <button 
-                                    onClick={onLogoutClick}
-                                    className="text-base font-medium text-red-600 hover:text-red-400 transition-colors duration-300 ease-in-out"
-                                >
-                                    Log out
-                                </button>
-                            ) : (
-                                <Link 
-                                    to="/login" 
-                                    onClick={handleLinkClick} 
-                                    className="text-base font-medium text-blue-500 hover:text-blue-300 transition-colors duration-300 ease-in-out"
-                                >
-                                    Log in
-                                </Link>
-                            )}
-                        </div>
-                    </div>
-                    }       
             </div> 
+            {mobileMenuOpen && 
+                <div className="absolute w-full lg:hidden bg-gray-100 backdrop-blur-sm pt-2 pb-4 slide-in-from-top shadow-md animate-in duration-400">
+                    <div className= "px-3 py-3 sm:px-3 sm:py-3 flex flex-col items-center space-y-3">
+                        <Link to="/create_listing" className={`block text-base font-medium hover:text-gray-300 ${location.pathname === '/create_listing' ? 'text-black' : 'text-gray-600'}`} onClick={() => handleLinkClick()}>
+                            Create Listing
+                        </Link>
+                        <Link to="/profile" className={`block text-base font-medium hover:text-gray-300 ${location.pathname === '/profile' ? 'text-black' : 'text-gray-600'}`} onClick={() => handleLinkClick()}>
+                            Profile
+                        </Link>
+                        <Link to="/contact" className={`block text-base font-medium hover:text-gray-300 ${location.pathname === '/contact' ? 'text-black' : 'text-gray-600'}`} onClick={() => handleLinkClick()}>
+                            Contact Us
+                        </Link>
+                        {user ? (
+                            <button 
+                                onClick={onLogoutClick}
+                                className="text-base font-medium text-red-600 hover:text-red-400 transition-colors duration-300 ease-in-out"
+                            >
+                                Log out
+                            </button>
+                        ) : (
+                            <Link 
+                                to="/login" 
+                                onClick={handleLinkClick} 
+                                className="text-base font-medium text-blue-500 hover:text-blue-300 transition-colors duration-300 ease-in-out"
+                            >
+                                Log in
+                            </Link>
+                        )}
+                    </div>
+                </div>
+                }       
         </nav>
         )
 }
