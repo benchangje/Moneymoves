@@ -55,16 +55,15 @@ export default function ContactUs() {
     return (
         <div className="bg-gray-50 min-h-screen">
             <div className="max-w-7xl mx-auto p-6 px-8 lg:p-8 lg:px-10">
-                <div className="mb-6 flex items-center justify-between gap-4">
-                    <div className="max-w-xl">
+                <div className="mb-6 flex flex-col items-start justify-between gap-4">
+                    <div className="w-full ">
                         <h1 className="text-3xl font-semibold text-gray-900 mb-3">Get in Touch</h1>
-                        <p className="text-gray-600 mt-3 max-w-xl leading-relaxed">Need help with a listing, partnership, or time-sensitive issue?
+                        <p className="text-gray-600 mt-3 leading-relaxed">Need help with a listing, partnership, or time-sensitive issue?
                         Our team typically responds within 24 hours — and within 8 hours for urgent requests.</p>
                     </div>
 
-                    <div className="flex items-center shrink-0 mt-3 ml-5">
-                        <label className="flex items-center justify-center gap-3 cursor-pointer select-none">
-                            <span className="text-sm text-gray-700">Contact Urgently</span>
+                    <div className="shrink-0">
+                        <label className="flex items-center justify-center gap-4 cursor-pointer select-none">
                             <button
                                 type="button"
                                 role="switch"
@@ -75,6 +74,7 @@ export default function ContactUs() {
                             >
                                 <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${urgent ? 'translate-x-6' : 'translate-x-1'}`} />
                             </button>
+                            <span className="text-gray-600 pb-0.5">Contact Urgently</span>
                         </label>
                     </div>
                 </div>
