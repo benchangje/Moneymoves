@@ -1,15 +1,17 @@
-import { Menu, X } from "lucide-react";
+import { Menu, X, LogIn, LogOut } from "lucide-react";
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom"
 import { useAuth } from "./useAuth";
+import { useBlink } from "./BlinkContext";
 
-export default function Navbar({ onLinkClick, onLogoutClick }) {
+export default function Navbar({ onLogoutClick }) {
     const [mobileMenuOpen, setMobileMenuIsOpen] = useState(false);
     const location = useLocation();
     const { user } = useAuth();
+    const { handlePageBlink } = useBlink();
 
     const handleLinkClick = () => {
-        if (onLinkClick) onLinkClick();
+        handlePageBlink();
         setMobileMenuIsOpen(false);
     };
 
@@ -43,16 +45,18 @@ export default function Navbar({ onLinkClick, onLogoutClick }) {
                         {user ? (
                             <button 
                                 onClick={onLogoutClick}
-                                className="text-base font-medium rounded-lg bg-red-600 hover:bg-red-500 text-white px-4 py-1.5 pb-2 transition-colors duration-300 ease-in-out"
+                                className="text-base font-medium rounded-lg bg-red-600 hover:bg-red-400 text-white px-3 py-1.5 pb-2 transition-colors duration-300 ease-in-out"
                             >
+                                <LogOut className="h-5 w-5 mb-0.5 mr-1.5 inline-block mr-1"/>
                                 Log out
                             </button>
                         ) : (
                             <Link 
                                 to="/login"
                                 onClick={handleLinkClick}
-                                className="text-base font-medium rounded-lg bg-blue-500 hover:bg-blue-400 text-white px-4 py-1.5 pb-2 transition-colors duration-300 ease-in-out"
+                                className="text-base font-medium rounded-lg bg-blue-600 hover:bg-blue-400 text-white px-3 py-1.5 pb-2 transition-colors duration-300 ease-in-out"
                             >
+                                <LogIn className="h-5 w-5 mb-0.5 mr-2 inline-block mr-1"/>
                                 Log in
                             </Link>
                         )}

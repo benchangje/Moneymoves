@@ -1,10 +1,10 @@
 import { useState } from 'react';
-import { useAuth } from '../contexts/AuthContext';
-import { useUserProfile } from '../hooks/useUserProfile';
+import { useAuth } from './useAuth';
+import { useUserProfile } from './useUserProfile';
 import { useNavigate } from 'react-router-dom';
 
 export default function ProfileSetup() {
-    const { user, completeProfileSetup } = useAuth();
+    const { user } = useAuth();
     const { createProfile } = useUserProfile(user);
     const navigate = useNavigate();
     
@@ -45,10 +45,6 @@ export default function ProfileSetup() {
                 location: formData.location
             });
 
-            // Mark setup as complete in context and localStorage
-            completeProfileSetup();
-            localStorage.setItem(`profile_setup_${user.uid}`, 'true');
-            
             // Redirect to home page
             navigate('/');
         } catch (err) {
