@@ -38,7 +38,7 @@ function App() {
 	const navigate = useNavigate();
 
 	return (
-		<div key={blinkKey} className="transition-opacity duration-300 bg-gray-50">
+		<div key={blinkKey} className="animate-page-blink bg-gray-50">
 			{showLogout && (
 				<LogoutModal
 					onClose={() => setShowLogout(false)}

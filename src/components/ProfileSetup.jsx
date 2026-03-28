@@ -1,12 +1,14 @@
 import { useState } from 'react';
+import { LogOut } from 'lucide-react';
 import { useAuth } from './useAuth';
 import { useUserProfile } from './useUserProfile';
-import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 export default function ProfileSetup() {
+
+    const { logout } = useAuth();
     const { user } = useAuth();
     const { createProfile } = useUserProfile(user);
-    const navigate = useNavigate();
     
     const [formData, setFormData] = useState({
         displayName: user?.displayName || '',
@@ -59,7 +61,7 @@ export default function ProfileSetup() {
         <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 flex items-center justify-center px-4">
             <div className="w-full max-w-md bg-white rounded-lg shadow-lg p-8">
                 <div className="text-center mb-8">
-                    <h1 className="text-3xl font-bold text-gray-900 mb-2">Welcome to MoneyMoves!</h1>
+                    <h1 className="text-3xl font-bold text-gray-900 mb-2">Welcome to Rentla!</h1>
                     <p className="text-gray-600">Let's set up your profile</p>
                 </div>
 
@@ -140,7 +142,7 @@ export default function ProfileSetup() {
                     <button
                         type="submit"
                         disabled={loading}
-                        className="w-full bg-gradient-to-r from-blue-500 to-purple-600 text-white font-semibold py-3 rounded-lg hover:from-blue-600 hover:to-purple-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="w-full bg-gradient-to-r from-blue-500 to-purple-600 text-white font-semibold py-3 rounded-lg hover:from-blue-600 hover:to-purple-700 hover:scale-101 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                         {loading ? 'Setting up profile...' : 'Complete Setup'}
                     </button>
@@ -149,11 +151,20 @@ export default function ProfileSetup() {
                         * Required field
                     </p>
                 </form>
-
                 <div className="mt-6 p-4 bg-blue-50 rounded-lg">
                     <p className="text-sm text-gray-700">
                         <span className="font-semibold">Email:</span> {user?.email}
                     </p>
+                </div>
+                <div className="mt-6 hover:scale-101 transition-all duration-300">
+                    <Link
+                        to="/"
+                        onClick={logout}
+                        className="relative w-full bg-red-500 hover:bg-red-600 text-white font-semibold py-3 rounded-lg transition-all duration-300 flex items-center justify-center"
+                    >
+                        <LogOut className="h-5 w-5 absolute left-4" aria-hidden="true" />
+                        <span className="w-full text-center">Cancel setup</span>
+                    </Link>
                 </div>
             </div>
         </div>
