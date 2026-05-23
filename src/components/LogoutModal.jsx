@@ -2,7 +2,7 @@ import { X } from "lucide-react";
 
 export default function LogoutModal({ onClose, onCancel, onLogout }) {
     return (
-        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-60">
             <div className="bg-white rounded-lg p-6 pt-4 pb-6.5 flex flex-col items-start gap-4 mb-10 shadow-[0_0_10px_rgba(0,0,0,0.1)]">
                 <div className="flex flex-row items-start gap-20">
                     <h2 className="text-2xl font-semibold text-gray-900">Confirm Logout</h2>
