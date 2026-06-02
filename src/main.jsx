@@ -5,15 +5,14 @@ import { AuthProvider } from "./components/AuthContext";
 import { BlinkProvider } from './components/BlinkContext.jsx';
 import './index.css'
 import App from './App.jsx'
+import { AuthProvider } from './contexts/AuthContext.jsx'
 
 createRoot(document.getElementById('root')).render(
-  	<BrowserRouter>
-      	<StrictMode>
-			<AuthProvider>
-				<BlinkProvider>
-					<App />
-				</BlinkProvider>
-			</AuthProvider>		
-     	 </StrictMode>
-    </BrowserRouter>,
+  <BrowserRouter>
+    <StrictMode>
+      <AuthProvider>
+        <App />
+      </AuthProvider>
+    </StrictMode>
+  </BrowserRouter>,
 )
