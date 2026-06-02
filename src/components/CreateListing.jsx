@@ -28,27 +28,12 @@ export default function CreateListing() {
     const [deposit, setDeposit] = useState("");
     const [description, setDescription] = useState("");
 
-    const existingLocations = [
-        "COM1 Level 2 (SoC)",
-        "UTown Starbucks",
-        "Central Library Forum"
-    ];
-
-    const [locationIsOpen, setLocationIsOpen] = useState(false);
-    const [selectedLocationOption, setSelectedLocationOption] = useState('Select a meet-up location');
-    const locationRef = useRef(null);
-
-    const isLocationValid = selectedLocationOption.trim() !== "";
-
-    const finalLocation = selectedLocationOption;
-
     const isFormValid = 
         listingTitle.trim() !== "" &&
         selectedCategory !== "Select a category" &&
         imageFile && imageFile.length > 0 &&
         selectedLendingInterval !== "Lending interval" &&
-        price.trim() !== "" &&
-        isLocationValid;
+        price.trim() !== "";
 
     const [submit, setSubmit] = useState(false);
 
@@ -88,7 +73,6 @@ export default function CreateListing() {
         formData.append("category", selectedCategory);
         formData.append("interval", selectedLendingInterval);
         formData.append("price", price);
-        formData.append("location", finalLocation);
         formData.append("deposit", deposit);
         formData.append("description", description);
 
@@ -122,9 +106,6 @@ export default function CreateListing() {
             }
             if (lendingRef.current && !lendingRef.current.contains(event.target)) {
                 setLendingIntervalIsOpen(false);
-            }
-            if (locationRef.current && !locationRef.current.contains(event.target)) {
-                setLocationIsOpen(false);
             }
         }
         document.addEventListener("mousedown", handleClickOutside);
@@ -252,43 +233,6 @@ export default function CreateListing() {
                                 onKeyDown={(e) => ["e", "E", "+", "-"].includes(e.key) && e.preventDefault()}
                                 className="w-full bg-[#eceef2] rounded-xl px-14 py-3 text-base text-gray-400 focus:text-gray-600 placeholder-gray-400 focus:outline-none focus:placeholder-gray-400 hover:bg-gray-200 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                             />
-                        </div>
-
-                        {/*MEET-UP LOCATION DROPDOWN*/}
-                        <div className="w-full flex-col space-x-8">
-                            <div className="relative hover:scale-101 transition-all duration-400 ease-out z-10 text-gray-500 mt-6 mb-3 text-base" ref={locationRef}>
-                                <button 
-                                    type="button" 
-                                    className={`w-full flex items-center justify-between bg-[#eceef2] rounded-xl px-4 py-3 text-base text-gray-500 hover:bg-gray-200 transition-all duration-400 ease-out`} 
-                                    onClick={() => setLocationIsOpen(!locationIsOpen)}
-                                >
-                                    <div className="flex items-center justify-start space-x-4">
-                                        <MapPinPen className={`w-5 h-5 sm:h-5 sm:w-5 ${locationIsOpen ? "text-gray-600" : "text-gray-400"}`} />
-                                        <div className={`${locationIsOpen ? "text-gray-600" : "text-gray-400"}`}>
-                                            {selectedLocationOption}
-                                        </div>
-                                    </div>
-                                    {locationIsOpen ? (<ChevronDown className="h-5 w-5 sm:h-6 sm:w-6 text-gray-600"/>) : (<ChevronRight className="h-5 w-5 sm:h-6 sm:w-6 text-gray-400"/>)}
-                                </button>
-                            <div className={`absolute top-full left-0 z-10 w-full mt-2 bg-gray-300 rounded-xl overflow-hidden transition-all shadow-md duration-400 
-                                    ${locationIsOpen ? "opacity-100 translate-y-0 pointer-events-auto" : "opacity-0 -translate-y-2 pointer-events-none"}`}>
-                                    <ul className="flex flex-col">
-                                        {existingLocations.map((interval) => (
-                                            <li key={interval}>
-                                                <button
-                                                    type="button"
-                                                    onClick={() => {
-                                                        setSelectedLocationOption(interval); 
-                                                        setLocationIsOpen(false);              
-                                                    }}
-                                                    className="w-full text-left px-4 py-3 text-gray-600 hover:bg-gray-200 transition-colors">
-                                                    {interval}
-                                                </button>
-                                            </li>
-                                        ))}
-                                    </ul>
-                                </div>
-                            </div>
                         </div>
 
                         {/*DEPOSIT AMOUNT*/}
