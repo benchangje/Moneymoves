@@ -49,7 +49,7 @@ return (
 	<h3 className="text-xl font-bold mb-2 text-gray-900 line-clamp-1">{item.title}</h3>
 	<p className="text-sm text-gray-600 mb-1.5 flex items-center gap-1">📍 {item.location}</p>
 	<p className="text-sm font-semibold mb-1.5 text-gray-900">${item.pricePerDay || item.price}/day</p>
-	<p className="text-xs text-gray-700">Deposit: ${item.deposit || 50}</p>
+	<p className="text-xs text-gray-700">Deposit: ${item.deposit}</p>
 
 	<div className="flex items-center gap-2 mt-2">
 		<div className="flex gap-1 items-center">

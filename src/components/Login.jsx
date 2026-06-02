@@ -135,7 +135,7 @@ export default function Login() {
                         <p className="text-sm text-gray-600 ml-1">
                             Don't have an account? 
                             <button onClick={handleGoToSignUp} className="text-blue-500 hover:underline font-medium ml-1">
-                                Sign up here
+                                Sign up with Email here
                             </button>
                         </p>
                     </div>
