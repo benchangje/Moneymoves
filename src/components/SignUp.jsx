@@ -1,11 +1,12 @@
 import { useState, useEffect } from "react";
-import { Mail, KeyRound, Eye, EyeOff } from "lucide-react";
+import { Mail, KeyRound, Eye, EyeOff, LogOut } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { createUserWithEmailAndPassword, sendEmailVerification } from "firebase/auth";
 import { auth } from "./firebase";
 import { useAuth } from "./useAuth";
 
 export default function SignUp() {
+
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [showPassword, setShowPassword] = useState(false);
@@ -108,11 +109,25 @@ export default function SignUp() {
                     <button
                         onClick={handleSignUp}
                         disabled={!email || !password}
-                        className={`${(!email || !password) ? 'bg-gray-500 hover:bg-gray-600 cursor-not-allowed' : 'bg-blue-500 hover:bg-blue-600'} w-full bg-blue-500 rounded-2xl w-full text-white px-5 py-3  mb-2 rounded-2xl hover:scale-101 transition-all duration-300`}
+                        className={`${(!email || !password) ? 'bg-gray-500 hover:bg-gray-600 cursor-not-allowed' : 'bg-blue-500 hover:bg-blue-600'} w-full bg-blue-500 rounded-2xl w-full text-white px-5 py-3 mb-2 rounded-2xl hover:scale-101 transition-all duration-300`}
                     >
                         Create Account
                     </button>
-
+                    <p className="text-sm text-gray-600 ml-1 py-3">
+                        Already have an account? 
+                        <button onClick={() => navigate("/login")} className="text-blue-500 hover:underline font-medium ml-1">
+                            Sign in here
+                        </button>
+                    </p>
+                    <div className="relative hover:scale-101 transition-all duration-300 mt-2 mb-2">
+                        <button 
+                            onClick={() => navigate('/')} 
+                            className="w-full bg-blue-500 text-white rounded-2xl pl-12 px-5 py-3 gap-2 hover:bg-blue-600 transition-all duration-300"
+                        >
+                            <LogOut className="h-5 w-5 text-white top-3.5 left-4 absolute transform" />
+                            Return to Marketplace
+                        </button>
+                    </div>
                     {errorMessage && (
                         <p className="text-red-500 mt-2 m-1">{errorMessage}</p>
                     )}

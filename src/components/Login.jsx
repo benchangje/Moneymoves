@@ -10,6 +10,17 @@ import { signInWithEmailAndPassword,
          signInWithPopup } from 'firebase/auth';
 
 const provider = new GoogleAuthProvider();
+provider.setCustomParameters({ prompt: 'select_account' });
+
+const checkAndNavigate = async (uid, navigate) => {
+    const userDocRef = doc(db, 'users', uid);
+    const docSnap = await getDoc(userDocRef);
+    if (!docSnap.exists() || !docSnap.data()?.displayName) {
+        navigate('/profile_setup');
+    } else {
+        navigate('/');
+    }
+};
 
 export default function Login() {
 
@@ -21,28 +32,9 @@ export default function Login() {
     const [errorMessage, setErrorMessage] = useState('');
 
     useEffect(() => {
-        const checkProfileSetup = async () => {
-            if (!user) return; 
-            try {
-                const userDocRef = doc(db, 'users', user.uid);
-                const docSnap = await getDoc(userDocRef);              
-                if (!docSnap.exists()) {
-                    navigate("/profile_setup")
-                } else if (docSnap.exists()) {
-                    const profileData = docSnap.data();
-                    if (!profileData.displayName) {                       
-                        navigate("/profile_setup");
-                    } else {
-                        navigate("/");
-                    }
-                } else {
-                    navigate("/profile_setup");
-                }
-            } catch (err) {
-                console.error('Error checking profile setup:', err);
-            }
-        };
-        checkProfileSetup();
+        if (user) {
+            checkAndNavigate(user.uid, navigate);
+        }
     }, [user]);
 
     //Sign up 
@@ -54,7 +46,8 @@ export default function Login() {
     const handleSignIn = async () => {
         setErrorMessage('');
         try {
-            await signInWithEmailAndPassword(auth, email, password);
+            const result = await signInWithEmailAndPassword(auth, email, password);
+            await checkAndNavigate(result.user.uid, navigate); 
         } catch (error) {
             console.error("Error signing in:", error);
             if (error.code === "auth/user-not-found") {
@@ -74,7 +67,8 @@ export default function Login() {
     //Sign in with Google
     const handleGoogleSignIn = async () => {
         try {
-            await signInWithPopup(auth, provider);
+            const result = await signInWithPopup(auth, provider);
+            await checkAndNavigate(result.user.uid, navigate)
         } catch (error) {
             console.error("Error signing in with Google:", error);
         }
@@ -141,7 +135,7 @@ export default function Login() {
                         <p className="text-sm text-gray-600 ml-1">
                             Don't have an account? 
                             <button onClick={handleGoToSignUp} className="text-blue-500 hover:underline font-medium ml-1">
-                                Sign up here
+                                Sign up with Email here
                             </button>
                         </p>
                     </div>

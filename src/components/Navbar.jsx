@@ -20,26 +20,24 @@ export default function Navbar({ onLogoutClick }) {
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"> 
                 <div className="flex items-center justify-between h-14 sm:h-16 md:h-16"> 
                     <div className="flex items-center space-x-2 group cursor-pointer">
-                        <span className="text-2xl sm:text-2xl md:text-2xl font-bold">
-                            <span className="group text-3xl lg:text-3xl font-bold hover:text-gray-300 transition-all duration-200">
-                                <Link to="/" className="group flex gap-1 text-2xl lg:text-3xl font-bold transition-all duration-150 ease-in-out active:scale-99 inline-flex" onClick={() => handleLinkClick()}>
-                                    <span className="flex text-gray-600 group-hover:text-gray-300 transition-colors items-center gap-1"> 
-                                        <div className="sm:w-36 sm:h-14 w-32 h-12 overflow-hidden bg-white flex items-center justify-center hover:scale-101 hover:opacity-50 transition-all duration-300 mt-2">
-                                            <img src="/rentlalogonew.jpg" className=""/>
-                                        </div>
-                                    </span>
-                                </Link>
-                            </span>
+                        <span className="group text-3xl lg:text-3xl font-bold hover:text-gray-300 transition-all duration-200">
+                            <Link to="/" className="group flex gap-1 text-2xl lg:text-3xl font-bold transition-all duration-150 ease-in-out active:scale-99 inline-flex" onClick={() => handleLinkClick()}>
+                                <span className="flex text-gray-600 group-hover:text-gray-400 transition-colors items-center"> 
+                                    <div className="sm:w-36 sm:h-14 w-32 h-12 overflow-hidden bg-white flex items-center justify-center hover:scale-101 hover:opacity-50 transition-all duration-300 mt-2">
+                                        <img src="/rentlalogonew.jpg" />
+                                    </div>
+                                </span>
+                            </Link>
                         </span>
                     </div>
                     <div className="hidden lg:flex items-center space-x-8">
-                        <Link to="/create_listing" className={`text-base font-medium ${location.pathname === '/create_listing' ? 'text-blue-500 hover:text-blue-300' : 'text-gray-600 hover:text-gray-300'}`} onClick={() => handleLinkClick()}>
+                        <Link to="/create_listing" className={`text-base font-medium ${location.pathname === '/create_listing' ? 'text-blue-500 hover:text-blue-300' : 'text-gray-600 hover:text-gray-400'}`} onClick={() => handleLinkClick()}>
                             Create Listing
                         </Link>
-                        <Link to="/profile" className={`text-base font-medium ${location.pathname === '/profile' ? 'text-blue-500 hover:text-blue-300' : 'text-gray-600 hover:text-gray-300'}`} onClick={() => handleLinkClick()}>
+                        <Link to="/profile" className={`text-base font-medium ${location.pathname === '/profile' ? 'text-blue-500 hover:text-blue-300' : 'text-gray-600 hover:text-gray-400'}`} onClick={() => handleLinkClick()}>
                             Profile
                         </Link>
-                        <Link to="/contact" className={`text-base font-medium ${location.pathname === '/contact' ? 'text-blue-500 hover:text-blue-300' : 'text-gray-600 hover:text-gray-300'}`} onClick={() => handleLinkClick()}>
+                        <Link to="/contact" className={`text-base font-medium ${location.pathname === '/contact' ? 'text-blue-500 hover:text-blue-300' : 'text-gray-600 hover:text-gray-400'}`} onClick={() => handleLinkClick()}>
                             Contact Us
                         </Link>
                         {user ? (
