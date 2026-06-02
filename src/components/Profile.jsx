@@ -258,7 +258,6 @@ export default function Profile() {
                                 </div>
                             ))}
                         </div>
-                    </div>
 
                     {/* Listings Section */}
                     <div className="border-t border-gray-200 px-6 py-8">
