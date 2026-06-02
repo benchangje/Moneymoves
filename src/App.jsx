@@ -12,11 +12,9 @@ function App() {
   const [blinkKey, setBlinkKey] = useState(Date.now());
   const { loading, error, user, needsProfileSetup } = useAuth();
 
-	const { logout } = useAuth();
-	const [showLogout, setShowLogout] = useState(false);
-	const { blinkKey, handlePageBlink } = useBlink();
-	const navigate = useNavigate();
-	const location = useLocation();
+  const handlePageBlink = () => {
+    setBlinkKey(Date.now());
+  };
 
   if (loading) {
     return (

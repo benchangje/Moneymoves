@@ -5,14 +5,14 @@ import { auth } from "../firebase";
 import { signOut, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
 import { useAuth } from "../contexts/AuthContext";
 
-export default function Navbar({ onLogoutClick }) {
+export default function Navbar({ onLinkClick }) {
     const [mobileMenuOpen, setMobileMenuIsOpen] = useState(false);
     const [signingIn, setSigningIn] = useState(false);
     const location = useLocation();
     const { user } = useAuth();
 
     const handleLinkClick = () => {
-        handlePageBlink();
+        if (onLinkClick) onLinkClick();
         setMobileMenuIsOpen(false);
     };
 
@@ -38,28 +38,30 @@ export default function Navbar({ onLogoutClick }) {
     };
 
     return (
-        <nav className="sticky top-0 w-full bg-white backdrop-blur-sm z-50 transition-all shadow-md"> 
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"> 
+        <nav className="sticky top-0 w-full bg-white backdrop-blur-sm z-50 transition-all shadow-md duration-400">
+           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"> 
                 <div className="flex items-center justify-between h-14 sm:h-16 md:h-16"> 
                     <div className="flex items-center space-x-2 group cursor-pointer">
-                        <span className="group text-3xl lg:text-3xl font-bold hover:text-gray-300 transition-all duration-200">
-                            <Link to="/" className="group flex gap-1 text-2xl lg:text-3xl font-bold transition-all duration-150 ease-in-out active:scale-99 inline-flex" onClick={() => handleLinkClick()}>
-                                <span className="flex text-gray-600 group-hover:text-gray-400 transition-colors items-center"> 
-                                    <div className="sm:w-36 sm:h-14 w-32 h-12 overflow-hidden bg-white flex items-center justify-center hover:scale-101 hover:opacity-50 transition-all duration-300 mt-2">
-                                        <img src="/rentlalogonew.jpg" />
-                                    </div>
-                                </span>
-                            </Link>
+                        <span className="text-2xl sm:text-2xl md:text-2xl font-bold">
+                            <span className="group text-3xl lg:text-3xl font-bold hover:text-gray-300 transition-all duration-200">
+                                <Link to="/" className="group flex gap-1 text-2xl lg:text-3xl font-bold transition-all duration-150 ease-in-out active:scale-99 inline-flex" onClick={() => handleLinkClick()}>
+                                    <span className="flex text-gray-600 group-hover:text-gray-300 transition-colors items-center gap-1"> 
+                                        <div className="sm:w-36 sm:h-16 w-32 h-14 overflow-hidden bg-white flex items-center justify-center hover:scale-101 hover:opacity-50 transition-all duration-300 rounded-lg pt-2">
+                                            <img src="/rentlalogonew.jpg" className=""/>
+                                        </div>
+                                    </span>
+                                </Link>
+                            </span>
                         </span>
                     </div>
-                    <div className="hidden lg:flex items-center space-x-8">
-                        <Link to="/create_listing" className={`text-base font-medium ${location.pathname === '/create_listing' ? 'text-blue-500 hover:text-blue-300' : 'text-gray-600 hover:text-gray-400'}`} onClick={() => handleLinkClick()}>
+                    <div className="hidden md:flex items-center space-x-6 lg:space-x-8">
+                        <Link to="/create_listing" className={`text-sm lg:text-base font-medium ${location.pathname === '/create_listing' ? 'text-blue-500 hover:text-blue-300' : 'text-gray-600 hover:text-gray-300'}`} onClick={() => handleLinkClick()}>
                             Create Listing
                         </Link>
-                        <Link to="/profile" className={`text-base font-medium ${location.pathname === '/profile' ? 'text-blue-500 hover:text-blue-300' : 'text-gray-600 hover:text-gray-400'}`} onClick={() => handleLinkClick()}>
+                        <Link to="/profile" className={`text-sm lg:text-base font-medium ${location.pathname === '/profile' ? 'text-blue-500 hover:text-blue-300' : 'text-gray-600 hover:text-gray-300'}`} onClick={() => handleLinkClick()}>
                             Profile
                         </Link>
-                        <Link to="/contact" className={`text-base font-medium ${location.pathname === '/contact' ? 'text-blue-500 hover:text-blue-300' : 'text-gray-600 hover:text-gray-400'}`} onClick={() => handleLinkClick()}>
+                        <Link to="/contact" className={`text-sm lg:text-base font-medium ${location.pathname === '/contact' ? 'text-blue-500 hover:text-blue-300' : 'text-gray-600 hover:text-gray-300'}`} onClick={() => handleLinkClick()}>
                             Contact Us
                         </Link>
                         
@@ -85,7 +87,7 @@ export default function Navbar({ onLogoutClick }) {
                             </button>
                         )}
                     </div>
-                    <button className="lg:hidden p-2 focus:outline-none text-gray-600 hover:text-gray-300" onClick={() => setMobileMenuIsOpen(!mobileMenuOpen)}>
+                    <button className="md:hidden p-2 focus:outline-none text-gray-600 hover:text-gray-300" onClick={() => setMobileMenuIsOpen(!mobileMenuOpen)}>
                         {mobileMenuOpen ? (<X className="h-5 w-5 sm:h-6 sm:w-6"/>) : (<Menu className="h-5 w-5 sm:h-6 sm:w-6"/>)}
                     </button>
                 </div>
@@ -130,7 +132,7 @@ export default function Navbar({ onLogoutClick }) {
                         </button>
                     )}
                 </div>
-                }       
+            </div>}
         </nav>
         )
 }
