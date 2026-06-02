@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { motion } from "framer-motion";
 import { LogOut } from 'lucide-react';
 import { useAuth } from './useAuth';
 import { useUserProfile } from './useUserProfile';
@@ -25,23 +24,12 @@ export default function ProfileSetup() {
         formData.tele_handle.trim() !== "" &&
         formData.location.trim() !== ""
 
-    const [showModal, setShowModal] = useState(false);
-    const [code, setCode] = useState("");
     const [submitLoading, setSubmitLoading] = useState(false);
     const [error, setError] = useState('');
-
-    const submitCode = () => {
-        console.log("Code submitted:", code);
-
-        // verification logic here
-
-        setShowModal(false);
-    };
 
     const handleChange = (e) => {
         let { name, value } = e.target;
 
-        // Clean telegram handle
         if (name === "tele_handle") {
             value = value.replace(/^@+/, "").trim();
         }
@@ -73,12 +61,10 @@ export default function ProfileSetup() {
             await createProfile({
                 displayName: formData.displayName,
                 bio: formData.bio,
-                phone: formData.phone,
                 tele_handle: formData.tele_handle,
                 location: formData.location
             });
 
-            // Redirect to home page
             navigate('/');
         } catch (err) {
             setError('Error creating profile: ' + err.message);
@@ -121,10 +107,10 @@ export default function ProfileSetup() {
 
                     {/* Telegram Handle */}
                     <div>
-                        <label htmlFor="phone" className="translate-x-1 block text-sm font-medium text-gray-700 mb-2">
+                        <label htmlFor="tele_handle" className="translate-x-1 block text-sm font-medium text-gray-700 mb-2">
                             Telegram Handle *
                         </label>
-                        <div className="flex items-center jusitfy-center gap-4">
+                        <div className="flex items-center justify-center gap-3">
                             <input
                                 id="tele_handle"
                                 name="tele_handle"
@@ -133,70 +119,15 @@ export default function ProfileSetup() {
                                 placeholder="@bobross"
                                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-1 focus:ring-blue-500 focus:border-transparent outline-none hover:scale-101 transition-all duration-400 ease-out"
                             />
-                            <div>
-                                {/* Telegram Verification */}
-                                <button
-                                    type="button"
-                                    disabled={formData.tele_handle == ""}
-                                    onClick={() => setShowModal(true)}
-                                    className={`${showModal ? "opacity-50" : "opacity-100" } shrink-0 bg-blue-500 text-white font-medium p-2 px-3 rounded-md hover:bg-blue-600 hover:scale-101 transition-all duration-400 disabled:opacity-50 disabled:bg-gray-500 disabled:cursor-not-allowed`}
-                                >
-                                    {showModal ? 'Verifying...' : 'Verify'}
-                                </button>    
-                            </div>                   
-                            {/* Modal */}
-                            {showModal && (
-                                <div className="fixed inset-0 z-50 flex items-center justify-center">
-                                    <div className="absolute inset-0 bg-black/40"/>
-                                    <motion.div
-                                        initial={{ y: "100%", opacity: 0 }}
-                                        animate={{ y: 0, opacity: 1 }}
-                                        exit={{ y: "100%", opacity: 0 }}
-                                        transition={{
-                                            duration: 0.4,
-                                            ease: "easeInOut"
-                                        }}
-                                        className="fixed inset-0 z-50 flex items-center justify-center"
-                                    >
-                                        <div className="bg-white rounded-2xl p-6 w-full max-w-sm shadow-xl">
-                                            <h2 className="text-xl font-semibold mb-2">
-                                                Enter Verification Code
-                                            </h2>
-                                            <p className="text-gray-500 text-sm mb-4">
-                                                Please enter the code sent to your Telegram.
-                                            </p>
-                                            <input
-                                                type="text"
-                                                inputMode="numeric"
-                                                maxLength={6}
-                                                value={code}
-                                                onChange={(e) => {setCode(e.target.value.replace(/\D/g, ""));}}
-                                                placeholder="123456"
-                                                className="w-full border border-gray-300 rounded-lg px-3 py-2 mb-6 hover:scale-101 focus:outline-none focus:ring-1 focus:ring-blue-500 transition-all duration-400 ease-out"
-                                            />
-                                            <div className="flex justify-end gap-4">
-                                                <button
-                                                    onClick={() => setShowModal(false)}
-                                                    className="px-4 py-2 rounded-lg border border-gray-300"
-                                                >
-                                                    Cancel
-                                                </button>
-
-                                                <button
-                                                    onClick={submitCode}
-                                                    className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg"
-                                                >
-                                                    Submit
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </motion.div>
-                                </div>
-                            )}
-                            </div>
-                            
+                            <button 
+                                disabled={!formData.tele_handle.trim()}
+                                className={`rounded-lg p-2 px-3 text-white transition-all duration-400 ease-out ${formData.tele_handle.trim()? "bg-blue-500 hover:bg-blue-400 hover:scale-101": "bg-gray-400 cursor-not-allowed"}`}
+                            >
+                                Verify
+                            </button>
+                        </div>
                         <p className="translate-x-1 mt-2 text-xs text-gray-500">
-                            We will send a verification message to this handle
+                            Other users will use this to contact you on Telegram
                         </p>
                     </div>
 
