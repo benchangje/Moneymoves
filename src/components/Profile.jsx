@@ -1,11 +1,14 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useUserProfile } from '../hooks/useUserProfile';
+import { useListings } from '../hooks/useListings';
 import { Star } from 'lucide-react';
+import ListingCard from './ListingCard';
 
 export default function Profile() {
     const { user } = useAuth();
-    const { profile, updateProfile, loading } = useUserProfile(user);
+    const { profile, updateProfile, loading: profileLoading } = useUserProfile(user);
+    const { listings: userListings, loading: listingsLoading } = useListings({ ownerUid: user?.uid });
     
     const [isEditing, setIsEditing] = useState(false);
     const [editName, setEditName] = useState('');
@@ -21,13 +24,6 @@ export default function Profile() {
         { id: 1, reviewer: "Shree", rating: 5, comment: "Great experience! Item was in perfect condition. Highly recommended!", date: "2026-02-15" },
         { id: 2, reviewer: "Sean", rating: 5, comment: "Excellent service and communication. Would rent again!", date: "2026-02-10" },
         { id: 3, reviewer: "Luke", rating: 4, comment: "Good quality items, very professional. Minor issue with delivery but resolved quickly.", date: "2026-02-05" }
-    ];
-
-    // Listings data
-    const listings = [
-        { id: 1, title: "PSA 10 Illustrator", price: "$1,000,000/month", image: "https://images2.minutemediacdn.com/image/upload/f_auto,q_auto,g_auto/images/voltaxMediaLibrary/mmsport/si_collects/01khhjv5j6z4rwpyn0yg.jpg" },
-        { id: 2, title: "Camera Equipment", price: "$150/month", image: "https://images.unsplash.com/photo-1609034227505-5876f6aa4e90?w=400&h=300&fit=crop" },
-        { id: 3, title: "Camping Tent", price: "$50/month", image: "https://images.unsplash.com/photo-1478131143081-80f7f84ca84d?w=400&h=300&fit=crop" }
     ];
 
     // Initialize form with profile data
@@ -47,6 +43,17 @@ export default function Profile() {
         : 0;
     const averageRating = averageRatingNum.toFixed(1);
     const ratedStars = Math.round(averageRatingNum);
+
+    const normalizedListings = userListings.map((listing) => ({
+        ...listing,
+        pricePerDay: Number(listing.price ?? 0),
+        deposit: Number(listing.deposit ?? 0),
+        dateListed: listing.createdAt
+            ? new Date(listing.createdAt).toISOString().split('T')[0]
+            : new Date().toISOString().split('T')[0],
+        image: listing.image || listing.images?.[0] || '',
+        location: listing.location || 'Location not provided',
+    }));
 
     // Handle profile save
     const handleSaveProfile = async () => {
@@ -83,7 +90,7 @@ export default function Profile() {
     };
 
     // Loading state
-    if (loading) {
+    if (profileLoading || listingsLoading) {
         return (
             <div className="flex justify-center items-center min-h-screen">
                 <div className="text-center">
@@ -258,22 +265,17 @@ export default function Profile() {
                                 </div>
                             ))}
                         </div>
+                    </div>
 
                     {/* Listings Section */}
                     <div className="border-t border-gray-200 px-6 py-8">
                         <h2 className="text-2xl font-bold text-gray-900 mb-6">Your Listings</h2>
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                            {listings.map((listing) => (
-                                <div key={listing.id} className="border border-gray-200 rounded-lg overflow-hidden hover:shadow-lg transition-shadow">
-                                    <img src={listing.image} alt={listing.title} className="w-full h-48 object-cover"/>
-                                    <div className="p-4">
-                                        <h3 className="font-semibold text-gray-900 mb-2">{listing.title}</h3>
-                                        <p className="text-blue-600 font-semibold">{listing.price}</p>
-                                    </div>
-                                </div>
+                            {normalizedListings.map((listing) => (
+                                <ListingCard key={listing.id} item={listing} />
                             ))}
                         </div>
-                        {listings.length === 0 && (
+                        {normalizedListings.length === 0 && (
                             <p className="text-gray-600">No listings yet. Create your first listing!</p>
                         )}
                     </div>

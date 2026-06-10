@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 import { auth, db } from '../firebase';
-import { onAuthStateChanged } from 'firebase/auth';
+import { browserLocalPersistence, onAuthStateChanged, setPersistence } from 'firebase/auth';
 import { doc, getDoc } from 'firebase/firestore';
 
 const AuthContext = createContext();
@@ -13,6 +13,16 @@ export const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     let isMounted = true;
+    let unsubscribe = null;
+    let initialNullTimer = null;
+    let hasResolvedInitialAuth = false;
+
+    const clearInitialNullTimer = () => {
+      if (initialNullTimer) {
+        clearTimeout(initialNullTimer);
+        initialNullTimer = null;
+      }
+    };
 
     // Check if user has a profile document in Firestore
     const checkUserHasProfile = async (firebaseUser) => {
@@ -22,56 +32,80 @@ export const AuthProvider = ({ children }) => {
         return docSnap.exists();
       } catch (err) {
         console.error('Error checking user profile:', err);
-        return false; // Assume no profile on error → show setup
+        return false;
       }
     };
 
-    // Safety timeout: ensure app loads even if Firebase auth hangs
-    const safetyTimeout = setTimeout(() => {
-      if (isMounted) {
-        console.warn('Auth initialization timed out, forcing load...');
-        setLoading(false);
-      }
-    }, 5000);
+    const finishAuthState = (firebaseUser, hasProfile) => {
+      if (!isMounted) return;
+      setUser(firebaseUser);
+      setNeedsProfileSetup(Boolean(firebaseUser && !hasProfile));
+      setLoading(false);
+      hasResolvedInitialAuth = true;
+      clearInitialNullTimer();
+    };
 
-    // Set up auth state listener
-    const unsubscribe = onAuthStateChanged(
-      auth,
-      async (currentUser) => {
-        console.log('Auth state changed:', currentUser?.email || 'No user');
+    const handleAuthState = async (currentUser) => {
+      console.log('Auth state changed:', currentUser?.email || 'No user');
 
-        if (currentUser) {
-          // Check profile BEFORE updating any state, so React can batch
-          // all state changes into a single render
-          const hasProfile = await checkUserHasProfile(currentUser);
-          if (!isMounted) return;
-
-          console.log('Profile check result — hasProfile:', hasProfile);
-          setUser(currentUser);
-          setNeedsProfileSetup(!hasProfile);
-        } else {
-          if (!isMounted) return;
-          setUser(null);
-          setNeedsProfileSetup(false);
+      if (!currentUser) {
+        if (!hasResolvedInitialAuth) {
+          clearInitialNullTimer();
+          initialNullTimer = setTimeout(() => {
+            if (!isMounted) return;
+            setUser(null);
+            setNeedsProfileSetup(false);
+            setLoading(false);
+            hasResolvedInitialAuth = true;
+          }, 800);
+          return;
         }
 
-        clearTimeout(safetyTimeout);
+        if (!isMounted) return;
+        setUser(null);
+        setNeedsProfileSetup(false);
         setLoading(false);
-      },
-      (authError) => {
+        return;
+      }
+
+      try {
+        const hasProfile = await checkUserHasProfile(currentUser);
+        if (!isMounted) return;
+
+        console.log('Profile check result — hasProfile:', hasProfile);
+        finishAuthState(currentUser, hasProfile);
+      } catch (err) {
+        console.error('Error during auth initialization:', err);
+        if (!isMounted) return;
+        finishAuthState(currentUser, false);
+      }
+    };
+
+    const initAuth = async () => {
+      try {
+        await setPersistence(auth, browserLocalPersistence);
+      } catch (persistError) {
+        console.warn('Auth persistence setup warning:', persistError);
+      }
+
+      unsubscribe = onAuthStateChanged(auth, handleAuthState, (authError) => {
         console.error('Auth state change error:', authError);
         if (isMounted) {
           setError(authError.message);
-          clearTimeout(safetyTimeout);
+          clearInitialNullTimer();
           setLoading(false);
         }
-      }
-    );
+      });
+    };
+
+    initAuth();
 
     return () => {
       isMounted = false;
-      clearTimeout(safetyTimeout);
-      unsubscribe();
+      clearInitialNullTimer();
+      if (unsubscribe) {
+        unsubscribe();
+      }
     };
   }, []);
 

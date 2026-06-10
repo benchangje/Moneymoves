@@ -1,4 +1,3 @@
-import { motion } from "framer-motion";
 import { useState } from "react";
 import { X } from "lucide-react";
 
@@ -47,16 +46,7 @@ export default function Filter({ onClose, onApply }) {
         <div className="fixed inset-0 z-60">
             <div className="absolute inset-0 bg-black/40" />
             <div className="w-full h-full flex items-center justify-center">
-                <motion.div
-                    initial={{ y: "100%", opacity: 0 }}
-                    animate={{ y: 0, opacity: 1 }}
-                    exit={{ y: "100%", opacity: 0 }}
-                    transition={{
-                        duration: 0.4,
-                        ease: "easeInOut"
-                    }}
-                    className="absolute w-3/4 bg-white p-6 pt-4 shadow-2xl rounded-xl"
-                >
+                <div className="absolute w-3/4 bg-white p-6 pt-4 shadow-2xl rounded-xl">
                     <div className="relative flex justify-center items-center mb-6">
                         <button
                             onClick={onClose}
@@ -155,7 +145,7 @@ export default function Filter({ onClose, onApply }) {
                             {isApplying ? "Applying..." : "Apply Filters"}
                         </button>
                     </form>
-                </motion.div>
+                </div>
             </div>
         </div>
     )

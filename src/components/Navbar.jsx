@@ -9,7 +9,7 @@ export default function Navbar({ onLogoutClick }) {
     const [mobileMenuOpen, setMobileMenuIsOpen] = useState(false);
     const [signingIn, setSigningIn] = useState(false);
     const location = useLocation();
-    const { user } = useAuth();
+    const { user, loading } = useAuth();
 
     const handleLinkClick = () => {
         handlePageBlink();
@@ -63,7 +63,9 @@ export default function Navbar({ onLogoutClick }) {
                             Contact Us
                         </Link>
                         
-                        {user ? (
+                        {loading ? (
+                            <div className="h-9 w-24 rounded-lg bg-gray-100 animate-pulse" />
+                        ) : user ? (
                             <div className="flex items-center space-x-3 pl-6 border-l border-gray-300">
                                 <span className="text-sm text-gray-600">{user?.email}</span>
                                 <button
@@ -90,7 +92,7 @@ export default function Navbar({ onLogoutClick }) {
                     </button>
                 </div>
             </div> 
-            {mobileMenuOpen && 
+            {mobileMenuOpen && (
             <div className="absolute w-full md:hidden bg-gray-100 backdrop-blur-sm px-4 pt-2 pb-4 space-y-2 slide-in-from-top shadow-md animate-in duration-400">
                 <div className= "px-3 py-3 sm:px-3 sm:py-3 flex flex-col items-center space-y-3">
                     <Link to="/create_listing" className={`block text-sm lg:text-base font-medium ${location.pathname === '/create_listing' ? 'text-blue-500 hover:text-blue-300' : 'text-gray-600 hover:text-gray-300'}`} onClick={() => handleLinkClick()}>
@@ -102,7 +104,9 @@ export default function Navbar({ onLogoutClick }) {
                     <Link to="/contact" className={`block text-sm lg:text-base font-medium ${location.pathname === '/contact' ? 'text-blue-500 hover:text-blue-300' : 'text-gray-600 hover:text-gray-300'}`} onClick={() => handleLinkClick()}>
                         Contact Us
                     </Link>
-                    {user ? (
+                    {loading ? (
+                        <div className="h-9 w-24 rounded-lg bg-gray-100 animate-pulse" />
+                    ) : user ? (
                         <div className="border-t border-gray-300 pt-3 w-full flex flex-col items-center space-y-2">
                             <span className="text-sm text-gray-600">{user?.email}</span>
                             <button
@@ -130,7 +134,8 @@ export default function Navbar({ onLogoutClick }) {
                         </button>
                     )}
                 </div>
-                }       
+            </div>
+            )}
         </nav>
         )
 }

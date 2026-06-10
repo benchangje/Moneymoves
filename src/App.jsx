@@ -4,19 +4,13 @@ import RentalMarketplace from './components/RentalMarketplace.jsx';
 import Profile from './components/Profile.jsx';
 import ProfileSetup from './components/ProfileSetup.jsx';
 import ContactUs from './components/ContactUs.jsx';
-import { useState } from 'react';
 import { Routes, Route } from 'react-router-dom';
 import { useAuth } from './contexts/AuthContext.jsx';
+import { useBlink } from './components/BlinkContext.jsx';
 
 function App() {
-  const [blinkKey, setBlinkKey] = useState(Date.now());
   const { loading, error, user, needsProfileSetup } = useAuth();
-
-	const { logout } = useAuth();
-	const [showLogout, setShowLogout] = useState(false);
-	const { blinkKey, handlePageBlink } = useBlink();
-	const navigate = useNavigate();
-	const location = useLocation();
+  const { blinkKey, handlePageBlink } = useBlink();
 
   if (loading) {
     return (
@@ -46,7 +40,6 @@ function App() {
     );
   }
 
-  // Show profile setup for new users
   if (user && needsProfileSetup) {
     return <ProfileSetup />;
   }
@@ -61,7 +54,7 @@ function App() {
         <Route path="/contact" element={<ContactUs />} />
       </Routes>
     </div>
-  )
+  );
 }
 
 export default App;
