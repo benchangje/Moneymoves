@@ -3,13 +3,10 @@ console.log("ViewListings component mounted");
 import { useState, useMemo } from "react";
 import { ChevronDown, Search } from "lucide-react";
 import ListingCard from "./ListingCard";
+import { useListings } from "./ListingsContext";
 
 export default function RentalMarketplace() {
-  	const [listings, setListings] = useState([
-		{ id: 1, title: "Canon EF 24-70mm Lens", pricePerDay: 25, dateListed: "2026-02-20", rating: 4.5, image: "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcSMWWfRi8L-0jkfRcPhOsB46-iyakJ6vH6wQnf0JtnBWWlxgLs", location: "Orchard, Singapore", deposit: 200 },
-		{ id: 2, title: "Winter Jacket - North Face", pricePerDay: 12, dateListed: "2026-02-18", rating: 4.8, image: "https://m.media-amazon.com/images/I/516JTrjCKBL._AC_SY879_.jpg", location: "Marina Bay, Singapore", deposit: 80 },
-		{ id: 3, title: "Pioneer DJ Speaker System", pricePerDay: 35, dateListed: "2026-02-22", rating: 4.2, image: "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcRyeSYOVREA3srB9bjLoyKFWMhuBBh6mK1oyCmlNkXP4wbMSTFrINna9g41CyYdV_vAzV8GfdY", location: "Clementi, Singapore", deposit: 250 },
-  	]);
+  	const { listings } = useListings();
 	const [query, setQuery] = useState("");
 	const [sortOption, setSortOption] = useState("cheapest");
 
@@ -111,5 +108,5 @@ export default function RentalMarketplace() {
 				)}
 	 		 </div>
 		</div>
-		);
-	}
+	);
+}

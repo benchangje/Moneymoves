@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { X, Star} from 'lucide-react';
+import { useListings } from './ListingsContext';
 
 export default function Profile() {
     const [username, setUsername] = useState("Benny Ben");
@@ -13,6 +14,10 @@ export default function Profile() {
     const [editBanner, setEditBanner] = useState(banner);
     const [sortOrder, setSortOrder] = useState('newest');
     const [selectedRating, setSelectedRating] = useState(null);
+
+    const { listings } = useListings();
+
+    const userListings = listings.filter(item => item.owner === username);
 
     const reviews = [
         { id: 1, reviewer: "Shree", rating: 5, comment: "Great experience! Item was in perfect condition. Highly recommended!", date: "2026-02-15" },
@@ -35,13 +40,6 @@ export default function Profile() {
             }
         }
     }, []);
-    
-    // Listings data
-    const listings = [
-        { id: 1, title: "PSA 10 Illustrator", price: "$1,000,000/month", image: "https://images2.minutemediacdn.com/image/upload/f_auto,q_auto,g_auto/images/voltaxMediaLibrary/mmsport/si_collects/01khhjv5j6z4rwpyn0yg.jpg" },
-        { id: 2, title: "Camera Equipment", price: "$150/month", image: "https://images.unsplash.com/photo-1609034227505-5876f6aa4e90?w=400&h=300&fit=crop" },
-        { id: 3, title: "Camping Tent", price: "$50/month", image: "https://images.unsplash.com/photo-1478131143081-80f7f84ca84d?w=400&h=300&fit=crop" }
-    ];
 
     const handleImageChange = (e) => {
         const file = e.target.files[0];
@@ -184,7 +182,7 @@ export default function Profile() {
                 <div className="p-6 mb-12">
                     <h1 className="text-3xl font-bold text-gray-900 mb-6">My Listings</h1>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {listings.map((listing) => (
+                        {userListings.map((listing) => (
                             <div key={listing.id} className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
                                 <div className="h-48 bg-gray-200 overflow-hidden">
                                     <img 

@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client'
 import { BrowserRouter } from 'react-router-dom'
 import { AuthProvider } from "./components/AuthContext";
 import { BlinkProvider } from './components/BlinkContext.jsx';
+import { ListingsProvider } from './components/ListingsContext.jsx';
 import './index.css'
 import App from './App.jsx'
 
@@ -11,7 +12,9 @@ createRoot(document.getElementById('root')).render(
       	<StrictMode>
 			<AuthProvider>
 				<BlinkProvider>
-					<App />
+					<ListingsProvider>
+						<App />
+					</ListingsProvider>
 				</BlinkProvider>
 			</AuthProvider>		
      	 </StrictMode>

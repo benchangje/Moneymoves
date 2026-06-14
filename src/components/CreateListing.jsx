@@ -1,11 +1,15 @@
 import { ChevronDown, ChevronRight, Plug2, Shirt, Handbag, CalendarDays, MapPinPen } from "lucide-react";
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useContext } from "react";
 import ImageDropzone from "./ImageDropzone";
 import Confetti from "react-confetti";
 import { Link } from "react-router-dom";
+import { AuthContext } from "./AuthContext";
+import { db } from "./firebase";
+import { collection, addDoc } from "firebase/firestore";
 
 export default function CreateListing() {
 
+    const { user } = useContext(AuthContext);
     //STATE AND REFS
     const [listingTitle, setListingTitle] = useState("");
 
@@ -69,6 +73,7 @@ export default function CreateListing() {
 
     const handleUpload = async (e) => {
         e.preventDefault(); 
+        if (!user) return alert("Log in to create a listing!");
         setIsUploading(true);
 
         try {
@@ -84,25 +89,24 @@ export default function CreateListing() {
                 };
             })
         );
-        
-        // 2. Packaging all states into a FormData object
-        const formData = new FormData();
-        formData.append("title", listingTitle);
-        formData.append("category", selectedCategory);
-        formData.append("interval", selectedLendingInterval);
-        formData.append("price", price);
-        formData.append("location", finalLocation);
-        formData.append("deposit", deposit);
-        formData.append("description", description);
 
-        // 3. Append the processed images as a JSON string
-        formData.append("images", JSON.stringify(processedImages));
+        const mainImageSrc = processedImages[0]
+            ? `data:${processedImages[0].mimeType};base64,${processedImages[0].base64}`
+            : "";
 
-        // 4. Send the POST request to the Google Apps Script endpoint
-        await fetch("https://script.google.com/macros/s/AKfycbwL5usnGqzMPuZycFp7jhPwwGCfcECWu_BQ12Eem6_HLfCH9AAPJg2OFjfKxiGUQv--sw/exec", {
-            method: "POST",
-            body: formData,
-            mode: "no-cors" 
+        await addDoc(collection(db, "listings"), {
+            title: listingTitle,
+            category: selectedCategory,
+            interval: selectedLendingInterval,
+            pricePerDay: Number(price),
+            location: finalLocation,
+            deposit: Number(deposit),
+            description: description,
+            images: processedImages,
+            mainImageSrc: mainImageSrc,
+            owner: user.uid,
+            dateListed: new Date().toISOString().split('T')[0],
+            rating: 5.0
         });
 
         // 5. Show the confetti and success message
