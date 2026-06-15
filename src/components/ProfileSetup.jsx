@@ -2,14 +2,15 @@ import { useState } from 'react';
 import { LogOut } from 'lucide-react';
 import { useAuth } from './useAuth';
 import { useUserProfile } from './useUserProfile';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 export default function ProfileSetup() {
 
     const { logout } = useAuth();
     const { user } = useAuth();
     const { createProfile } = useUserProfile(user);
-    
+    const navigate = useNavigate();
+
     const [formData, setFormData] = useState({
         displayName: user?.displayName || '',
         bio: '',
