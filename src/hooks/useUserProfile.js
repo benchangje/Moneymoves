@@ -1,53 +1,82 @@
 import { useState, useCallback, useEffect } from 'react';
-import { db } from '../firebase';
-import { doc, setDoc, getDoc, updateDoc, serverTimestamp } from 'firebase/firestore';
+import { db, hasFirebaseConfig, storage } from '../firebase';
+import { doc, setDoc, onSnapshot, updateDoc, serverTimestamp } from 'firebase/firestore';
+import { getDownloadURL, ref, uploadBytes } from 'firebase/storage';
+
+const DEFAULT_PROFILE_PICTURE = '/default-pfp.svg';
+
+const uploadProfileAsset = async (userId, file, assetType) => {
+  if (!file || !storage) return '';
+
+  const assetRef = ref(storage, `profiles/${userId}/${assetType}-${Date.now()}-${file.name}`);
+  const snapshot = await uploadBytes(assetRef, file);
+  return getDownloadURL(snapshot.ref);
+};
 
 export const useUserProfile = (user) => {
   const [profile, setProfile] = useState(null);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Get user profile from Firestore
-  const getProfile = useCallback(async () => {
-    if (!user) return;
-    
-    try {
-      setLoading(true);
-      const userDocRef = doc(db, 'users', user.uid);
-      const docSnap = await getDoc(userDocRef);
-      
-      if (docSnap.exists()) {
-        setProfile(docSnap.data());
-      } else {
-        setProfile(null);
-      }
-    } catch (err) {
-      console.error('Error fetching profile:', err);
-      setError(err.message);
-    } finally {
+  // Get user profile from Firestore with real-time listener
+  const getProfile = useCallback(() => {
+    if (!user) return () => {};
+
+    if (!hasFirebaseConfig || !db) {
+      setProfile(null);
+      setError(null);
       setLoading(false);
+      return () => {};
     }
+    
+    const userDocRef = doc(db, 'users', user.uid);
+    
+    const unsubscribe = onSnapshot(
+      userDocRef,
+      (docSnap) => {
+        if (docSnap.exists()) {
+          setProfile(docSnap.data());
+        } else {
+          setProfile(null);
+        }
+        setError(null);
+        setLoading(false);
+      },
+      (err) => {
+        console.error('Error fetching profile:', err);
+        setError(err.message);
+        setLoading(false);
+      }
+    );
+
+    return unsubscribe;
   }, [user]);
 
   // Create user profile on first login
   const createProfile = useCallback(async (profileData) => {
     if (!user) return;
+
+    if (!hasFirebaseConfig || !db) {
+      throw new Error('Firebase is not configured. Add a .env.local file before creating profiles.');
+    }
     
     try {
       setLoading(true);
       const userDocRef = doc(db, 'users', user.uid);
+      const uploadedPhotoURL = await uploadProfileAsset(user.uid, profileData?.photoFile, 'avatar');
+      const uploadedBannerURL = await uploadProfileAsset(user.uid, profileData?.bannerFile, 'banner');
       
       const newProfile = {
         uid: user.uid,
         email: user.email,
         displayName: user.displayName || profileData?.displayName || '',
-        photoURL: user.photoURL || profileData?.photoURL || '',
+        photoURL: uploadedPhotoURL || user.photoURL || profileData?.photoURL || DEFAULT_PROFILE_PICTURE,
+        bannerURL: uploadedBannerURL || profileData?.bannerURL || '',
         bio: profileData?.bio || '',
         phone: profileData?.phone || '',
         location: profileData?.location || '',
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp(),
-        ...profileData,
       };
       
       await setDoc(userDocRef, newProfile, { merge: true });
@@ -65,13 +94,22 @@ export const useUserProfile = (user) => {
   // Update user profile
   const updateProfile = useCallback(async (updates) => {
     if (!user) return;
+
+    if (!hasFirebaseConfig || !db) {
+      throw new Error('Firebase is not configured. Add a .env.local file before updating profiles.');
+    }
     
     try {
       setLoading(true);
       const userDocRef = doc(db, 'users', user.uid);
+      const { photoFile, bannerFile, ...profileUpdates } = updates;
+      const uploadedPhotoURL = await uploadProfileAsset(user.uid, photoFile, 'avatar');
+      const uploadedBannerURL = await uploadProfileAsset(user.uid, bannerFile, 'banner');
       
       const updateData = {
-        ...updates,
+        ...profileUpdates,
+        ...(uploadedPhotoURL ? { photoURL: uploadedPhotoURL } : {}),
+        ...(uploadedBannerURL ? { bannerURL: uploadedBannerURL } : {}),
         updatedAt: serverTimestamp(),
       };
       
@@ -87,14 +125,34 @@ export const useUserProfile = (user) => {
     }
   }, [user, profile]);
 
-  // Load profile on user change
+  // Set up real-time listener on user change
   useEffect(() => {
-    if (user) {
-      getProfile();
-    } else {
-      setProfile(null);
-    }
+    const unsubscribe = getProfile();
+    return () => {
+      if (typeof unsubscribe === 'function') {
+        unsubscribe();
+      }
+    };
   }, [user, getProfile]);
+
+  useEffect(() => {
+    const ensureDefaultProfilePicture = async () => {
+      if (!user || !profile || profile.photoURL) return;
+      if (!hasFirebaseConfig || !db) return;
+
+      try {
+        const userDocRef = doc(db, 'users', user.uid);
+        await updateDoc(userDocRef, {
+          photoURL: DEFAULT_PROFILE_PICTURE,
+          updatedAt: serverTimestamp(),
+        });
+      } catch (err) {
+        console.error('Error backfilling default profile picture:', err);
+      }
+    };
+
+    ensureDefaultProfilePicture();
+  }, [profile, user]);
 
   return {
     profile,

@@ -1,14 +1,18 @@
-import { useState, useEffect } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useUserProfile } from '../hooks/useUserProfile';
 import { useListings } from '../hooks/useListings';
+import { useReviews } from '../hooks/useReviews';
 import { Star } from 'lucide-react';
 import ListingCard from './ListingCard';
+
+const DEFAULT_PROFILE_PICTURE = '/default-pfp.svg';
 
 export default function Profile() {
     const { user } = useAuth();
     const { profile, updateProfile, loading: profileLoading } = useUserProfile(user);
     const { listings: userListings, loading: listingsLoading } = useListings({ ownerUid: user?.uid });
+    const { reviews, loading: reviewsLoading, averageRating, ratedStars } = useReviews('user', user?.uid);
     
     const [isEditing, setIsEditing] = useState(false);
     const [editName, setEditName] = useState('');
@@ -16,15 +20,15 @@ export default function Profile() {
     const [editBio, setEditBio] = useState('');
     const [editPhone, setEditPhone] = useState('');
     const [editLocation, setEditLocation] = useState('');
+    const [editPhotoFile, setEditPhotoFile] = useState(null);
+    const [editBannerFile, setEditBannerFile] = useState(null);
+    const [editPhotoPreview, setEditPhotoPreview] = useState('');
+    const [editBannerPreview, setEditBannerPreview] = useState('');
+    const [avatarError, setAvatarError] = useState(false);
+    const photoInputRef = useRef(null);
+    const bannerInputRef = useRef(null);
     const [saving, setSaving] = useState(false);
     const [message, setMessage] = useState('');
-
-    // Sample data
-    const reviews = [
-        { id: 1, reviewer: "Shree", rating: 5, comment: "Great experience! Item was in perfect condition. Highly recommended!", date: "2026-02-15" },
-        { id: 2, reviewer: "Sean", rating: 5, comment: "Excellent service and communication. Would rent again!", date: "2026-02-10" },
-        { id: 3, reviewer: "Luke", rating: 4, comment: "Good quality items, very professional. Minor issue with delivery but resolved quickly.", date: "2026-02-05" }
-    ];
 
     // Initialize form with profile data
     useEffect(() => {
@@ -34,15 +38,33 @@ export default function Profile() {
             setEditBio(profile.bio || '');
             setEditPhone(profile.phone || '');
             setEditLocation(profile.location || '');
+            setEditPhotoPreview(profile.photoURL || '');
+            setEditBannerPreview(profile.bannerURL || '');
+            setAvatarError(false);
         }
     }, [profile]);
 
-    // Calculate average rating
-    const averageRatingNum = reviews.length > 0 
-        ? reviews.reduce((sum, review) => sum + review.rating, 0) / reviews.length
-        : 0;
-    const averageRating = averageRatingNum.toFixed(1);
-    const ratedStars = Math.round(averageRatingNum);
+    const handlePhotoChange = (e) => {
+        const file = e.target.files?.[0] || null;
+        setEditPhotoFile(file);
+        setEditPhotoPreview(file ? URL.createObjectURL(file) : (profile?.photoURL || ''));
+    };
+
+    const handleBannerChange = (e) => {
+        const file = e.target.files?.[0] || null;
+        setEditBannerFile(file);
+        setEditBannerPreview(file ? URL.createObjectURL(file) : (profile?.bannerURL || ''));
+    };
+
+    const openPhotoPicker = () => {
+        photoInputRef.current?.click();
+    };
+
+    const openBannerPicker = () => {
+        bannerInputRef.current?.click();
+    };
+
+
 
     const normalizedListings = userListings.map((listing) => ({
         ...listing,
@@ -66,6 +88,8 @@ export default function Profile() {
                 bio: editBio,
                 phone: editPhone,
                 location: editLocation,
+                photoFile: editPhotoFile,
+                bannerFile: editBannerFile,
             });
             
             setMessage('Profile updated successfully!');
@@ -85,6 +109,10 @@ export default function Profile() {
             setEditBio(profile.bio || '');
             setEditPhone(profile.phone || '');
             setEditLocation(profile.location || '');
+            setEditPhotoFile(null);
+            setEditBannerFile(null);
+            setEditPhotoPreview(profile.photoURL || DEFAULT_PROFILE_PICTURE);
+            setEditBannerPreview(profile.bannerURL || '');
         }
         setIsEditing(false);
     };
@@ -115,7 +143,10 @@ export default function Profile() {
     return (
         <div className="min-h-screen bg-gray-50">
             {/* Banner */}
-            <div className="w-full h-64 bg-gradient-to-r from-blue-500 to-purple-600"></div>
+            <div
+                className="w-full h-64 bg-linear-to-r from-blue-500 to-purple-600 bg-cover bg-center"
+                style={profile?.bannerURL ? { backgroundImage: `url(${profile.bannerURL})` } : undefined}
+            ></div>
 
             {/* Profile Content */}
             <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 -mt-32 relative z-10">
@@ -124,8 +155,13 @@ export default function Profile() {
                     <div className="px-6 py-8">
                         <div className="flex flex-col md:flex-row items-start md:items-center gap-8">
                             {/* Avatar */}
-                            <div className="w-32 h-32 rounded-full bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center text-white text-4xl font-bold flex-shrink-0">
-                                {profile?.displayName?.charAt(0)?.toUpperCase() || user?.email?.charAt(0)?.toUpperCase() || 'U'}
+                            <div className="w-32 h-32 rounded-full bg-linear-to-br from-blue-400 to-purple-500 shrink-0 overflow-hidden border border-white/20">
+                                <img
+                                    src={avatarError ? DEFAULT_PROFILE_PICTURE : (profile?.photoURL || DEFAULT_PROFILE_PICTURE)}
+                                    alt="Profile avatar"
+                                    className="h-full w-full object-cover"
+                                    onError={() => setAvatarError(true)}
+                                />
                             </div>
 
                             {/* Profile Info */}
@@ -202,6 +238,34 @@ export default function Profile() {
                                             placeholder="City, State"
                                         />
                                     </div>
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-1">Profile Picture</label>
+                                        <input ref={photoInputRef} type="file" accept="image/*" onChange={handlePhotoChange} className="hidden" />
+                                        <button
+                                            type="button"
+                                            onClick={openPhotoPicker}
+                                            className="px-4 py-2 rounded-lg bg-blue-500 text-white text-sm font-medium hover:bg-blue-600 transition-colors"
+                                        >
+                                            Add profile picture
+                                        </button>
+                                        {editPhotoPreview && (
+                                            <img src={editPhotoPreview} alt="Profile preview" className="mt-3 h-24 w-24 rounded-full object-cover border" />
+                                        )}
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-1">Banner Picture</label>
+                                        <input ref={bannerInputRef} type="file" accept="image/*" onChange={handleBannerChange} className="hidden" />
+                                        <button
+                                            type="button"
+                                            onClick={openBannerPicker}
+                                            className="px-4 py-2 rounded-lg bg-blue-500 text-white text-sm font-medium hover:bg-blue-600 transition-colors"
+                                        >
+                                            Add banner picture
+                                        </button>
+                                        {editBannerPreview && (
+                                            <img src={editBannerPreview} alt="Banner preview" className="mt-3 h-28 w-full rounded-lg object-cover border" />
+                                        )}
+                                    </div>
                                     {message && (
                                         <div className={`p-3 rounded-lg ${message.includes('Error') ? 'bg-red-50 text-red-600' : 'bg-green-50 text-green-600'}`}>
                                             {message}
@@ -230,7 +294,7 @@ export default function Profile() {
                     {/* Ratings Section */}
                     <div className="border-t border-gray-200 px-6 py-8">
                         <h2 className="text-2xl font-bold text-gray-900 mb-6">Ratings</h2>
-                        <div className="bg-gradient-to-br from-yellow-50 to-orange-50 p-6 rounded-lg mb-8">
+                        <div className="bg-linear-to-br from-yellow-50 to-orange-50 p-6 rounded-lg mb-8">
                             <p className="text-sm text-gray-600 mb-2">Average Rating</p>
                             <div className="flex items-center gap-3">
                                 <p className="text-4xl font-bold text-gray-900">{averageRating}</p>
@@ -246,25 +310,36 @@ export default function Profile() {
                         </div>
 
                         {/* Reviews */}
-                        <div className="space-y-4">
-                            {reviews.map((review) => (
-                                <div key={review.id} className="border border-gray-200 rounded-lg p-4">
-                                    <div className="flex justify-between items-start mb-2">
-                                        <p className="font-semibold text-gray-900">{review.reviewer}</p>
-                                        <span className="text-sm text-gray-500">{review.date}</span>
+                        {reviewsLoading ? (
+                            <div className="text-center py-8">
+                                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto"></div>
+                                <p className="text-gray-600 mt-4">Loading reviews...</p>
+                            </div>
+                        ) : reviews.length === 0 ? (
+                            <p className="text-gray-600 text-center py-8">No reviews yet</p>
+                        ) : (
+                            <div className="space-y-4">
+                                {reviews.map((review) => (
+                                    <div key={review.id} className="border border-gray-200 rounded-lg p-4">
+                                        <div className="flex justify-between items-start mb-2">
+                                            <p className="font-semibold text-gray-900">{review.reviewerName || 'Anonymous'}</p>
+                                            <span className="text-sm text-gray-500">
+                                                {review.createdAt ? new Date(review.createdAt).toLocaleDateString() : 'Recently'}
+                                            </span>
+                                        </div>
+                                        <div className="flex gap-1 mb-2">
+                                            {[...Array(5)].map((_, i) => (
+                                                <Star
+                                                    key={i}
+                                                    className={`w-4 h-4 ${i < review.rating ? 'fill-yellow-400 text-yellow-400' : 'text-gray-300'}`}
+                                                />
+                                            ))}
+                                        </div>
+                                        <p className="text-gray-700">{review.comment}</p>
                                     </div>
-                                    <div className="flex gap-1 mb-2">
-                                        {[...Array(5)].map((_, i) => (
-                                            <Star
-                                                key={i}
-                                                className={`w-4 h-4 ${i < review.rating ? 'fill-yellow-400 text-yellow-400' : 'text-gray-300'}`}
-                                            />
-                                        ))}
-                                    </div>
-                                    <p className="text-gray-700">{review.comment}</p>
-                                </div>
-                            ))}
-                        </div>
+                                ))}
+                            </div>
+                        )}
                     </div>
 
                     {/* Listings Section */}

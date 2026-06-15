@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect } from 'react';
-import { db } from './firebase';
+import { db, hasFirebaseConfig } from './firebase';
 import { doc, setDoc, getDoc, updateDoc, serverTimestamp } from 'firebase/firestore';
 
 export const useUserProfile = (user) => {
@@ -10,6 +10,12 @@ export const useUserProfile = (user) => {
  	// Get user profile from Firestore
   	const getProfile = useCallback(async () => {
 		if (!user) return;
+
+		if (!hasFirebaseConfig || !db) {
+			setProfile(null);
+			setError(null);
+			return;
+		}
 		
 		try {
 			setLoading(true);
@@ -32,6 +38,10 @@ export const useUserProfile = (user) => {
     // Create user profile on first login
   	const createProfile = useCallback(async (profileData) => {
     	if (!user) return;
+
+	    if (!hasFirebaseConfig || !db) {
+			throw new Error('Firebase is not configured. Add a .env.local file before creating profiles.');
+		}
     
 		try {
 			setLoading(true);
@@ -64,6 +74,10 @@ export const useUserProfile = (user) => {
   	// Update user profile
     const updateProfile = useCallback(async (updates) => {
     	if (!user) return;
+
+	    if (!hasFirebaseConfig || !db) {
+			throw new Error('Firebase is not configured. Add a .env.local file before updating profiles.');
+		}
     
     	try {
 			setLoading(true);

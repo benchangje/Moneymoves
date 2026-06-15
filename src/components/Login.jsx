@@ -1,5 +1,5 @@
 import { signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
-import { auth } from '../firebase';
+import { auth, hasFirebaseConfig } from '../firebase';
 import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 
@@ -9,6 +9,11 @@ export default function Login() {
   const [loading, setLoading] = useState(false);
 
   const handleGoogleSignIn = async () => {
+    if (!hasFirebaseConfig || !auth) {
+      setError('Firebase is not configured. Add a .env.local file to enable sign-in.');
+      return;
+    }
+
     try {
       setLoading(true);
       setError('');

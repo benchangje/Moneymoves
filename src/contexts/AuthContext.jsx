@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useState } from 'react';
-import { auth, db } from '../firebase';
+import { auth, db, hasFirebaseConfig } from '../firebase';
 import { browserLocalPersistence, onAuthStateChanged, setPersistence } from 'firebase/auth';
 import { doc, getDoc } from 'firebase/firestore';
 
@@ -16,6 +16,17 @@ export const AuthProvider = ({ children }) => {
     let unsubscribe = null;
     let initialNullTimer = null;
     let hasResolvedInitialAuth = false;
+
+    if (!hasFirebaseConfig || !auth || !db) {
+      if (!isMounted) return undefined;
+      setUser(null);
+      setNeedsProfileSetup(false);
+      setError(null);
+      setLoading(false);
+      return () => {
+        isMounted = false;
+      };
+    }
 
     const clearInitialNullTimer = () => {
       if (initialNullTimer) {

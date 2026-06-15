@@ -7,7 +7,7 @@ import {
   serverTimestamp,
   where,
 } from 'firebase/firestore';
-import { db } from '../firebase';
+import { db, hasFirebaseConfig } from '../firebase';
 
 export const useListings = ({ ownerUid = null, publishedOnly = false } = {}) => {
   const [listings, setListings] = useState([]);
@@ -15,17 +15,41 @@ export const useListings = ({ ownerUid = null, publishedOnly = false } = {}) => 
   const [error, setError] = useState(null);
 
   const buildQuery = useCallback(() => {
+    if (!hasFirebaseConfig || !db) {
+      return null;
+    }
+
     const listingsRef = collection(db, 'listings');
+
+    if (ownerUid && publishedOnly) {
+      return query(
+        listingsRef,
+        where('ownerUid', '==', ownerUid),
+        where('status', '==', 'published')
+      );
+    }
 
     if (ownerUid) {
       return query(listingsRef, where('ownerUid', '==', ownerUid));
     }
 
+    if (publishedOnly) {
+      return query(listingsRef, where('status', '==', 'published'));
+    }
+
     return query(listingsRef);
-  }, [ownerUid]);
+  }, [ownerUid, publishedOnly]);
 
   useEffect(() => {
     const q = buildQuery();
+
+    if (!q) {
+      setListings([]);
+      setError(null);
+      setLoading(false);
+      return undefined;
+    }
+
     const unsubscribe = onSnapshot(
       q,
       (snapshot) => {
@@ -61,6 +85,10 @@ export const useListings = ({ ownerUid = null, publishedOnly = false } = {}) => 
 };
 
 export const createListing = async (listingData) => {
+  if (!hasFirebaseConfig || !db) {
+    throw new Error('Firebase is not configured. Add a .env.local file before creating listings.');
+  }
+
   const docRef = await addDoc(collection(db, 'listings'), {
     ...listingData,
     status: 'published',

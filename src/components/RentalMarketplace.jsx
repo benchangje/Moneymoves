@@ -21,12 +21,13 @@ export default function RentalMarketplace() {
         () =>
             marketplaceListings.map((listing) => ({
                 id: listing.id,
+                ownerUid: listing.ownerUid,
+                ownerName: listing.ownerName,
                 title: listing.title,
                 pricePerDay: Number(listing.price ?? 0),
                 dateListed: listing.createdAt
                     ? new Date(listing.createdAt).toISOString().split("T")[0]
                     : "",
-                rating: 4.5,
                 image: listing.image || listing.images?.[0] || "",
                 location: listing.location || "Location not provided",
                 deposit: Number(listing.deposit ?? 0),
