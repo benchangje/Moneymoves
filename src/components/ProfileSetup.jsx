@@ -6,7 +6,7 @@ import ImageDropzoneProfile from "./ImageDropzoneProfile";
 import { useNavigate } from 'react-router-dom'; 
 import { Link } from 'react-router-dom';
 
-export default function ProfileSetup() {
+const DEFAULT_PROFILE_PICTURE = '/default-pfp.svg';
 
     const [telegramVerified, setTelegramVerified] = useState(false);
     const telegramUser = window.Telegram?.WebApp?.initDataUnsafe?.user;
@@ -46,6 +46,26 @@ export default function ProfileSetup() {
         }));
     };
 
+    const handlePhotoChange = (e) => {
+        const file = e.target.files?.[0] || null;
+        setPhotoFile(file);
+        setPhotoPreview(file ? URL.createObjectURL(file) : '');
+    };
+
+    const handleBannerChange = (e) => {
+        const file = e.target.files?.[0] || null;
+        setBannerFile(file);
+        setBannerPreview(file ? URL.createObjectURL(file) : '');
+    };
+
+    const openPhotoPicker = () => {
+        photoInputRef.current?.click();
+    };
+
+    const openBannerPicker = () => {
+        bannerInputRef.current?.click();
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         
@@ -64,7 +84,7 @@ export default function ProfileSetup() {
         }
 
         try {
-            setSubmitLoading(true);
+            setLoading(true);
             setError('');
             
             await createProfile({
@@ -78,7 +98,7 @@ export default function ProfileSetup() {
             setError('Error creating profile: ' + err.message);
             console.error(err);
         } finally {
-            setSubmitLoading(false);
+            setLoading(false);
         }
     };
 
@@ -102,10 +122,10 @@ export default function ProfileSetup() {
     }, [telegramUsername]);
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 flex items-center justify-center p-4 py-8">
-            <div className="w-full max-w-md bg-white rounded-lg shadow-[0_0_8px_rgba(0,0,0,0.08)] p-8">
+        <div className="min-h-screen bg-linear-to-br from-blue-50 to-purple-50 flex items-center justify-center px-4">
+            <div className="w-full max-w-md bg-white rounded-lg shadow-lg p-8">
                 <div className="text-center mb-8">
-                    <h1 className="text-3xl font-bold text-gray-900 mb-2">Welcome to Rentla!</h1>
+                    <h1 className="text-3xl font-bold text-gray-900 mb-2">Welcome to MoneyMoves!</h1>
                     <p className="text-gray-600">Let's set up your profile</p>
                 </div>
 
@@ -137,7 +157,8 @@ export default function ProfileSetup() {
                             value={formData.displayName}
                             onChange={handleChange}
                             placeholder="John Doe"
-                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-1 focus:ring-blue-500 focus:border-transparent outline-none hover:scale-101 transition-all duration-400 ease-out"
+                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition"
+                            required
                         />
                     </div>
                     
@@ -173,8 +194,8 @@ export default function ProfileSetup() {
 
                     {/* Location */}
                     <div>
-                        <label htmlFor="location" className="translate-x-1 block text-sm font-medium text-gray-700 mb-2">
-                            Location *
+                        <label htmlFor="location" className="block text-sm font-medium text-gray-700 mb-2">
+                            Location
                         </label>
                         <input
                             type="text"
@@ -183,41 +204,62 @@ export default function ProfileSetup() {
                             value={formData.location}
                             onChange={handleChange}
                             placeholder="City, State"
-                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-1 focus:ring-blue-500 focus:border-transparent outline-none hover:scale-101 transition-all duration-400 ease-out"
+                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition"
                         />
                     </div>
 
-                    {/* Bio */}
                     <div>
-                        <label htmlFor="bio" className="translate-x-1 block text-sm font-medium text-gray-700 mb-2">
-                            Bio
+                        <label htmlFor="photoFile" className="block text-sm font-medium text-gray-700 mb-2">
+                            Profile Picture
                         </label>
-                        <textarea
-                            id="bio"
-                            name="bio"
-                            value={formData.bio}
-                            onChange={handleChange}
-                            placeholder="Tell other users about yourself (optional)"
-                            rows="4"
-                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-1 focus:ring-blue-500 focus:border-transparent outline-none hover:scale-101 transition-all duration-400 ease-out resize-none"
-                        />
-                        <p className="translate-x-1 text-xs text-gray-500 mt-1">Max 500 characters</p>
+                        <input ref={photoInputRef} type="file" id="photoFile" accept="image/*" onChange={handlePhotoChange} className="hidden" />
+                        <button
+                            type="button"
+                            onClick={openPhotoPicker}
+                            className="px-4 py-2 rounded-lg bg-blue-500 text-white text-sm font-medium hover:bg-blue-600 transition-colors"
+                        >
+                            Add profile picture
+                        </button>
+                        {photoPreview && (
+                            <img src={photoPreview} alt="Profile preview" className="mt-3 h-24 w-24 rounded-full object-cover border" />
+                        )}
+                        {!photoPreview && (
+                            <img src={DEFAULT_PROFILE_PICTURE} alt="Default profile preview" className="mt-3 h-24 w-24 rounded-full object-cover border" />
+                        )}
+                    </div>
+
+                    <div>
+                        <label htmlFor="bannerFile" className="block text-sm font-medium text-gray-700 mb-2">
+                            Banner Picture
+                        </label>
+                        <input ref={bannerInputRef} type="file" id="bannerFile" accept="image/*" onChange={handleBannerChange} className="hidden" />
+                        <button
+                            type="button"
+                            onClick={openBannerPicker}
+                            className="px-4 py-2 rounded-lg bg-blue-500 text-white text-sm font-medium hover:bg-blue-600 transition-colors"
+                        >
+                            Add banner picture
+                        </button>
+                        {bannerPreview && (
+                            <img src={bannerPreview} alt="Banner preview" className="mt-3 h-28 w-full rounded-lg object-cover border" />
+                        )}
                     </div>
 
                     {/* Submit Button */}
                     <button
                         type="submit"
-                        disabled={!isFormValid || submitLoading}
-                        className="w-full bg-gradient-to-r from-blue-500 to-purple-600 text-white font-semibold py-3 rounded-lg hover:from-blue-600 hover:to-purple-700 hover:scale-101 transition-all duration-400 disabled:opacity-50 disabled:cursor-not-allowed"
+                        disabled={loading}
+                        className="w-full bg-linear-to-r from-blue-500 to-purple-600 text-white font-semibold py-3 rounded-lg hover:from-blue-600 hover:to-purple-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                        {submitLoading ? 'Setting up profile...' : 'Complete Setup'}
+                        {loading ? 'Setting up profile...' : 'Complete Setup'}
                     </button>
 
-                    <p className="text-sm text-gray-500 text-center">
+                    <p className="text-xs text-gray-500 text-center">
                         * Required field
                     </p>
                 </form>
-                <div className="mt-6 p-4 bg-gray-200 rounded-lg">
+
+                <div className="mt-6 p-4 bg-blue-50 rounded-lg">
                     <p className="text-sm text-gray-700">
                         <span className="font-semibold">Email:</span> {user?.email}
                     </p>

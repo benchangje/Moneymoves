@@ -1,0 +1,34 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /listings/{listingId} {
+      allow read: if resource.data.status == 'published' || (request.auth != null && resource.data.ownerUid == request.auth.uid);
+      allow create: if request.auth != null
+        && request.resource.data.ownerUid == request.auth.uid
+        && request.resource.data.title is string
+        && request.resource.data.price is number
+        && request.resource.data.status == 'published';
+      allow update, delete: if request.auth != null && resource.data.ownerUid == request.auth.uid;
+    }
+
+    match /users/{userId} {
+      allow read: if request.auth != null;
+      allow create, update: if request.auth != null && request.auth.uid == userId;
+    }
+
+    match /reviews/{reviewId} {
+      allow read: if (resource.data.listingId != null
+        && exists(/databases/$(database)/documents/listings/$(resource.data.listingId))
+        && get(/databases/$(database)/documents/listings/$(resource.data.listingId)).data.status == 'published')
+        || request.auth != null;
+      allow create: if request.auth != null
+        && request.resource.data.reviewerId == request.auth.uid
+        && request.resource.data.rating is number
+        && request.resource.data.rating >= 1
+        && request.resource.data.rating <= 5
+        && request.resource.data.comment is string
+        && request.resource.data.comment.size() > 0;
+      allow update, delete: if request.auth != null && resource.data.reviewerId == request.auth.uid;
+    }
+  }
+}

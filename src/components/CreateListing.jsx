@@ -3,6 +3,8 @@ import { useState, useRef, useEffect } from "react";
 import ImageDropzone from "./ImageDropzone";
 import Confetti from "react-confetti";
 import { Link } from "react-router-dom";
+import { useAuth } from "../contexts/AuthContext";
+import { createListing } from "../hooks/useListings";
 
 export default function CreateListing() {
 
@@ -38,6 +40,7 @@ export default function CreateListing() {
     const [submit, setSubmit] = useState(false);
 
     const [isUploading, setIsUploading] = useState(false);
+    const { user } = useAuth();
 
     // This translates the image file into a Base64 text string
     const fileToBase64 = (file) => {
@@ -54,45 +57,59 @@ export default function CreateListing() {
         setIsUploading(true);
 
         try {
-        // 1. Loop through ALL uploaded images and convert them to Base64
-        // Promise.all ensures we wait for every single image to finish converting before moving on
-        const processedImages = await Promise.all(
-            imageFile.map(async (file) => {
-                const base64String = await fileToBase64(file);
-                return {
-                    name: file.name,
-                    mimeType: file.type,
-                    base64: base64String
-                };
-            })
-        );
-        
-        // 2. Packaging all states into a FormData object
-        const formData = new FormData();
-        formData.append("title", listingTitle);
-        formData.append("category", selectedCategory);
-        formData.append("interval", selectedLendingInterval);
-        formData.append("price", price);
-        formData.append("deposit", deposit);
-        formData.append("description", description);
+            if (!user?.uid) {
+                throw new Error("Please sign in to create a listing.");
+            }
 
-        // 3. Append the processed images as a JSON string
-        formData.append("images", JSON.stringify(processedImages));
+            const processedImages = await Promise.all(
+                imageFile.map(async (file) => {
+                    const base64String = await fileToBase64(file);
+                    return {
+                        name: file.name,
+                        mimeType: file.type,
+                        base64: base64String
+                    };
+                })
+            );
 
-        // 4. Send the POST request to the Google Apps Script endpoint
-        await fetch("https://script.google.com/macros/s/AKfycbwL5usnGqzMPuZycFp7jhPwwGCfcECWu_BQ12Eem6_HLfCH9AAPJg2OFjfKxiGUQv--sw/exec", {
-            method: "POST",
-            body: formData,
-            mode: "no-cors" 
-        });
+            const primaryImage = processedImages[0]
+                ? `data:${processedImages[0].mimeType};base64,${processedImages[0].base64}`
+                : "";
 
-        // 5. Show the confetti and success message
-        setSubmit(true);
+            const formData = new FormData();
+            formData.append("title", listingTitle);
+            formData.append("category", selectedCategory);
+            formData.append("interval", selectedLendingInterval);
+            formData.append("price", price);
+            formData.append("deposit", deposit);
+            formData.append("description", description);
+            formData.append("images", JSON.stringify(processedImages));
 
-        // Catch errors
+            await fetch("https://script.google.com/macros/s/AKfycbwL5usnGqzMPuZycFp7jhPwwGCfcECWu_BQ12Eem6_HLfCH9AAPJg2OFjfKxiGUQv--sw/exec", {
+                method: "POST",
+                body: formData,
+                mode: "no-cors" 
+            });
+
+            await createListing({
+                ownerUid: user.uid,
+                ownerEmail: user.email || "",
+                ownerName: user.displayName || "",
+                title: listingTitle,
+                category: selectedCategory,
+                interval: selectedLendingInterval,
+                price: Number(price),
+                deposit: Number(deposit || 0),
+                description,
+                image: primaryImage,
+                images: processedImages,
+                location: ""
+            });
+
+            setSubmit(true);
         } catch (error) {
             console.error("Error saving data:", error);
-            alert("There was an issue uploading your images. Please try again.");
+            alert(error.message || "There was an issue uploading your images. Please try again.");
         } finally {
             setIsUploading(false); 
         }

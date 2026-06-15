@@ -1,12 +1,15 @@
 import { useState, useEffect } from "react";
 import { Star } from "lucide-react";
+import { useReviews } from "../hooks/useReviews";
+import ReviewForm from "./ReviewForm";
 
-const ListingCard = ({ item, onCardClick }) => {
+const ListingCard = ({ item, onCardClick = () => {} }) => {
 const defaultPlaceholder =
 	item.imageFallback ||
 	`https://via.placeholder.com/640x360.png?text=${encodeURIComponent(item.title || "Listing")}`;
 
 const [imgSrc, setImgSrc] = useState(item.image || defaultPlaceholder);
+const { averageRating, reviewCount } = useReviews('listing', item.id, Boolean(item?.id));
 
 // update imgSrc when item changes (e.g. when rendering recommendations)
 useEffect(() => {
@@ -26,7 +29,7 @@ const dateListed =
 		day: "numeric",
 	});
 
-const rating = typeof item.rating === "number" ? item.rating : 4.5; // placeholder default
+const rating = Number(averageRating) || (typeof item.rating === "number" ? item.rating : 0);
 const fullStars = Math.floor(rating);
 const emptyStars = 5 - fullStars;
 
@@ -60,9 +63,11 @@ return (
 				<Star key={`e-${i}`} className="w-3 h-3 fill-gray-300 stroke-gray-300" />
 			))}
 		</div>
-		<span className="text-xs text-gray-900">{rating.toFixed(1)}</span>
+		<span className="text-xs text-gray-900">{rating > 0 ? rating.toFixed(1) : 'No rating'}</span>
+		{reviewCount > 0 && <span className="text-xs text-gray-600">({reviewCount})</span>}
 	</div>
 	<p className="text-xs text-gray-700 mt-2">Listed: {dateListed}</p>
+	<ReviewForm listing={item} />
 	</div>
 );
 };
