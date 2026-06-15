@@ -1,161 +1,79 @@
-import { useState, useEffect } from "react";
-import { Mail, KeyRound, Eye, EyeOff, LogOut } from "lucide-react";
-import { auth, db } from "./firebase";
-import { doc, getDoc } from "firebase/firestore";
-import { FcGoogle } from "react-icons/fc";
-import { useAuth } from "./useAuth";
-import { useNavigate } from "react-router-dom";
-import { signInWithEmailAndPassword, 
-         GoogleAuthProvider,
-         signInWithPopup } from 'firebase/auth';
-
-const provider = new GoogleAuthProvider();
+import { signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
+import { auth, hasFirebaseConfig } from '../firebase';
+import { useNavigate } from 'react-router-dom';
+import { useState } from 'react';
 
 export default function Login() {
+  const navigate = useNavigate();
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
-    const { user } = useAuth();
-    const navigate = useNavigate();
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-    const [showPassword, setShowPassword] = useState(false);
-    const [errorMessage, setErrorMessage] = useState('');
+  const handleGoogleSignIn = async () => {
+    if (!hasFirebaseConfig || !auth) {
+      setError('Firebase is not configured. Add a .env.local file to enable sign-in.');
+      return;
+    }
 
-    useEffect(() => {
-        const checkProfileSetup = async () => {
-            if (!user) return; 
-            try {
-                const userDocRef = doc(db, 'users', user.uid);
-                const docSnap = await getDoc(userDocRef);              
-                if (!docSnap.exists()) {
-                    navigate("/profile_setup")
-                } else if (docSnap.exists()) {
-                    const profileData = docSnap.data();
-                    if (!profileData.displayName) {                       
-                        navigate("/profile_setup");
-                    } else {
-                        navigate("/");
-                    }
-                } else {
-                    navigate("/profile_setup");
-                }
-            } catch (err) {
-                console.error('Error checking profile setup:', err);
-            }
-        };
-        checkProfileSetup();
-    }, [user]);
+    try {
+      setLoading(true);
+      setError('');
+      const provider = new GoogleAuthProvider();
+      await signInWithPopup(auth, provider);
+      navigate('/');
+    } catch (error) {
+      setError(error.message);
+      console.error('Sign in error:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    //Sign up 
-    const handleGoToSignUp = async () => {
-        navigate("/signup");
-    };
+  return (
+    <div className="min-h-screen bg-white flex items-center justify-center px-4 sm:px-6 lg:px-8">
+      <div className="w-full max-w-md">
+        <div className="bg-white rounded-lg shadow-md p-8">
+          <div className="flex justify-center mb-6">
+            <img src="/rentlalogonew.jpg" alt="Logo" className="h-16 w-auto" />
+          </div>
+          
+          <h1 className="text-3xl font-bold text-center text-gray-600 mb-2">
+            Welcome to MoneyMoves
+          </h1>
+          <p className="text-center text-gray-500 mb-8">
+            Sign in to access your account
+          </p>
 
-    //Sign in
-    const handleSignIn = async () => {
-        setErrorMessage('');
-        try {
-            await signInWithEmailAndPassword(auth, email, password);
-        } catch (error) {
-            console.error("Error signing in:", error);
-            if (error.code === "auth/user-not-found") {
-                setErrorMessage("No account found with this email.");
-            } else if (error.code === "auth/wrong-password") {
-                setErrorMessage("Incorrect password.");
-            } else if (error.code === "auth/invalid-email") {
-                setErrorMessage("Invalid email format.");
-            } else if (error.code === "auth/invalid-credential") {
-                setErrorMessage("Invalid email or password.");
-            } else {
-                setErrorMessage("Something went wrong. Please try again.");
-            }
-        };
-    };
-
-    //Sign in with Google
-    const handleGoogleSignIn = async () => {
-        try {
-            await signInWithPopup(auth, provider);
-        } catch (error) {
-            console.error("Error signing in with Google:", error);
-        }
-    };
-
-    return (
-        <div className="bg-gray-50 min-h-screen z-60">
-            <div className="flex flex-col items-center max-w-7xl mx-auto p-6 px-8 lg:p-8 lg:px-10">
-                <h1 className="text-3xl font-semibold text-gray-900 mb-3">Login</h1>
-                <p className="text-base text-gray-600">Please sign in or sign up to access your profile and create listings.</p>
-                <div className="max-w-lg w-full mx-auto mt-6 bg-white p-6 pb-5 rounded-lg shadow-[0_0_8px_rgba(0,0,0,0.08)]">
-                    <div className="relative hover:scale-101 transition-all duration-300 mt-1">
-                        <Mail className="h-5 w-5 text-gray-400 top-3.5 left-4 absolute transform" />
-                        <input 
-                            type="email" 
-                            placeholder="Email Address" 
-                            value={email} 
-                            onChange={(e) => setEmail(e.target.value)} 
-                            className="w-full bg-gray-200 rounded-2xl pl-12 px-5 py-3 placeholder-gray-400 focus:outline-none focus:placeholder-gray-400 text-gray-400 focus:text-gray-600 hover:bg-gray-300 mb-6"
-                        />
-                    </div>
-                    <div className="relative hover:scale-101 transition-all duration-300">
-                        <KeyRound className="h-5 w-5 text-gray-400 top-3.5 left-4 absolute transform" />
-                        <input 
-                            type={showPassword ? "text" : "password"} 
-                            placeholder="Password" 
-                            value={password} 
-                            onChange={(e) => setPassword(e.target.value)} 
-                            className="w-full bg-gray-200 rounded-2xl pl-12 px-5 py-3 placeholder-gray-400 focus:outline-none focus:placeholder-gray-400 text-gray-400 focus:text-gray-600 hover:bg-gray-300 mb-6"
-                        />
-                        <button 
-                            type="button" 
-                            onClick={() => setShowPassword(!showPassword)} 
-                            className="absolute right-4 top-3.5 text-gray-400 hover:text-gray-600"
-                        >
-                            {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
-                        </button>
-                    </div>
-                    <div className="flex flex-col items-start gap-5">
-                        <button 
-                            onClick={handleSignIn} 
-                            disabled={!email || !password}
-                            className={`${(!email || !password) ? 'bg-gray-500 hover:bg-gray-600 cursor-not-allowed' : 'bg-blue-500 hover:bg-blue-600'} w-full text-white px-5 py-3 rounded-2xl hover:scale-101 transition-all duration-300`}>
-                            Sign In
-                        </button>
-                        {errorMessage &&
-                            <div>
-                                <p className="text-red-500 ml-1">{errorMessage}</p>
-                            </div>
-                        }
-                        <div className="w-full flex items-center gap-3">
-                            <div className="flex-grow border-t-1 border-gray-400 opacity-60 h-px"></div>
-                            <span className="text-gray-400 text-base pb-0.5">
-                                or
-                            </span>
-                            <div className="flex-grow border-t-1 border-gray-400 opacity-60 h-px"></div>
-                        </div>
-                        <div className="w-full rounded-2xl bg-white border-1 border-gray-300 text-gray-600 hover:bg-gray-100 hover:scale-101 transition-all duration-300">
-                            <button onClick={handleGoogleSignIn} className=" font-medium w-full px-5 py-3 flex flex-row justify-center rounded-2xl gap-2">
-                                <FcGoogle className="h-6 w-6 shrink-0 mr-1"/>
-                                <p className="text-medium">Sign in with Google</p>
-                            </button>
-                        </div>
-                        <p className="text-sm text-gray-600 ml-1">
-                            Don't have an account? 
-                            <button onClick={handleGoToSignUp} className="text-blue-500 hover:underline font-medium ml-1">
-                                Sign up here
-                            </button>
-                        </p>
-                    </div>
-                    <div className="relative hover:scale-101 transition-all duration-300 mt-5 mb-2">
-                        <button 
-                            onClick={() => navigate('/')} 
-                            className="w-full bg-blue-500 text-white rounded-2xl pl-12 px-5 py-3 gap-2 hover:bg-blue-600 transition-all duration-300"
-                        >
-                            <LogOut className="h-5 w-5 text-white top-3.5 left-4 absolute transform" />
-                            Return to Marketplace
-                        </button>
-                    </div>
-                </div>
+          {error && (
+            <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-md">
+              <p className="text-red-600 text-sm">{error}</p>
             </div>
+          )}
+
+          <button
+            onClick={handleGoogleSignIn}
+            disabled={loading}
+            className="w-full flex items-center justify-center gap-3 px-4 py-3 bg-white border border-gray-300 rounded-lg font-medium text-gray-700 hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {loading ? (
+              <span className="animate-spin">⏳</span>
+            ) : (
+              <>
+                <svg className="w-5 h-5" viewBox="0 0 24 24">
+                  <path
+                    fill="currentColor"
+                    d="M12 2C6.47 2 2 6.47 2 12s4.47 10 10 10 10-4.47 10-10S17.53 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm3.5-9c.83 0 1.5-.67 1.5-1.5S16.33 8 15.5 8 14 8.67 14 9.5s.67 1.5 1.5 1.5zm-7 0c.83 0 1.5-.67 1.5-1.5S9.33 8 8.5 8 7 8.67 7 9.5 7.67 11 8.5 11zm3.5 6.5c2.33 0 4.31-1.46 5.11-3.5H6.89c.8 2.04 2.78 3.5 5.11 3.5z"
+                  />
+                </svg>
+                Sign in with Google
+              </>
+            )}
+          </button>
+
+          <p className="text-center text-gray-500 text-sm mt-6">
+            By signing in, you agree to our Terms of Service and Privacy Policy
+          </p>
         </div>
-    );
+      </div>
+    </div>
+  );
 }

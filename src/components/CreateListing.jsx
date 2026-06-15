@@ -3,12 +3,13 @@ import { useState, useRef, useEffect } from "react";
 import ImageDropzone from "./ImageDropzone";
 import Confetti from "react-confetti";
 import { Link } from "react-router-dom";
+import { useAuth } from "../contexts/AuthContext";
+import { createListing } from "../hooks/useListings";
 
 export default function CreateListing() {
 
     //STATE AND REFS
     const [listingTitle, setListingTitle] = useState("");
-
     const [categoryIsOpen, setCategoryIsOpen] = useState(false);
     const [selectedCategory, setSelectedCategory] = useState("Select a category");
     const categories = [
@@ -29,33 +30,17 @@ export default function CreateListing() {
     const [deposit, setDeposit] = useState("");
     const [description, setDescription] = useState("");
 
-    const existingLocations = [
-        "COM1 Level 2 (SoC)",
-        "UTown Starbucks",
-        "Central Library Forum"
-    ];
-
-    const [locationIsOpen, setLocationIsOpen] = useState(false);
-    const [selectedLocationOption, setSelectedLocationOption] = useState('Select a meet-up location');
-    const locationRef = useRef(null);
-
-    const isLocationValid = selectedLocationOption.trim() !== "";
-
-    const finalLocation = selectedLocationOption;
-
     const isFormValid = 
         listingTitle.trim() !== "" &&
         selectedCategory !== "Select a category" &&
         imageFile && imageFile.length > 0 &&
         selectedLendingInterval !== "Lending interval" &&
-        price.trim() !== "" &&
-        deposit.trim() !== "" &&
-        description.trim() !== "" &&
-        isLocationValid;
+        price.trim() !== "";
 
     const [submit, setSubmit] = useState(false);
 
     const [isUploading, setIsUploading] = useState(false);
+    const { user } = useAuth();
 
     // This translates the image file into a Base64 text string
     const fileToBase64 = (file) => {
@@ -72,46 +57,59 @@ export default function CreateListing() {
         setIsUploading(true);
 
         try {
-        // 1. Loop through ALL uploaded images and convert them to Base64
-        // Promise.all ensures we wait for every single image to finish converting before moving on
-        const processedImages = await Promise.all(
-            imageFile.map(async (file) => {
-                const base64String = await fileToBase64(file);
-                return {
-                    name: file.name,
-                    mimeType: file.type,
-                    base64: base64String
-                };
-            })
-        );
-        
-        // 2. Packaging all states into a FormData object
-        const formData = new FormData();
-        formData.append("title", listingTitle);
-        formData.append("category", selectedCategory);
-        formData.append("interval", selectedLendingInterval);
-        formData.append("price", price);
-        formData.append("location", finalLocation);
-        formData.append("deposit", deposit);
-        formData.append("description", description);
+            if (!user?.uid) {
+                throw new Error("Please sign in to create a listing.");
+            }
 
-        // 3. Append the processed images as a JSON string
-        formData.append("images", JSON.stringify(processedImages));
+            const processedImages = await Promise.all(
+                imageFile.map(async (file) => {
+                    const base64String = await fileToBase64(file);
+                    return {
+                        name: file.name,
+                        mimeType: file.type,
+                        base64: base64String
+                    };
+                })
+            );
 
-        // 4. Send the POST request to the Google Apps Script endpoint
-        await fetch("https://script.google.com/macros/s/AKfycbwL5usnGqzMPuZycFp7jhPwwGCfcECWu_BQ12Eem6_HLfCH9AAPJg2OFjfKxiGUQv--sw/exec", {
-            method: "POST",
-            body: formData,
-            mode: "no-cors" 
-        });
+            const primaryImage = processedImages[0]
+                ? `data:${processedImages[0].mimeType};base64,${processedImages[0].base64}`
+                : "";
 
-        // 5. Show the confetti and success message
-        setSubmit(true);
+            const formData = new FormData();
+            formData.append("title", listingTitle);
+            formData.append("category", selectedCategory);
+            formData.append("interval", selectedLendingInterval);
+            formData.append("price", price);
+            formData.append("deposit", deposit);
+            formData.append("description", description);
+            formData.append("images", JSON.stringify(processedImages));
 
-        // Catch errors
+            await fetch("https://script.google.com/macros/s/AKfycbwL5usnGqzMPuZycFp7jhPwwGCfcECWu_BQ12Eem6_HLfCH9AAPJg2OFjfKxiGUQv--sw/exec", {
+                method: "POST",
+                body: formData,
+                mode: "no-cors" 
+            });
+
+            await createListing({
+                ownerUid: user.uid,
+                ownerEmail: user.email || "",
+                ownerName: user.displayName || "",
+                title: listingTitle,
+                category: selectedCategory,
+                interval: selectedLendingInterval,
+                price: Number(price),
+                deposit: Number(deposit || 0),
+                description,
+                image: primaryImage,
+                images: processedImages,
+                location: ""
+            });
+
+            setSubmit(true);
         } catch (error) {
             console.error("Error saving data:", error);
-            alert("There was an issue uploading your images. Please try again.");
+            alert(error.message || "There was an issue uploading your images. Please try again.");
         } finally {
             setIsUploading(false); 
         }
@@ -125,9 +123,6 @@ export default function CreateListing() {
             }
             if (lendingRef.current && !lendingRef.current.contains(event.target)) {
                 setLendingIntervalIsOpen(false);
-            }
-            if (locationRef.current && !locationRef.current.contains(event.target)) {
-                setLocationIsOpen(false);
             }
         }
         document.addEventListener("mousedown", handleClickOutside);
@@ -143,6 +138,7 @@ export default function CreateListing() {
                 </h1>
                 <div className="bg-white shadow-[0_0_8px_rgba(0,0,0,0.08)] rounded-xl p-4 sm:p-6 lg:p-8">
                     <form onSubmit={handleUpload} className="w-full">
+                        
                         {/*TITLE INPUT*/}
                         <div className="pb-6 hover:scale-101 transition-all duration-400 ease-out">
                             <input
@@ -163,7 +159,7 @@ export default function CreateListing() {
                                 className={`w-full flex items-center justify-between bg-[#eceef2] rounded-xl px-4 py-3 text-base hover:bg-gray-200 transition-all duration-400 ease-out`}
                                 onClick={() => setCategoryIsOpen(!categoryIsOpen)}
                             >
-                                <div className="flex items-center justify-between gap-4">
+                                <div className="flex items-center justify-between gap-3">
                                     {selectedCategory !== "Select a category" && (() => {
                                         const activeItem = categories.find(pair => pair.label === selectedCategory);
                                         const ActiveIcon = activeItem ? activeItem.icon : null;
@@ -175,7 +171,7 @@ export default function CreateListing() {
                                 </div>
                                 {categoryIsOpen ? (<ChevronDown className="h-5 w-5 sm:h-6 sm:w-6 text-gray-600"/>) : (<ChevronRight className="h-5 w-5 sm:h-6 sm:w-6 text-gray-400"/>)}
                             </button>
-                            <div className={`absolute top-full left-0  w-full mt-2 bg-[#eceef2] rounded-xl overflow-hidden transition-all shadow-md duration-400 ease-out
+                            <div className={`absolute top-full left-0  w-full mt-2 bg-gray-300 rounded-xl overflow-hidden transition-all shadow-md duration-400 ease-out
                                 ${categoryIsOpen ? "opacity-100 translate-y-0 pointer-events-auto" : "opacity-0 -translate-y-2 pointer-events-none"}`}>
                                 <ul className="flex flex-col">
                                     {categories.map((category) => (
@@ -186,7 +182,7 @@ export default function CreateListing() {
                                                     setSelectedCategory(category.label); 
                                                     setCategoryIsOpen(false);              
                                                 }}
-                                                className="w-full text-left px-4 py-3 text-gray-400 hover:bg-gray-200 hover:text-gray-600 transition-colors">
+                                                className="w-full text-left px-4 py-3 text-gray-600 hover:bg-gray-200 transition-colors">
                                                 {category.label}
                                             </button>
                                         </li>
@@ -218,7 +214,7 @@ export default function CreateListing() {
                                     </div>
                                     {lendingIntervalIsOpen ? (<ChevronDown className="h-5 w-5 sm:h-6 sm:w-6 text-gray-600"/>) : (<ChevronRight className="h-5 w-5 sm:h-6 sm:w-6 text-gray-400"/>)}
                                 </button>
-                                <div className={`absolute top-full left-0 z-10 w-full mt-2 bg-[#eceef2] rounded-xl overflow-hidden transition-all shadow-md duration-400 
+                                <div className={`absolute top-full left-0 z-10 w-full mt-2 bg-gray-300 rounded-xl overflow-hidden transition-all shadow-md duration-400 
                                     ${lendingIntervalIsOpen ? "opacity-100 translate-y-0 pointer-events-auto" : "opacity-0 -translate-y-2 pointer-events-none"}`}>
                                     <ul className="flex flex-col">
                                         {lendingIntervals.map((interval) => (
@@ -229,7 +225,7 @@ export default function CreateListing() {
                                                         setSelectedLendingInterval(interval); 
                                                         setLendingIntervalIsOpen(false);              
                                                     }}
-                                                    className="w-full text-left px-4 py-3 text-gray-400 hover:bg-gray-200 hover:text-gray-600 transition-colors">
+                                                    className="w-full text-left px-4 py-3 text-gray-600 hover:bg-gray-200 transition-colors">
                                                     {interval}
                                                 </button>
                                             </li>
@@ -256,45 +252,8 @@ export default function CreateListing() {
                             />
                         </div>
 
-                        {/*MEET-UP LOCATION DROPDOWN*/}
-                        <div className="w-full flex-col space-x-8">
-                            <div className="relative hover:scale-101 transition-all duration-400 ease-out z-10 text-gray-500 mt-6 text-base" ref={locationRef}>
-                                <button 
-                                    type="button" 
-                                    className={`w-full flex items-center justify-between bg-[#eceef2] rounded-xl px-4 py-3 text-base text-gray-500 hover:bg-gray-200 transition-all duration-400 ease-out`} 
-                                    onClick={() => setLocationIsOpen(!locationIsOpen)}
-                                >
-                                    <div className="flex items-center justify-start space-x-4">
-                                        <MapPinPen className={`w-5 h-5 sm:h-5 sm:w-5 ${locationIsOpen ? "text-gray-600" : "text-gray-400"}`} />
-                                        <div className={`${locationIsOpen ? "text-gray-600" : "text-gray-400"}`}>
-                                            {selectedLocationOption}
-                                        </div>
-                                    </div>
-                                    {locationIsOpen ? (<ChevronDown className="h-5 w-5 sm:h-6 sm:w-6 text-gray-600"/>) : (<ChevronRight className="h-5 w-5 sm:h-6 sm:w-6 text-gray-400"/>)}
-                                </button>
-                            <div className={`absolute top-full left-0 z-10 w-full mt-2 bg-[#eceef2] rounded-xl overflow-hidden transition-all shadow-md duration-400 
-                                    ${locationIsOpen ? "opacity-100 translate-y-0 pointer-events-auto" : "opacity-0 -translate-y-2 pointer-events-none"}`}>
-                                    <ul className="flex flex-col">
-                                        {existingLocations.map((interval) => (
-                                            <li key={interval}>
-                                                <button
-                                                    type="button"
-                                                    onClick={() => {
-                                                        setSelectedLocationOption(interval); 
-                                                        setLocationIsOpen(false);              
-                                                    }}
-                                                    className="w-full text-left px-4 py-3 text-gray-400 hover:bg-gray-200 hover:text-gray-600 transition-colors">
-                                                    {interval}
-                                                </button>
-                                            </li>
-                                        ))}
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-
                         {/*DEPOSIT AMOUNT*/}
-                        <div className="w-full mt-6 hover:scale-101 transition-all duration-400 ease-out">
+                        <div className="mt-6 w-full hover:scale-101 transition-all duration-400 ease-out">
                             <span className="absolute ml-5 mt-3 text-gray-400 text-base">
                                 S$
                             </span>
@@ -302,8 +261,8 @@ export default function CreateListing() {
                                 type="number"
                                 value={deposit}
                                 onChange={(e) => setDeposit(e.target.value)}
-                                placeholder={`Deposit amount`}
-                                onBlur={(e) => e.target.placeholder = `Deposit amount`}
+                                placeholder={`${deposit === "" ? "No" : ""} Deposit amount (Optional)`}
+                                onBlur={(e) => e.target.placeholder = `${deposit === "" ? "No" : ""} Deposit amount (Optional)`}
                                 onFocus={(e) => e.target.placeholder = `Enter a deposit amount for your listing`}
                                 onKeyDown={(e) => ["e", "E", "+", "-"].includes(e.key) && e.preventDefault()}
                                 className="w-full bg-[#eceef2] rounded-xl px-14 py-3 text-base text-gray-400 focus:text-gray-600 focus:outline-none placeholder-gray-400 focus:placeholder-gray-400 hover:bg-gray-200 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
@@ -313,11 +272,11 @@ export default function CreateListing() {
                         {/*ITEM DESCRIPTION INPUT*/}
                         <div className="w-full mt-6 hover:scale-101 transition-all duration-400 ease-out">
                             <textarea
-                                placeholder="Item description"
+                                placeholder="Item description (Optional)"
                                 value={description}
                                 onChange={(e) => setDescription(e.target.value)}
                                 maxLength={2000}
-                                onBlur={(e) => e.target.placeholder = "Item description"}
+                                onBlur={(e) => e.target.placeholder = "Item description (Optional) "}
                                 onFocus={(e) => e.target.placeholder = "Enter a description for your listing"}
                                 className="w-full block bg-[#eceef2] rounded-xl px-5 py-3 text-base text-gray-400 focus:text-gray-600 focus:outline-none placeholder-gray-400 focus:placeholder-gray-400 hover:bg-gray-200 resize-none h-48"
                             />
@@ -364,5 +323,5 @@ export default function CreateListing() {
                 </div>
             </div>
         </div>
-        )
-    }
+    )
+}

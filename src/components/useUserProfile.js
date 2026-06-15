@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect } from 'react';
-import { db } from './firebase';
+import { db, hasFirebaseConfig } from './firebase';
 import { doc, setDoc, getDoc, updateDoc, serverTimestamp } from 'firebase/firestore';
 
 export const useUserProfile = (user) => {
@@ -7,9 +7,15 @@ export const useUserProfile = (user) => {
   	const [loading, setLoading] = useState(false);
   	const [error, setError] = useState(null);
 
- 	 // Get user profile from Firestore
+ 	// Get user profile from Firestore
   	const getProfile = useCallback(async () => {
 		if (!user) return;
+
+		if (!hasFirebaseConfig || !db) {
+			setProfile(null);
+			setError(null);
+			return;
+		}
 		
 		try {
 			setLoading(true);
@@ -29,9 +35,13 @@ export const useUserProfile = (user) => {
 		}
 	}, [user]);
 
-  // Create user profile on first login
+    // Create user profile on first login
   	const createProfile = useCallback(async (profileData) => {
     	if (!user) return;
+
+	    if (!hasFirebaseConfig || !db) {
+			throw new Error('Firebase is not configured. Add a .env.local file before creating profiles.');
+		}
     
 		try {
 			setLoading(true);
@@ -41,9 +51,8 @@ export const useUserProfile = (user) => {
 			uid: user.uid,
 			email: user.email,
 			displayName: profileData?.displayName || user.displayName || '',
-			photoURL: user.photoURL || profileData?.photoURL || '',
 			bio: profileData?.bio || '',
-			phone: profileData?.phone || '',
+			tele_handle: profileData?.tele_handle || '',
 			location: profileData?.location || '',
 			createdAt: serverTimestamp(),
 			updatedAt: serverTimestamp(),
@@ -60,11 +69,15 @@ export const useUserProfile = (user) => {
 		} finally {
 			setLoading(false);
 		}
-  }, [user]);
+    }, [user]);
 
-  // Update user profile
-  const updateProfile = useCallback(async (updates) => {
+  	// Update user profile
+    const updateProfile = useCallback(async (updates) => {
     	if (!user) return;
+
+	    if (!hasFirebaseConfig || !db) {
+			throw new Error('Firebase is not configured. Add a .env.local file before updating profiles.');
+		}
     
     	try {
 			setLoading(true);
@@ -87,7 +100,7 @@ export const useUserProfile = (user) => {
 		}
   	}, [user, profile]);
 
-  // Load profile on user change
+  	// Load profile on user change
 	useEffect(() => {
 		if (user) {
 			getProfile();
