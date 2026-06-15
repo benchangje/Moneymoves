@@ -15,7 +15,13 @@ provider.setCustomParameters({ prompt: 'select_account' });
 const checkAndNavigate = async (uid, navigate) => {
     const userDocRef = doc(db, 'users', uid);
     const docSnap = await getDoc(userDocRef);
-    if (!docSnap.exists() || !docSnap.data()?.displayName) {
+    const profile = docSnap.exists() ? docSnap.data() : null;
+    const hasCompletedProfile =
+        profile?.displayName?.trim() &&
+        profile?.tele_handle?.trim() &&
+        profile?.location?.trim();
+
+    if (!hasCompletedProfile) {
         navigate('/profile_setup');
     } else {
         navigate('/');

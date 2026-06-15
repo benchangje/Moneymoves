@@ -9,7 +9,9 @@ export default function SignUp() {
 
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const [confirmPassword, setConfirmPassword] = useState("")
     const [showPassword, setShowPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const [errorMessage, setErrorMessage] = useState("");
     const navigate = useNavigate();
     const { user } = useAuth();
@@ -25,6 +27,9 @@ export default function SignUp() {
     const isValidPasswordConfig = (password) => {
         return /\d/.test(password) && /[!@#$%^&*]/.test(password);
     };
+    const isPasswordConfirm = (password) => {
+        return password == confirmPassword;
+    }
     const handleSignUp = async () => {
         setErrorMessage("");
         if (!isValidEmail(email)) {
@@ -41,6 +46,10 @@ export default function SignUp() {
         }
         if (!isValidPasswordConfig(password)) {
             setErrorMessage("Password must include a number and a special character");
+            return;
+        }
+        if (!isPasswordConfirm(password)) {
+            setErrorMessage("Please ensure both password fields match");
             return;
         }
         try {
@@ -93,7 +102,7 @@ export default function SignUp() {
                         <KeyRound className="h-5 w-5 text-gray-400 top-3.5 left-4 absolute transform" />
                         <input 
                             type={showPassword ? "text" : "password"} 
-                            placeholder="Password" 
+                            placeholder="Set Password" 
                             value={password} 
                             onChange={(e) => setPassword(e.target.value)} 
                             className="w-full bg-gray-200 rounded-2xl pl-12 px-5 py-3 placeholder-gray-400 focus:outline-none focus:placeholder-gray-400 text-gray-400 focus:text-gray-600 hover:bg-gray-300 mb-6"
@@ -104,6 +113,23 @@ export default function SignUp() {
                             className="absolute right-4 top-3.5 text-gray-400 hover:text-gray-600"
                         >
                             {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                        </button>
+                    </div>
+                    <div className="relative hover:scale-101 transition-all duration-300">
+                        <KeyRound className="h-5 w-5 text-gray-400 top-3.5 left-4 absolute transform" />
+                        <input 
+                            type={showConfirmPassword ? "text" : "password"} 
+                            placeholder="Confirm Password" 
+                            value={confirmPassword} 
+                            onChange={(e) => setConfirmPassword(e.target.value)} 
+                            className="w-full bg-gray-200 rounded-2xl pl-12 px-5 py-3 placeholder-gray-400 focus:outline-none focus:placeholder-gray-400 text-gray-400 focus:text-gray-600 hover:bg-gray-300 mb-6"
+                        />
+                        <button 
+                            type="button" 
+                            onClick={() => setShowConfirmPassword(!showConfirmPassword)} 
+                            className="absolute right-4 top-3.5 text-gray-400 hover:text-gray-600"
+                        >
+                            {showConfirmPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                         </button>
                     </div>
                     <button
@@ -129,7 +155,7 @@ export default function SignUp() {
                         </button>
                     </div>
                     {errorMessage && (
-                        <p className="text-red-500 mt-2 m-1">{errorMessage}</p>
+                        <p className="text-red-500 mt-3 m-1">{errorMessage}</p>
                     )}
                 </div>
             </div>

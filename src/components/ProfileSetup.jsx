@@ -1,21 +1,26 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { LogOut } from 'lucide-react';
 import { useAuth } from './useAuth';
 import { useUserProfile } from './useUserProfile';
+import ImageDropzoneProfile from "./ImageDropzoneProfile";
 import { useNavigate } from 'react-router-dom'; 
 import { Link } from 'react-router-dom';
 
 export default function ProfileSetup() {
 
+    const [telegramVerified, setTelegramVerified] = useState(false);
+    const telegramUser = window.Telegram?.WebApp?.initDataUnsafe?.user;
+    const telegramUsername = telegramUser?.username ?? "";
     const { logout } = useAuth();
     const { user } = useAuth();
     const navigate = useNavigate(); 
     const { createProfile } = useUserProfile(user);
+    const [profileImage, setProfileImage] = useState('');
     
     const [formData, setFormData] = useState({
         displayName: user?.displayName || '',
         bio: '',
-        tele_handle: '',
+        tele_handle: telegramUsername,
         location: ''
     });
 
@@ -32,6 +37,7 @@ export default function ProfileSetup() {
 
         if (name === "tele_handle") {
             value = value.replace(/^@+/, "").trim();
+            setTelegramVerified(false);
         }
 
         setFormData(prev => ({
@@ -49,6 +55,9 @@ export default function ProfileSetup() {
         } else if (!formData.tele_handle.trim()) {
             setError('Telegram Handle is required');
             return;
+        } else if (!telegramVerified) {
+            setError("Telegram handle verification is required");
+            return;
         } else if (!formData.location.trim()) {
             setError('Location is required');
             return;
@@ -59,10 +68,9 @@ export default function ProfileSetup() {
             setError('');
             
             await createProfile({
-                displayName: formData.displayName,
-                bio: formData.bio,
-                tele_handle: formData.tele_handle,
-                location: formData.location
+                ...formData,
+                profileImage,
+                profileCompleted: true
             });
 
             navigate('/');
@@ -73,6 +81,25 @@ export default function ProfileSetup() {
             setSubmitLoading(false);
         }
     };
+
+    const handleVerifyTelegram = () => {
+        const enteredHandle = formData.tele_handle.toLowerCase();
+        const actualHandle = telegramUsername.toLowerCase();
+
+        if (enteredHandle === actualHandle) {
+            setTelegramVerified(true);
+            setError("");
+        } else {
+            setTelegramVerified(false);
+            setError("Telegram handle does not match.");
+        }
+    };
+
+    useEffect(() => {
+        if (!telegramUsername) {
+            setError("Telegram handle not detected: Telegram handle is required for profile setup.\n\nCreate one in Telegram Settings → Username.");
+        }
+    }, [telegramUsername]);
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 flex items-center justify-center p-4 py-8">
@@ -89,10 +116,19 @@ export default function ProfileSetup() {
                 )}
 
                 <form onSubmit={handleSubmit} className="space-y-6">
+
+                    {/* Profile Picture */}
+                    <div>
+                        <label htmlFor="profilePicture" className="translate-x-1 block text-sm font-medium text-gray-700 mb-3">
+                            Set Profile Picture 
+                        </label>
+                        <ImageDropzoneProfile className="ml-1" onImageSelect={(imageDataUrl) => setProfileImage(imageDataUrl)} />
+                    </div>
+
                     {/* Display Name */}
                     <div>
                         <label htmlFor="displayName" className="translate-x-1 block text-sm font-medium text-gray-700 mb-2">
-                            Full Name *
+                            Display Name *
                         </label>
                         <input
                             type="text"
@@ -104,7 +140,7 @@ export default function ProfileSetup() {
                             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-1 focus:ring-blue-500 focus:border-transparent outline-none hover:scale-101 transition-all duration-400 ease-out"
                         />
                     </div>
-
+                    
                     {/* Telegram Handle */}
                     <div>
                         <label htmlFor="tele_handle" className="translate-x-1 block text-sm font-medium text-gray-700 mb-2">
@@ -120,10 +156,14 @@ export default function ProfileSetup() {
                                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-1 focus:ring-blue-500 focus:border-transparent outline-none hover:scale-101 transition-all duration-400 ease-out"
                             />
                             <button 
-                                disabled={!formData.tele_handle.trim()}
-                                className={`rounded-lg p-2 px-3 text-white transition-all duration-400 ease-out ${formData.tele_handle.trim()? "bg-blue-500 hover:bg-blue-400 hover:scale-101": "bg-gray-400 cursor-not-allowed"}`}
+                                type="button"
+                                onClick={handleVerifyTelegram}
+                                disabled={!formData.tele_handle.trim() || !telegramUsername || telegramVerified}
+                                className={`rounded-lg p-2 px-3 text-white transition-all duration-400 ease-out 
+                                    ${formData.tele_handle.trim() && telegramUsername && !telegramVerified ? "bg-blue-500 hover:bg-blue-400 hover:scale-101": "bg-gray-400 cursor-not-allowed"}
+                                    ${telegramVerified ? "bg-gradient-to-r from-blue-500/50 to-purple-600/50 cursor-not-allowed" : ""}`}
                             >
-                                Verify
+                                {telegramVerified ? "Verified ✓" : "Verify"}
                             </button>
                         </div>
                         <p className="translate-x-1 mt-2 text-xs text-gray-500">
@@ -185,7 +225,6 @@ export default function ProfileSetup() {
                 <div className="mt-6 hover:scale-101 transition-all duration-300">
                     <Link
                         to="/"
-                        onClick={logout}
                         className="relative w-full bg-red-500 hover:bg-red-600 text-white font-semibold py-3 rounded-lg transition-all duration-400 flex items-center justify-center"
                     >
                         <LogOut className="h-5 w-5 absolute left-4" aria-hidden="true" />
