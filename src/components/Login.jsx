@@ -1,7 +1,32 @@
-import { signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
-import { auth, hasFirebaseConfig } from '../firebase';
-import { useNavigate } from 'react-router-dom';
-import { useState } from 'react';
+import { useState, useEffect } from "react";
+import { Mail, KeyRound, Eye, EyeOff, LogOut } from "lucide-react";
+import { auth, db } from "./firebase";
+import { doc, getDoc } from "firebase/firestore";
+import { FcGoogle } from "react-icons/fc";
+import { useAuth } from "./useAuth";
+import { useNavigate } from "react-router-dom";
+import { signInWithEmailAndPassword, 
+         GoogleAuthProvider,
+         signInWithPopup } from 'firebase/auth';
+
+const provider = new GoogleAuthProvider();
+provider.setCustomParameters({ prompt: 'select_account' });
+
+const checkAndNavigate = async (uid, navigate) => {
+    const userDocRef = doc(db, 'users', uid);
+    const docSnap = await getDoc(userDocRef);
+    const profile = docSnap.exists() ? docSnap.data() : null;
+    const hasCompletedProfile =
+        profile?.displayName?.trim() &&
+        profile?.tele_handle?.trim() &&
+        profile?.location?.trim();
+
+    if (!hasCompletedProfile) {
+        navigate('/profile_setup');
+    } else {
+        navigate('/');
+    }
+};
 
 export default function Login() {
   const navigate = useNavigate();

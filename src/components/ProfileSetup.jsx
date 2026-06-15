@@ -1,33 +1,45 @@
-import { useRef, useState } from 'react';
-import { useAuth } from '../contexts/AuthContext';
-import { useUserProfile } from '../hooks/useUserProfile';
-import { useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { LogOut } from 'lucide-react';
+import { useAuth } from './useAuth';
+import { useUserProfile } from './useUserProfile';
+import ImageDropzoneProfile from "./ImageDropzoneProfile";
+import { useNavigate } from 'react-router-dom'; 
+import { Link } from 'react-router-dom';
 
 const DEFAULT_PROFILE_PICTURE = '/default-pfp.svg';
 
-export default function ProfileSetup() {
-    const { user, completeProfileSetup } = useAuth();
+    const [telegramVerified, setTelegramVerified] = useState(false);
+    const telegramUser = window.Telegram?.WebApp?.initDataUnsafe?.user;
+    const telegramUsername = telegramUser?.username ?? "";
+    const { logout } = useAuth();
+    const { user } = useAuth();
+    const navigate = useNavigate(); 
     const { createProfile } = useUserProfile(user);
-    const navigate = useNavigate();
+    const [profileImage, setProfileImage] = useState('');
     
     const [formData, setFormData] = useState({
         displayName: user?.displayName || '',
         bio: '',
-        phone: '',
+        tele_handle: telegramUsername,
         location: ''
     });
-    
-    const [loading, setLoading] = useState(false);
+
+    const isFormValid = 
+        formData.displayName.trim() !== "" &&
+        formData.tele_handle.trim() !== "" &&
+        formData.location.trim() !== ""
+
+    const [submitLoading, setSubmitLoading] = useState(false);
     const [error, setError] = useState('');
-    const [photoFile, setPhotoFile] = useState(null);
-    const [bannerFile, setBannerFile] = useState(null);
-    const [photoPreview, setPhotoPreview] = useState('');
-    const [bannerPreview, setBannerPreview] = useState('');
-    const photoInputRef = useRef(null);
-    const bannerInputRef = useRef(null);
 
     const handleChange = (e) => {
-        const { name, value } = e.target;
+        let { name, value } = e.target;
+
+        if (name === "tele_handle") {
+            value = value.replace(/^@+/, "").trim();
+            setTelegramVerified(false);
+        }
+
         setFormData(prev => ({
             ...prev,
             [name]: value
@@ -60,6 +72,15 @@ export default function ProfileSetup() {
         if (!formData.displayName.trim()) {
             setError('Name is required');
             return;
+        } else if (!formData.tele_handle.trim()) {
+            setError('Telegram Handle is required');
+            return;
+        } else if (!telegramVerified) {
+            setError("Telegram handle verification is required");
+            return;
+        } else if (!formData.location.trim()) {
+            setError('Location is required');
+            return;
         }
 
         try {
@@ -67,19 +88,11 @@ export default function ProfileSetup() {
             setError('');
             
             await createProfile({
-                displayName: formData.displayName,
-                bio: formData.bio,
-                phone: formData.phone,
-                location: formData.location,
-                photoFile,
-                bannerFile
+                ...formData,
+                profileImage,
+                profileCompleted: true
             });
 
-            // Mark setup as complete in context and localStorage
-            completeProfileSetup();
-            localStorage.setItem(`profile_setup_${user.uid}`, 'true');
-            
-            // Redirect to home page
             navigate('/');
         } catch (err) {
             setError('Error creating profile: ' + err.message);
@@ -88,6 +101,25 @@ export default function ProfileSetup() {
             setLoading(false);
         }
     };
+
+    const handleVerifyTelegram = () => {
+        const enteredHandle = formData.tele_handle.toLowerCase();
+        const actualHandle = telegramUsername.toLowerCase();
+
+        if (enteredHandle === actualHandle) {
+            setTelegramVerified(true);
+            setError("");
+        } else {
+            setTelegramVerified(false);
+            setError("Telegram handle does not match.");
+        }
+    };
+
+    useEffect(() => {
+        if (!telegramUsername) {
+            setError("Telegram handle not detected: Telegram handle is required for profile setup.\n\nCreate one in Telegram Settings → Username.");
+        }
+    }, [telegramUsername]);
 
     return (
         <div className="min-h-screen bg-linear-to-br from-blue-50 to-purple-50 flex items-center justify-center px-4">
@@ -104,10 +136,19 @@ export default function ProfileSetup() {
                 )}
 
                 <form onSubmit={handleSubmit} className="space-y-6">
+
+                    {/* Profile Picture */}
+                    <div>
+                        <label htmlFor="profilePicture" className="translate-x-1 block text-sm font-medium text-gray-700 mb-3">
+                            Set Profile Picture 
+                        </label>
+                        <ImageDropzoneProfile className="ml-1" onImageSelect={(imageDataUrl) => setProfileImage(imageDataUrl)} />
+                    </div>
+
                     {/* Display Name */}
                     <div>
-                        <label htmlFor="displayName" className="block text-sm font-medium text-gray-700 mb-2">
-                            Full Name *
+                        <label htmlFor="displayName" className="translate-x-1 block text-sm font-medium text-gray-700 mb-2">
+                            Display Name *
                         </label>
                         <input
                             type="text"
@@ -120,38 +161,35 @@ export default function ProfileSetup() {
                             required
                         />
                     </div>
-
-                    {/* Bio */}
+                    
+                    {/* Telegram Handle */}
                     <div>
-                        <label htmlFor="bio" className="block text-sm font-medium text-gray-700 mb-2">
-                            Bio
+                        <label htmlFor="tele_handle" className="translate-x-1 block text-sm font-medium text-gray-700 mb-2">
+                            Telegram Handle *
                         </label>
-                        <textarea
-                            id="bio"
-                            name="bio"
-                            value={formData.bio}
-                            onChange={handleChange}
-                            placeholder="Tell other users about yourself (optional)"
-                            rows="4"
-                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition resize-none"
-                        />
-                        <p className="text-xs text-gray-500 mt-1">Max 500 characters</p>
-                    </div>
-
-                    {/* Phone */}
-                    <div>
-                        <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-2">
-                            Phone Number
-                        </label>
-                        <input
-                            type="tel"
-                            id="phone"
-                            name="phone"
-                            value={formData.phone}
-                            onChange={handleChange}
-                            placeholder="+1 (555) 123-4567"
-                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition"
-                        />
+                        <div className="flex items-center justify-center gap-3">
+                            <input
+                                id="tele_handle"
+                                name="tele_handle"
+                                value={formData.tele_handle}
+                                onChange={handleChange}
+                                placeholder="@bobross"
+                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-1 focus:ring-blue-500 focus:border-transparent outline-none hover:scale-101 transition-all duration-400 ease-out"
+                            />
+                            <button 
+                                type="button"
+                                onClick={handleVerifyTelegram}
+                                disabled={!formData.tele_handle.trim() || !telegramUsername || telegramVerified}
+                                className={`rounded-lg p-2 px-3 text-white transition-all duration-400 ease-out 
+                                    ${formData.tele_handle.trim() && telegramUsername && !telegramVerified ? "bg-blue-500 hover:bg-blue-400 hover:scale-101": "bg-gray-400 cursor-not-allowed"}
+                                    ${telegramVerified ? "bg-gradient-to-r from-blue-500/50 to-purple-600/50 cursor-not-allowed" : ""}`}
+                            >
+                                {telegramVerified ? "Verified ✓" : "Verify"}
+                            </button>
+                        </div>
+                        <p className="translate-x-1 mt-2 text-xs text-gray-500">
+                            Other users will use this to contact you on Telegram
+                        </p>
                     </div>
 
                     {/* Location */}
@@ -225,6 +263,15 @@ export default function ProfileSetup() {
                     <p className="text-sm text-gray-700">
                         <span className="font-semibold">Email:</span> {user?.email}
                     </p>
+                </div>
+                <div className="mt-6 hover:scale-101 transition-all duration-300">
+                    <Link
+                        to="/"
+                        className="relative w-full bg-red-500 hover:bg-red-600 text-white font-semibold py-3 rounded-lg transition-all duration-400 flex items-center justify-center"
+                    >
+                        <LogOut className="h-5 w-5 absolute left-4" aria-hidden="true" />
+                        <span className="w-full text-center">Cancel setup</span>
+                    </Link>
                 </div>
             </div>
         </div>

@@ -4,7 +4,7 @@ import { doc, setDoc, getDoc, updateDoc, serverTimestamp } from 'firebase/firest
 
 export const useUserProfile = (user) => {
    	const [profile, setProfile] = useState(null);
-  	const [loading, setLoading] = useState(false);
+	  const [loading, setLoading] = useState(!!user);
   	const [error, setError] = useState(null);
 
  	// Get user profile from Firestore
@@ -48,15 +48,11 @@ export const useUserProfile = (user) => {
 			const userDocRef = doc(db, 'users', user.uid);
 		
 		const newProfile = {
+			...profileData,
 			uid: user.uid,
 			email: user.email,
-			displayName: profileData?.displayName || user.displayName || '',
-			bio: profileData?.bio || '',
-			tele_handle: profileData?.tele_handle || '',
-			location: profileData?.location || '',
 			createdAt: serverTimestamp(),
 			updatedAt: serverTimestamp(),
-			...profileData,
 		};
       
 		await setDoc(userDocRef, newProfile, { merge: true });
@@ -106,6 +102,7 @@ export const useUserProfile = (user) => {
 			getProfile();
 		} else {
 			setProfile(null);
+			setLoading(false);
 		}
 	}, [user, getProfile]);
 
