@@ -1,9 +1,9 @@
 import { createContext, useContext, useEffect, useState } from 'react';
-import { auth, db, hasFirebaseConfig } from '../firebase';
-import { browserLocalPersistence, onAuthStateChanged, setPersistence } from 'firebase/auth';
+import { auth, db, hasFirebaseConfig } from '../hooks/firebase';
+import { browserLocalPersistence, onAuthStateChanged, setPersistence, signOut } from 'firebase/auth';
 import { doc, getDoc } from 'firebase/firestore';
 
-const AuthContext = createContext();
+export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
@@ -125,8 +125,18 @@ export const AuthProvider = ({ children }) => {
     setNeedsProfileSetup(false);
   };
 
+  const logout = async () => {
+    if (!auth || !hasFirebaseConfig) {
+      setUser(null);
+      setNeedsProfileSetup(false);
+      return;
+    }
+
+    await signOut(auth);
+  };
+
   return (
-    <AuthContext.Provider value={{ user, loading, error, needsProfileSetup, completeProfileSetup }}>
+    <AuthContext.Provider value={{ user, loading, error, needsProfileSetup, completeProfileSetup, logout }}>
       {children}
     </AuthContext.Provider>
   );

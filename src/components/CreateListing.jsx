@@ -76,21 +76,6 @@ export default function CreateListing() {
                 ? `data:${processedImages[0].mimeType};base64,${processedImages[0].base64}`
                 : "";
 
-            const formData = new FormData();
-            formData.append("title", listingTitle);
-            formData.append("category", selectedCategory);
-            formData.append("interval", selectedLendingInterval);
-            formData.append("price", price);
-            formData.append("deposit", deposit);
-            formData.append("description", description);
-            formData.append("images", JSON.stringify(processedImages));
-
-            await fetch("https://script.google.com/macros/s/AKfycbwL5usnGqzMPuZycFp7jhPwwGCfcECWu_BQ12Eem6_HLfCH9AAPJg2OFjfKxiGUQv--sw/exec", {
-                method: "POST",
-                body: formData,
-                mode: "no-cors" 
-            });
-
             await createListing({
                 ownerUid: user.uid,
                 ownerEmail: user.email || "",

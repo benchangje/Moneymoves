@@ -1,23 +1,26 @@
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import { useUserProfile } from "../hooks/useUserProfile";
 
 export default function ProtectedRoute({ children }) {
-  const { user, loading } = useAuth();
+    const { user } = useAuth();
+    const { profile, loading } = useUserProfile(user);
 
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading...</p>
-        </div>
-      </div>
-    );
-  }
+    if (!user) {
+        return <Navigate to="/login" replace />;
+    }
 
-  if (!user) {
-    return <Navigate to="/login" replace />;
-  }
+    if (loading) {
+        return (
+            <div className="loading-screen">
+                <p>Verifying profile status...</p>
+            </div>
+        ); 
+    }
 
-  return children;
+    if (!profile?.profileCompleted) {
+        return <Navigate to="/profile_setup" replace />;
+    }
+
+    return children;
 }

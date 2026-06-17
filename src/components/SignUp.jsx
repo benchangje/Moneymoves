@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Mail, KeyRound, Eye, EyeOff, LogOut } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { createUserWithEmailAndPassword, sendEmailVerification } from "firebase/auth";
-import { auth } from "../firebase";
+import { auth } from "../hooks/firebase";
 import { useAuth } from "../contexts/AuthContext";
 
 export default function SignUp() {

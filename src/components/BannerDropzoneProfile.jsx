@@ -1,48 +1,13 @@
 import { useState, useCallback } from "react";
 import { useDropzone } from "react-dropzone";
 import { X, Plus } from "lucide-react";
+import { resizeImage } from "./ImageDropzoneProfile";
 
-const MAX_SIZE = 100;
-const QUALITY = 0.5;
+const MAX_SIZE = 200;
+const QUALITY = 0.6;
 
-{/* IMAGE RESIZER */}
-export const resizeImage = (file) =>
-    new Promise((resolve, reject) => {
-        const reader = new FileReader();
-
-        reader.onload = () => {
-            const image = new Image();
-
-            image.onload = () => {
-                const canvas = document.createElement("canvas");
-                const context = canvas.getContext("2d");
-
-                if (!context) {
-                    reject(new Error("Unable to resize image."));
-                    return;
-                }
-
-                const scale = Math.min(1, MAX_SIZE / Math.max(image.width, image.height));
-                const width = Math.round(image.width * scale);
-                const height = Math.round(image.height * scale);
-
-                canvas.width = width;
-                canvas.height = height;
-                context.drawImage(image, 0, 0, width, height);
-
-                resolve(canvas.toDataURL("image/jpeg", QUALITY));
-            };
-
-            image.onerror = () => reject(new Error("Unable to load image."));
-            image.src = reader.result;
-        };
-
-        reader.onerror = () => reject(new Error("Unable to read image file."));
-        reader.readAsDataURL(file);
-    });
-
-{/* IMAGE DROPZONE */}
-export default function ImageDropzoneProfile({ onImageSelect }) {
+{/* BANNER DROPZONE */}
+export default function BannerDropzoneProfile({ onImageSelect }) {
     const [preview, setPreview] = useState(null);
 
     const handleClearImage = (event) => {
@@ -73,13 +38,13 @@ export default function ImageDropzoneProfile({ onImageSelect }) {
     });
 
     return (
-    <div className="relative w-20 h-20 overflow-visible">
+    <div className="relative w-full h-24 overflow-visible">
 
         {preview && (
             <button
                 type="button"
                 onClick={handleClearImage}
-                className="absolute -top-1 -right-1 z-20 rounded-full bg-gray-500 p-1 text-white transition-colors hover:bg-gray-700"
+                className="absolute -top-2 -right-2 z-20 rounded-full bg-gray-500 p-1 text-white transition-colors hover:bg-gray-700"
                 aria-label="Remove profile photo"
             >
                 <X className="h-4 w-4" strokeWidth={2.5} />
@@ -89,7 +54,7 @@ export default function ImageDropzoneProfile({ onImageSelect }) {
         {/* DROPZONE CONTAINER */}
         <div
             {...getRootProps()}
-            className={`relative flex items-center justify-center w-full h-full border border-gray-300 hover:bg-gray-100 rounded-full cursor-pointer transition-all duration-400 ease-in-out overflow-hidden 
+            className={`relative flex items-center justify-center w-full h-full border border-gray-300 rounded-xl hover:bg-gray-100 cursor-pointer transition-all duration-400 ease-in-out overflow-hidden 
             ${!preview ? "hover:scale-101" : ""}
             ${isDragActive ? "scale-101" : ""}`}>
             {/* HIDDEN INPUT FIELD REQUIRED FOR LIBRARY */}
@@ -109,4 +74,5 @@ export default function ImageDropzoneProfile({ onImageSelect }) {
             )}
         </div>
     </div>
-    );}
+    );
+}
