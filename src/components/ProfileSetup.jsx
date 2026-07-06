@@ -162,7 +162,7 @@ export default function ProfileSetup() {
                             value={formData.displayName}
                             onChange={handleChange}
                             placeholder="John Doe"
-                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-[0.5px] focus:ring-gray-600 focus:border-gray-600 outline-none hover:scale-101 transition-transform duration-400 ease-out"
+                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:border-gray-600 outline-none hover:scale-101 transition-transform duration-400 ease-out"
                             required
                         />
                     </div>
@@ -179,7 +179,7 @@ export default function ProfileSetup() {
                                 value={formData.tele_handle}
                                 onChange={handleChange}
                                 placeholder="@bobross"
-                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-[0.5px] focus:ring-gray-600 focus:border-gray-600 focus:border-1 outline-none hover:scale-101 transition-transform duration-400 ease-out"
+                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:border-gray-600 focus:border-1 outline-none hover:scale-101 transition-transform duration-400 ease-out"
                                 required
                             />
                             <button 
@@ -210,7 +210,7 @@ export default function ProfileSetup() {
                             value={formData.location}
                             onChange={handleChange}
                             placeholder="City, State"
-                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-[0.5px] focus:ring-gray-600 focus:border-gray-600 outline-none hover:scale-101 transition-transform duration-400 ease-out"
+                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:border-gray-600 outline-none hover:scale-101 transition-transform duration-400 ease-out"
                         />
                     </div>
 
@@ -225,7 +225,7 @@ export default function ProfileSetup() {
                             value={formData.bio}
                             onChange={handleChange}
                             maxLength={2000}
-                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-[0.5px] focus:ring-gray-600 focus:border-gray-600 outline-none hover:scale-101 transition-transform duration-400 ease-out h-32 resize-none"
+                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:border-gray-600 outline-none hover:scale-101 transition-transform duration-400 ease-out h-32 resize-none"
                         />
                     </div>
 
