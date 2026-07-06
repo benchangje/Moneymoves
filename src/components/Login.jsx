@@ -7,7 +7,7 @@ import { useAuth } from "../contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { signInWithEmailAndPassword, 
          GoogleAuthProvider,
-         signInWithPopup } from 'firebase/auth';
+         signInWithRedirect } from 'firebase/auth';
 
 const provider = new GoogleAuthProvider();
 
