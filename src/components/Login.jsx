@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
 import { Mail, KeyRound, Eye, EyeOff, LogOut } from "lucide-react";
-import { auth, db } from "./firebase";
+import { auth, db } from "../hooks/firebase";
 import { doc, getDoc } from "firebase/firestore";
 import { FcGoogle } from "react-icons/fc";
-import { useAuth } from "./useAuth";
+import { useAuth } from "../contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { signInWithEmailAndPassword, 
          GoogleAuthProvider,
