@@ -133,9 +133,20 @@ export default function ProfileSetup() {
                     <p className="text-gray-600">Let's set up your profile</p>
                 </div>
 
-                <pre style={{fontSize: 10, wordBreak: 'break-all'}}>
-                    {JSON.stringify(window.Telegram?.WebApp?.initDataUnsafe, null, 2)}
-                </pre>
+                <pre style={{
+    fontSize: 12,
+    wordBreak: 'break-all',
+    whiteSpace: 'pre-wrap',
+    background: '#333',
+    color: '#0f0',
+    padding: 12,
+    border: '3px solid red',
+    borderRadius: 8,
+    marginBottom: 16,
+    minHeight: 40
+}}>
+    {JSON.stringify(window.Telegram?.WebApp?.initDataUnsafe, null, 2) ?? 'NO DATA — initDataUnsafe is undefined/null'}
+</pre>
 
                 {error && (
                     <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-600 text-sm">
