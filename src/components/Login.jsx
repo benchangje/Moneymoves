@@ -74,7 +74,7 @@ export default function Login() {
     //Sign in with Google
     const handleGoogleSignIn = async () => {
         try {
-            await signInWithPopup(auth, provider);
+            await signInWithRedirect(auth, provider);
         } catch (error) {
             console.error("Error signing in with Google:", error);
         }
