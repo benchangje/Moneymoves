@@ -45,7 +45,7 @@ const ListingCard = ({ item, onCardClick = () => {} }) => {
     if (!teleHandle) return;
 
     const cleanHandle = teleHandle.replace(/^@/, "");
-    const message = `Hi! I'm interested in your listing "${item.title}" on Moneymoves.`;
+    const message = `Hi! I'm interested in your listing "${item.title}" on RentLa.`;
     const telegramUrl = `https://t.me/${cleanHandle}?text=${encodeURIComponent(message)}`;
     window.open(telegramUrl, "_blank", "noopener,noreferrer");
   };
@@ -71,7 +71,6 @@ const ListingCard = ({ item, onCardClick = () => {} }) => {
           }}
         />
         <h3 className="text-xl font-bold mb-2 text-gray-900 line-clamp-1">{item.title}</h3>
-        <p className="text-sm text-gray-600 mb-1.5 flex items-center gap-1">📍 {item.location}</p>
         <p className="text-sm font-semibold mb-1.5 text-gray-900">${item.pricePerDay || item.price}/day</p>
         <p className="text-xs text-gray-700">Deposit: ${item.deposit}</p>
 
@@ -99,7 +98,6 @@ const ListingCard = ({ item, onCardClick = () => {} }) => {
           className="w-full h-48 object-cover rounded-lg mb-4"
         />
         <h2 className="text-2xl font-bold text-gray-900 mb-2">{item.title}</h2>
-        <p className="text-sm text-gray-600 mb-2 flex items-center gap-1">📍 {item.location}</p>
         <p className="text-lg font-semibold text-gray-900 mb-1">${item.pricePerDay || item.price}/day</p>
         <p className="text-sm text-gray-700 mb-2">Deposit: ${item.deposit}</p>
 
