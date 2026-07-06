@@ -18,22 +18,21 @@ export default function RentalMarketplace() {
     const navigate = useNavigate();
 
     const normalizedListings = useMemo(
-    () =>
-        marketplaceListings.map((listing) => ({
-            id: listing.id,
-            ownerUid: listing.ownerUid,
-            ownerName: listing.ownerName,
-            title: listing.title,
-            description: listing.description || "",
-            pricePerDay: Number(listing.price ?? 0),
-            dateListed: listing.createdAt
-                ? new Date(listing.createdAt).toISOString().split("T")[0]
-                : "",
-            image: listing.image || listing.images?.[0] || "",
-            location: listing.location || "Location not provided",
-            deposit: Number(listing.deposit ?? 0),
-        })),
-    [marketplaceListings]
+        () =>
+            marketplaceListings.map((listing) => ({
+                id: listing.id,
+                ownerUid: listing.ownerUid,
+                ownerName: listing.ownerName,
+                title: listing.title,
+                pricePerDay: Number(listing.price ?? 0),
+                dateListed: listing.createdAt
+                    ? new Date(listing.createdAt).toISOString().split("T")[0]
+                    : "",
+                image: listing.image || listing.images?.[0] || "",
+                location: listing.location || "Location not provided",
+                deposit: Number(listing.deposit ?? 0),
+            })),
+        [marketplaceListings]
     );
 
     const filteredListings = normalizedListings.filter((item) =>
