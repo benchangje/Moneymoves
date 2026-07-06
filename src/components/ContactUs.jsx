@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react"
 import { Mail, MessageCircle, Clock } from "lucide-react"
+import emailjs from '@emailjs/browser';
 
 export default function ContactUs() {
     const [name, setName] = useState("")
@@ -15,7 +16,7 @@ export default function ContactUs() {
         const e = {}
         if (!name.trim()) e.name = "Name is required"
         if (!email.trim()) e.email = "Email is required"
-        else if (!/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email)) e.email = "Enter a valid email"
+        else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) e.email = "Enter a valid email"
         if (!message.trim()) e.message = "Message is required"
         return e
     }
@@ -36,20 +37,30 @@ export default function ContactUs() {
         setTouched((t) => ({ ...t, [field]: true }))
     }
 
-    function handleSubmit(e) {
+    async function handleSubmit(e) {
         e.preventDefault()
         setTouched({ name: true, email: true, message: true })
         if (!isValid) return
         setLoading(true)
-        setTimeout(() => {
-            setLoading(false)
+        try {
+            await emailjs.send('service_08g14w8', 'template_416fs0g', {
+                from_name: name,
+                from_email: email,
+                message: message,
+                urgent: urgent ? '🚨 URGENT' : 'Normal',
+            }, 'LAWQOJjHJbrGJS-Rl')
             setSubmitted(true)
             setName("")
             setEmail("")
             setMessage("")
             setTouched({})
             setErrors({})
-        }, 1000)
+        } catch (err) {
+            setErrors({ submit: 'Failed to send message. Please try again.' })
+            console.error('EmailJS error:', err)
+        } finally {
+            setLoading(false)
+        }
     }
 
     return (
@@ -228,9 +239,6 @@ export default function ContactUs() {
                             </div>
                         </div>
 
-                        <div className="mt-6 pt-4 border-t border-gray-100">
-                            <a href="#" className="text-sm text-blue-600 hover:underline">FAQ — placeholder</a>
-                        </div>
                     </aside>
                 </div>
             </div>

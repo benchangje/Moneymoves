@@ -10,14 +10,14 @@ import Login from './components/Login.jsx';
 import ProtectedRoute from './components/ProtectedRoute.jsx';
 import ProfileSetup from './components/ProfileSetup.jsx';
 import SignUp from './components/SignUp.jsx';
-import { useAuth } from "./components/useAuth.js";
+import { useAuth } from "./contexts/AuthContext"
 import { useBlink } from "./components/BlinkContext.jsx";
 import { useNavigate }	 from 'react-router-dom';
 import './index.css';
 
 function MainLayout( {onLogoutClick} ) {
-	return (
-		<div>
+  return (
+    <div>
 			<Navbar onLogoutClick={onLogoutClick} />
 			<Outlet />	
 		</div>
@@ -46,9 +46,9 @@ function App() {
 						handlePageBlink();
 						setShowLogout(false);
 					}}
-					onLogout={() => {
+					onLogout={async () => {
 						handlePageBlink();
-						logout();
+						await logout();
 						setShowLogout(false);
 						navigate('/login');
 					}}

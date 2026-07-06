@@ -1,14 +1,17 @@
 import { useState, useEffect } from "react";
-import { Mail, KeyRound, Eye, EyeOff } from "lucide-react";
+import { Mail, KeyRound, Eye, EyeOff, LogOut } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { createUserWithEmailAndPassword, sendEmailVerification } from "firebase/auth";
-import { auth } from "./firebase";
-import { useAuth } from "./useAuth";
+import { auth } from "../hooks/firebase";
+import { useAuth } from "../contexts/AuthContext";
 
 export default function SignUp() {
+
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const [confirmPassword, setConfirmPassword] = useState("")
     const [showPassword, setShowPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const [errorMessage, setErrorMessage] = useState("");
     const navigate = useNavigate();
     const { user } = useAuth();
@@ -24,6 +27,9 @@ export default function SignUp() {
     const isValidPasswordConfig = (password) => {
         return /\d/.test(password) && /[!@#$%^&*]/.test(password);
     };
+    const isPasswordConfirm = (password) => {
+        return password == confirmPassword;
+    }
     const handleSignUp = async () => {
         setErrorMessage("");
         if (!isValidEmail(email)) {
@@ -40,6 +46,10 @@ export default function SignUp() {
         }
         if (!isValidPasswordConfig(password)) {
             setErrorMessage("Password must include a number and a special character");
+            return;
+        }
+        if (!isPasswordConfirm(password)) {
+            setErrorMessage("Please ensure both password fields match");
             return;
         }
         try {
@@ -92,7 +102,7 @@ export default function SignUp() {
                         <KeyRound className="h-5 w-5 text-gray-400 top-3.5 left-4 absolute transform" />
                         <input 
                             type={showPassword ? "text" : "password"} 
-                            placeholder="Password" 
+                            placeholder="Set Password" 
                             value={password} 
                             onChange={(e) => setPassword(e.target.value)} 
                             className="w-full bg-gray-200 rounded-2xl pl-12 px-5 py-3 placeholder-gray-400 focus:outline-none focus:placeholder-gray-400 text-gray-400 focus:text-gray-600 hover:bg-gray-300 mb-6"
@@ -105,16 +115,47 @@ export default function SignUp() {
                             {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                         </button>
                     </div>
+                    <div className="relative hover:scale-101 transition-all duration-300">
+                        <KeyRound className="h-5 w-5 text-gray-400 top-3.5 left-4 absolute transform" />
+                        <input 
+                            type={showConfirmPassword ? "text" : "password"} 
+                            placeholder="Confirm Password" 
+                            value={confirmPassword} 
+                            onChange={(e) => setConfirmPassword(e.target.value)} 
+                            className="w-full bg-gray-200 rounded-2xl pl-12 px-5 py-3 placeholder-gray-400 focus:outline-none focus:placeholder-gray-400 text-gray-400 focus:text-gray-600 hover:bg-gray-300 mb-6"
+                        />
+                        <button 
+                            type="button" 
+                            onClick={() => setShowConfirmPassword(!showConfirmPassword)} 
+                            className="absolute right-4 top-3.5 text-gray-400 hover:text-gray-600"
+                        >
+                            {showConfirmPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                        </button>
+                    </div>
                     <button
                         onClick={handleSignUp}
                         disabled={!email || !password}
-                        className={`${(!email || !password) ? 'bg-gray-500 hover:bg-gray-600 cursor-not-allowed' : 'bg-blue-500 hover:bg-blue-600'} w-full bg-blue-500 rounded-2xl w-full text-white px-5 py-3  mb-2 rounded-2xl hover:scale-101 transition-all duration-300`}
+                        className={`${(!email || !password) ? 'bg-gray-500 hover:bg-gray-600 cursor-not-allowed' : 'bg-blue-500 hover:bg-blue-600'} w-full bg-blue-500 rounded-2xl w-full text-white px-5 py-3 mb-2 rounded-2xl hover:scale-101 transition-all duration-300`}
                     >
                         Create Account
                     </button>
-
+                    <p className="text-sm text-gray-600 ml-1 py-3">
+                        Already have an account? 
+                        <button onClick={() => navigate("/login")} className="text-blue-500 hover:underline font-medium ml-1">
+                            Sign in here
+                        </button>
+                    </p>
+                    <div className="relative hover:scale-101 transition-all duration-300 mt-2 mb-2">
+                        <button 
+                            onClick={() => navigate('/')} 
+                            className="w-full bg-blue-500 text-white rounded-2xl pl-12 px-5 py-3 gap-2 hover:bg-blue-600 transition-all duration-300"
+                        >
+                            <LogOut className="h-5 w-5 text-white top-3.5 left-4 absolute transform" />
+                            Return to Marketplace
+                        </button>
+                    </div>
                     {errorMessage && (
-                        <p className="text-red-500 mt-2 m-1">{errorMessage}</p>
+                        <p className="text-red-500 mt-3 m-1">{errorMessage}</p>
                     )}
                 </div>
             </div>
