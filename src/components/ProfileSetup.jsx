@@ -14,8 +14,7 @@ export default function ProfileSetup() {
 
     const [isOnTelegram, setIsOnTelegram] = useState(true)
     const [telegramVerified, setTelegramVerified] = useState(false);
-    const telegramUser = window.Telegram?.WebApp?.initDataUnsafe?.user;
-    const telegramUsername = telegramUser?.username ?? "";
+    const [telegramUsername, setTelegramUsername] = useState("");
     const { user } = useAuth();
     const navigate = useNavigate(); 
     const { createProfile } = useUserProfile(user);
@@ -25,9 +24,27 @@ export default function ProfileSetup() {
     const [formData, setFormData] = useState({
         displayName: user?.displayName || '',
         bio: '',
-        tele_handle: telegramUsername,
+        tele_handle: '',
         location: ''
     });
+
+    useEffect(() => {
+        const telegramWebApp = window.Telegram?.WebApp;
+        console.log('WebApp exists:', !!telegramWebApp);
+        console.log('initData raw:', telegramWebApp?.initData);
+        console.log('initDataUnsafe:', telegramWebApp?.initDataUnsafe);
+        console.log('user:', telegramWebApp?.initDataUnsafe?.user);
+
+        if (!telegramWebApp) {
+            setIsOnTelegram(false);
+            return;
+        }
+
+        telegramWebApp.ready?.();
+
+        const telegramUser = telegramWebApp.initDataUnsafe?.user;
+        setTelegramUsername(telegramUser?.username ?? "");
+    }, []);
 
     const isFormValid = 
         formData.displayName.trim() !== "" &&
@@ -36,6 +53,7 @@ export default function ProfileSetup() {
 
     const [submitLoading, setSubmitLoading] = useState(false);
     const [error, setError] = useState('');
+    const telegramHandlePlaceholder = telegramUsername ? `@${telegramUsername}` : '@bobross';
 
     const handleChange = (e) => {
         let { name, value } = e.target;
@@ -102,7 +120,7 @@ export default function ProfileSetup() {
     };
 
     useEffect(() => {
-        if (!telegramUsername && !isOnTelegram) {
+        if (!telegramUsername && isOnTelegram) {
             setError("Telegram handle not detected: Telegram handle is required for profile setup.\n\nCreate one in Telegram Settings → Username.");
         }
     }, [telegramUsername]);
@@ -114,6 +132,10 @@ export default function ProfileSetup() {
                     <h1 className="text-3xl font-bold text-gray-900 mb-2">Welcome to RentLa!</h1>
                     <p className="text-gray-600">Let's set up your profile</p>
                 </div>
+
+                <pre style={{fontSize: 10, wordBreak: 'break-all'}}>
+                    {JSON.stringify(window.Telegram?.WebApp?.initDataUnsafe, null, 2)}
+                </pre>
 
                 {error && (
                     <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-600 text-sm">
@@ -167,7 +189,7 @@ export default function ProfileSetup() {
                                 name="tele_handle"
                                 value={formData.tele_handle}
                                 onChange={handleChange}
-                                placeholder={telegramUsername}
+                                placeholder={telegramHandlePlaceholder}
                                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-1 focus:ring-blue-500 focus:border-transparent outline-none hover:scale-101 transition-all duration-400 ease-out"
                                 required
                             />
