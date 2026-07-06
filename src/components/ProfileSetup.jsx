@@ -30,10 +30,6 @@ export default function ProfileSetup() {
 
     useEffect(() => {
         const telegramWebApp = window.Telegram?.WebApp;
-        console.log('WebApp exists:', !!telegramWebApp);
-        console.log('initData raw:', telegramWebApp?.initData);
-        console.log('initDataUnsafe:', telegramWebApp?.initDataUnsafe);
-        console.log('user:', telegramWebApp?.initDataUnsafe?.user);
 
         if (!telegramWebApp) {
             setIsOnTelegram(false);
@@ -120,10 +116,12 @@ export default function ProfileSetup() {
     };
 
     useEffect(() => {
-        if (!telegramUsername && isOnTelegram) {
+        if (!isOnTelegram) {
+            setError("This page must be opened inside Telegram.");
+        } else if (!telegramUsername) {
             setError("Telegram handle not detected: Telegram handle is required for profile setup.\n\nCreate one in Telegram Settings → Username.");
         }
-    }, [telegramUsername]);
+    }, [telegramUsername, isOnTelegram]);
 
     return (
         <div className="min-h-screen bg-linear-to-br from-blue-50 to-purple-50 flex items-center justify-center px-4">
@@ -132,21 +130,6 @@ export default function ProfileSetup() {
                     <h1 className="text-3xl font-bold text-gray-900 mb-2">Welcome to RentLa!</h1>
                     <p className="text-gray-600">Let's set up your profile</p>
                 </div>
-
-                <pre style={{
-    fontSize: 12,
-    wordBreak: 'break-all',
-    whiteSpace: 'pre-wrap',
-    background: '#333',
-    color: '#0f0',
-    padding: 12,
-    border: '3px solid red',
-    borderRadius: 8,
-    marginBottom: 16,
-    minHeight: 40
-}}>
-    {JSON.stringify(window.Telegram?.WebApp?.initDataUnsafe, null, 2) ?? 'NO DATA — initDataUnsafe is undefined/null'}
-</pre>
 
                 {error && (
                     <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-600 text-sm">
@@ -254,7 +237,7 @@ export default function ProfileSetup() {
                     {/* Submit Button */}
                     <button
                         type="submit"
-                        disabled={submitLoading && isFormValid}
+                        disabled={submitLoading || isFormValid}
                         className={`w-full text-white font-semibold py-3 rounded-lg transition-all duration-400 ease-out disabled:cursor-not-allowed
                             ${isFormValid ? "bg-linear-to-r from-blue-500 to-purple-600 hover:scale-101": "bg-gray-400 cursor-not-allowed"}`}
                     >
