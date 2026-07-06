@@ -167,7 +167,7 @@ export default function ProfileSetup() {
                                 name="tele_handle"
                                 value={formData.tele_handle}
                                 onChange={handleChange}
-                                placeholder="@bobross"
+                                placeholder={telegramUsername}
                                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-1 focus:ring-blue-500 focus:border-transparent outline-none hover:scale-101 transition-all duration-400 ease-out"
                                 required
                             />
