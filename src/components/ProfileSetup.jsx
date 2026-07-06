@@ -12,7 +12,6 @@ const DEFAULT_BANNER_PICTURE = '/rentlalogonew.jpg'
 
 export default function ProfileSetup() {
 
-    const [isOnTelegram, setIsOnTelegram] = useState(true)
     const [telegramVerified, setTelegramVerified] = useState(false);
     const [telegramUsername, setTelegramUsername] = useState("");
     const { user } = useAuth();
@@ -20,6 +19,8 @@ export default function ProfileSetup() {
     const { createProfile } = useUserProfile(user);
     const [photoURL, setPhotoURL] = useState('');
     const [bannerURL, setBannerURL] = useState('');
+    const [submitLoading, setSubmitLoading] = useState(false);
+    const [error, setError] = useState('');
 
     const [formData, setFormData] = useState({
         displayName: user?.displayName || '',
@@ -32,14 +33,19 @@ export default function ProfileSetup() {
         const telegramWebApp = window.Telegram?.WebApp;
 
         if (!telegramWebApp) {
-            setIsOnTelegram(false);
+            setError("This page must be opened inside Telegram.");
             return;
         }
 
         telegramWebApp.ready?.();
 
         const telegramUser = telegramWebApp.initDataUnsafe?.user;
-        setTelegramUsername(telegramUser?.username ?? "");
+        const username = telegramUser?.username ?? "";
+        setTelegramUsername(username);
+
+        if (!username) {
+            setError("Telegram handle not detected: Telegram handle is required for profile setup.\n\nCreate one in Telegram Settings → Username.");
+        }
     }, []);
 
     const isFormValid = 
@@ -47,16 +53,13 @@ export default function ProfileSetup() {
         formData.tele_handle.trim() !== "" &&
         telegramVerified
 
-    const [submitLoading, setSubmitLoading] = useState(false);
-    const [error, setError] = useState('');
-    const telegramHandlePlaceholder = telegramUsername ? `@${telegramUsername}` : '@bobross';
-
     const handleChange = (e) => {
         let { name, value } = e.target;
 
         if (name === "tele_handle") {
             value = value.replace(/^@+/, "").trim();
             setTelegramVerified(false);
+            setError('');
         }
 
         setFormData(prev => ({
@@ -103,8 +106,8 @@ export default function ProfileSetup() {
     };
 
     const handleVerifyTelegram = () => {
-        const enteredHandle = formData.tele_handle.toLowerCase();
-        const actualHandle = telegramUsername.toLowerCase();
+        const enteredHandle = formData.tele_handle.trim().toLowerCase();
+        const actualHandle = (telegramUsername ?? "").trim().toLowerCase();
 
         if (enteredHandle === actualHandle || enteredHandle === "rentladev") {
             setTelegramVerified(true);
@@ -114,14 +117,6 @@ export default function ProfileSetup() {
             setError("Telegram handle does not match.");
         }
     };
-
-    useEffect(() => {
-        if (!isOnTelegram) {
-            setError("This page must be opened inside Telegram.");
-        } else if (!telegramUsername) {
-            setError("Telegram handle not detected: Telegram handle is required for profile setup.\n\nCreate one in Telegram Settings → Username.");
-        }
-    }, [telegramUsername, isOnTelegram]);
 
     return (
         <div className="min-h-screen bg-linear-to-br from-blue-50 to-purple-50 flex items-center justify-center px-4">
@@ -183,7 +178,7 @@ export default function ProfileSetup() {
                                 name="tele_handle"
                                 value={formData.tele_handle}
                                 onChange={handleChange}
-                                placeholder={telegramHandlePlaceholder}
+                                placeholder="@bobross"
                                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-1 focus:ring-blue-500 focus:border-transparent outline-none hover:scale-101 transition-all duration-400 ease-out"
                                 required
                             />
@@ -237,7 +232,7 @@ export default function ProfileSetup() {
                     {/* Submit Button */}
                     <button
                         type="submit"
-                        disabled={submitLoading || isFormValid}
+                        disabled={submitLoading || !isFormValid}
                         className={`w-full text-white font-semibold py-3 rounded-lg transition-all duration-400 ease-out disabled:cursor-not-allowed
                             ${isFormValid ? "bg-linear-to-r from-blue-500 to-purple-600 hover:scale-101": "bg-gray-400 cursor-not-allowed"}`}
                     >
