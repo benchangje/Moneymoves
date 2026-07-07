@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 import { auth, db, hasFirebaseConfig } from '../hooks/firebase';
-import { browserLocalPersistence, onAuthStateChanged, setPersistence, signOut } from 'firebase/auth';
+import { browserLocalPersistence, getRedirectResult, onAuthStateChanged, setPersistence, signOut } from 'firebase/auth';
 import { doc, getDoc } from 'firebase/firestore';
 
 export const AuthContext = createContext();
@@ -97,6 +97,16 @@ export const AuthProvider = ({ children }) => {
         await setPersistence(auth, browserLocalPersistence);
       } catch (persistError) {
         console.warn('Auth persistence setup warning:', persistError);
+      }
+
+      try {
+        const redirectResult = await getRedirectResult(auth);
+        if (redirectResult?.user) {
+          const hasProfile = await checkUserHasProfile(redirectResult.user);
+          finishAuthState(redirectResult.user, hasProfile);
+        }
+      } catch (redirectError) {
+        console.error('Error handling redirect sign-in:', redirectError);
       }
 
       unsubscribe = onAuthStateChanged(auth, handleAuthState, (authError) => {

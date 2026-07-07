@@ -7,7 +7,7 @@ import { useAuth } from "../contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { signInWithEmailAndPassword, 
          GoogleAuthProvider,
-         signInWithPopup } from 'firebase/auth';
+         signInWithRedirect } from 'firebase/auth';
 
 const provider = new GoogleAuthProvider();
 
@@ -74,7 +74,7 @@ export default function Login() {
     //Sign in with Google
     const handleGoogleSignIn = async () => {
         try {
-            await signInWithPopup(auth, provider);
+            await signInWithRedirect(auth, provider);
         } catch (error) {
             console.error("Error signing in with Google:", error);
         }
