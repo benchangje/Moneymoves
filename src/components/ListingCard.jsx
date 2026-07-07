@@ -1,23 +1,20 @@
 import { useState, useEffect } from "react";
-import { Star, Send } from "lucide-react";
+import { Star, Trash2 } from "lucide-react";
 import { useReviews } from "../hooks/useReviews";
-import { useOwnerProfile } from "../hooks/useOwnerProfile";
 import ReviewForm from "./ReviewForm";
-import Modal from "./Modal";
 
-const ListingCard = ({ item, onCardClick = () => {} }) => {
-  const defaultPlaceholder =
-    item.imageFallback ||
-    `https://via.placeholder.com/640x360.png?text=${encodeURIComponent(item.title || "Listing")}`;
+const ListingCard = ({ item, onCardClick = () => {}, onDelete = () => {} }) => {
+const defaultPlaceholder =
+	item.imageFallback ||
+	`https://via.placeholder.com/640x360.png?text=${encodeURIComponent(item.title || "Listing")}`;
 
-  const [imgSrc, setImgSrc] = useState(item.image || defaultPlaceholder);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const { averageRating, reviewCount } = useReviews("listing", item.id, Boolean(item?.id));
-  const { teleHandle, loading: loadingOwner } = useOwnerProfile(item.ownerUid);
+const [imgSrc, setImgSrc] = useState(item.image || defaultPlaceholder);
+const { averageRating, reviewCount } = useReviews('listing', item.id, Boolean(item?.id));
 
-  useEffect(() => {
-    setImgSrc(item.image || defaultPlaceholder);
-  }, [item.image, item.title]);
+// update imgSrc when item changes (e.g. when rendering recommendations)
+useEffect(() => {
+	setImgSrc(item.image || defaultPlaceholder);
+}, [item.image, item.title]);
 
   const handleImgError = () => {
     setImgSrc(defaultPlaceholder);
@@ -141,10 +138,69 @@ const ListingCard = ({ item, onCardClick = () => {} }) => {
 
         <p className="text-xs text-gray-700 mb-4">Listed: {dateListed}</p>
 
-        <ReviewForm listing={item} />
-      </Modal>
-    </>
-  );
+const dateListed =
+	item.dateListed ||
+	new Date().toLocaleDateString(undefined, {
+		year: "numeric",
+		month: "short",
+		day: "numeric",
+	});
+
+const rating = Number(averageRating) || (typeof item.rating === "number" ? item.rating : 0);
+const fullStars = Math.floor(rating);
+const emptyStars = 5 - fullStars;
+
+return (
+	<div className="relative w-full sm:w-1/2 md:w-64 cursor-pointer transition-all bg-white shadow-[0_0_8px_rgba(0,0,0,0.08)] hover:shadow-xl hover:scale-101 duration-300 ease-in-out hover:bg-gray-200 rounded-lg p-4" onClick={() => onCardClick(item.id)}>
+		{onDelete && (
+			<button
+				type="button"
+				onClick={(e) => {
+					e.stopPropagation();
+					onDelete(item.id);
+				}}
+				className="absolute top-2 right-2 text-gray-500 hover:text-red-600 transition-colors duration-300 ease-in-out"
+				aria-label="Delete listing"
+				title="Delete listing"
+			>
+				<Trash2 className="w-4 h-4" />
+			</button>
+		)}
+		<img
+			src={imgSrc}
+			onError={handleImgError}
+			alt={item.title || "Listing image"}
+			className="w-full"
+			style={{
+			display: "block",
+			height: "140px",
+			objectFit: "cover",
+			borderRadius: "8px",
+			marginBottom: "10px",
+			backgroundColor: "#e5e5e5",
+			}}
+		/>
+	<h3 className="text-xl font-bold mb-2 text-gray-900 line-clamp-1">{item.title}</h3>
+	<p className="text-sm text-gray-600 mb-1.5 flex items-center gap-1">📍 {item.location}</p>
+	<p className="text-sm font-semibold mb-1.5 text-gray-900">${item.pricePerDay || item.price}/day</p>
+	<p className="text-xs text-gray-700">Deposit: ${item.deposit}</p>
+
+	<div className="flex items-center gap-2 mt-2">
+		<div className="flex gap-1 items-center">
+			{Array.from({ length: fullStars }).map((_, i) => (
+				<Star key={`f-${i}`} className="w-3 h-3 fill-yellow-400 stroke-yellow-400" />
+			))}
+			{Array.from({ length: emptyStars }).map((_, i) => (
+				<Star key={`e-${i}`} className="w-3 h-3 fill-gray-300 stroke-gray-300" />
+			))}
+		</div>
+		<span className="text-xs text-gray-900">{rating > 0 ? rating.toFixed(1) : 'No rating'}</span>
+		{reviewCount > 0 && <span className="text-xs text-gray-600">({reviewCount})</span>}
+	</div>
+	<p className="text-xs text-gray-700 mt-2">Listed: {dateListed}</p>
+	<ReviewForm listing={item} />
+	</div>
+);
 };
 
 export default ListingCard;

@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback } from 'react';
 import { addDoc, collection, onSnapshot, query, serverTimestamp, where } from 'firebase/firestore';
-import { db, hasFirebaseConfig } from './firebase';
+import { db, hasFirebaseConfig } from '../hooks/firebase';
 
 export const useListings = ({ ownerUid = null, publishedOnly = false } = {}) => {
     const [listings, setListings] = useState([]);

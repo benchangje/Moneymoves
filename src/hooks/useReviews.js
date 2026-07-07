@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { db, hasFirebaseConfig } from './firebase';
+import { db, hasFirebaseConfig } from '../hooks/firebase';
 import { addDoc, collection, onSnapshot, query, serverTimestamp, where, orderBy } from 'firebase/firestore';
 
 export const useReviews = (reviewType = 'listing', targetId = null, enabled = true) => {

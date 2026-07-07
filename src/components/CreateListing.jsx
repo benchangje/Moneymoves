@@ -1,5 +1,5 @@
 import { ChevronDown, ChevronRight, Plug2, Shirt, Handbag, CalendarDays, MapPinPen } from "lucide-react";
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useContext } from "react";
 import ImageDropzone from "./ImageDropzone";
 import Confetti from "react-confetti";
 import { Link } from "react-router-dom";
@@ -54,6 +54,7 @@ export default function CreateListing() {
 
     const handleUpload = async (e) => {
         e.preventDefault(); 
+        if (!user) return alert("Log in to create a listing!");
         setIsUploading(true);
 
         try {
