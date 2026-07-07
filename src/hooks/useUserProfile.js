@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect } from 'react';
-import { db, hasFirebaseConfig, storage } from './firebase';
+import { db, hasFirebaseConfig, storage } from '../hooks/firebase';
 import { doc, setDoc, onSnapshot, updateDoc, serverTimestamp } from 'firebase/firestore';
 import { getDownloadURL, ref, uploadBytes } from 'firebase/storage';
 

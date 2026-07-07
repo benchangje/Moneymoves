@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
-import { Star } from "lucide-react";
+import { Star, Trash2 } from "lucide-react";
 import { useReviews } from "../hooks/useReviews";
 import ReviewForm from "./ReviewForm";
 
-const ListingCard = ({ item, onCardClick = () => {} }) => {
+const ListingCard = ({ item, onCardClick = () => {}, onDelete = () => {} }) => {
 const defaultPlaceholder =
 	item.imageFallback ||
 	`https://via.placeholder.com/640x360.png?text=${encodeURIComponent(item.title || "Listing")}`;
@@ -34,7 +34,21 @@ const fullStars = Math.floor(rating);
 const emptyStars = 5 - fullStars;
 
 return (
-	<div className="w-full sm:w-1/2 md:w-64 cursor-pointer transition-all bg-white shadow-[0_0_8px_rgba(0,0,0,0.08)] hover:shadow-xl hover:scale-101 duration-300 ease-in-out hover:bg-gray-200 rounded-lg p-4" onClick={() => onCardClick(item.id)}>
+	<div className="relative w-full sm:w-1/2 md:w-64 cursor-pointer transition-all bg-white shadow-[0_0_8px_rgba(0,0,0,0.08)] hover:shadow-xl hover:scale-101 duration-300 ease-in-out hover:bg-gray-200 rounded-lg p-4" onClick={() => onCardClick(item.id)}>
+		{onDelete && (
+			<button
+				type="button"
+				onClick={(e) => {
+					e.stopPropagation();
+					onDelete(item.id);
+				}}
+				className="absolute top-2 right-2 text-gray-500 hover:text-red-600 transition-colors duration-300 ease-in-out"
+				aria-label="Delete listing"
+				title="Delete listing"
+			>
+				<Trash2 className="w-4 h-4" />
+			</button>
+		)}
 		<img
 			src={imgSrc}
 			onError={handleImgError}

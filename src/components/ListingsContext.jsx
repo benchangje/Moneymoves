@@ -1,6 +1,6 @@
 import { createContext, useState, useContext, useEffect } from "react";
 import { collection, onSnapshot } from "firebase/firestore";
-import { db } from "./firebase";
+import { db } from "../hooks/firebase";
 
 const ListingsContext = createContext(null);
 

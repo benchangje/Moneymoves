@@ -8,7 +8,6 @@ import { createListing } from "../hooks/useListings";
 
 export default function CreateListing() {
 
-    const { user } = useContext(AuthContext);
     //STATE AND REFS
     const [listingTitle, setListingTitle] = useState("");
     const [categoryIsOpen, setCategoryIsOpen] = useState(false);
