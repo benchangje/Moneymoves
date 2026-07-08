@@ -22,7 +22,7 @@
             onClick={onClose}
         >
             <div
-                className="bg-white rounded-lg shadow-xl max-w-lg w-full max-h-[90vh] overflow-y-auto relative p-6 pb-4"
+                className="bg-white rounded-lg shadow-xl max-w-lg w-full h-[82vh] overflow-y-auto relative p-6 pb-2"
                 onClick={(e) => e.stopPropagation()}
             >
                 <button

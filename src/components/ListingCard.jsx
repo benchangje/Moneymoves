@@ -144,7 +144,7 @@ const ListingCard = ({ item, onCardClick = () => {}, onDelete = null }) => {
                 ) : teleHandle ? (
                     <button
                         onClick={handleContactClick}
-                        className="w-full flex items-center justify-center gap-2 bg-[#229ED9] hover:bg-[#1b87ba] text-white font-semibold py-2.5 rounded-lg mb-4 transition-colors"
+                        className="w-full flex items-center justify-center gap-2 bg-[#229ED9] hover:bg-[#1b87ba] text-white font-semibold py-2.5 rounded-md mb-5 transition-colors"
                     >
                         <Send className="w-4 h-4" />
                         Contact via Telegram
@@ -155,7 +155,6 @@ const ListingCard = ({ item, onCardClick = () => {}, onDelete = null }) => {
             )}
 
             <p className="text-xs text-gray-700 mb-4">Listed: {dateListed}</p>
-
             <ReviewForm listing={item} />
         </Modal>
     </>

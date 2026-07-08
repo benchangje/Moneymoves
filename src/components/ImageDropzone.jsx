@@ -1,26 +1,44 @@
 import { useState, useCallback } from "react";
 import { useDropzone } from "react-dropzone";
 import { UploadCloud, X } from "lucide-react";
+import { resizeImage } from "./ImageDropzoneProfile";
 
 export default function ImageDropzone({ onImageSelect }) {
     
-    const MAXFILES = 8;
+    const MAXFILES = 5;
     const [preview, setPreview] = useState([]);
     const [viewImage, setViewImage] = useState(null);
     
-    const onDrop = useCallback((acceptedFiles) => {
-            setPreview(prev => {
-                const slotsLeft = MAXFILES - prev.length;
-                if (slotsLeft <= 0) return prev; 
-                const allowedFiles = acceptedFiles.slice(0, slotsLeft);
-                const newFiles = allowedFiles.map(file => Object.assign(file, {
-                    preview: URL.createObjectURL(file)
-                }));
-                const updated = [...prev, ...newFiles];
-                if (onImageSelect) onImageSelect(updated);
-                return updated;
-            });
-        }, [onImageSelect]);
+    const onDrop = useCallback(async (acceptedFiles) => {
+        const slotsLeft = MAXFILES - preview.length;
+        if (slotsLeft <= 0) return;
+
+        const allowedFiles = acceptedFiles.slice(0, slotsLeft);
+
+        const newFiles = await Promise.all(
+            allowedFiles.map(async (file) => {
+                try {
+                    const resizedDataUrl = await resizeImage(file);
+                    const blob = await fetch(resizedDataUrl).then((res) => res.blob());
+                    const baseName = file.name.replace(/\.[^/.]+$/, "");
+                    const compressedFile = new File([blob], `${baseName}.jpg`, { type: "image/jpeg" });
+
+                    return Object.assign(compressedFile, {
+                        preview: resizedDataUrl,
+                    });
+                } catch (error) {
+                    console.error("Error resizing listing image:", error);
+                    return Object.assign(file, {
+                        preview: URL.createObjectURL(file),
+                    });
+                }
+            })
+        );
+
+        const updated = [...preview, ...newFiles];
+        setPreview(updated);
+        if (onImageSelect) onImageSelect(updated);
+    }, [onImageSelect, preview]);
 
     const { getRootProps, getInputProps, isDragActive } = useDropzone({
         onDrop,

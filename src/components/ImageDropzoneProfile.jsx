@@ -3,7 +3,7 @@ import { useDropzone } from "react-dropzone";
 import { X, Plus } from "lucide-react";
 
 const MAX_SIZE = 100;
-const QUALITY = 0.5;
+const QUALITY = 0.6;
 
 {/* IMAGE RESIZER */}
 export const resizeImage = (file) =>

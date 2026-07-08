@@ -3,9 +3,6 @@ import { useDropzone } from "react-dropzone";
 import { X, Plus } from "lucide-react";
 import { resizeImage } from "./ImageDropzoneProfile";
 
-const MAX_SIZE = 200;
-const QUALITY = 0.6;
-
 {/* BANNER DROPZONE */}
 export default function BannerDropzoneProfile({ onImageSelect }) {
     const [preview, setPreview] = useState(null);
