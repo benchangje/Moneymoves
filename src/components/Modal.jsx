@@ -18,7 +18,7 @@
 
     return createPortal(
         <div
-            className="fixed inset-0 z-[100] bg-black/50 flex items-start justify-center overflow-y-auto p-6 sm:items-center sm:p-6"
+            className="fixed inset-0 z-[100] bg-black/50 flex items-center justify-center overflow-y-auto p-6 sm:items-center sm:p-6"
             onClick={onClose}
         >
             <div
