@@ -84,7 +84,7 @@ export default function RentalMarketplace() {
     }, [normalizedListings, query]);
 
     return (
-        <div className="min-h-screen max-w-7xl mx-auto p-6 px-8 lg:p-8 lg:px-10">
+        <div className="min-h-screen max-w-7xl mx-auto p-6 lg:p-8">
             <h1 className="text-3xl font-semibold mb-6 text-gray-900">Marketplace</h1>
             <div className="mb-6 flex flex-row items-center gap-4">
                 <div className="group relative flex-1 hover:scale-101 transition-all duration-300 md:w-1/2">

@@ -18,11 +18,11 @@
 
     return createPortal(
         <div
-            className="fixed inset-0 z-[100] bg-black/50 flex items-center justify-center"
+            className="fixed inset-0 z-[100] bg-black/50 flex items-start justify-center overflow-y-auto p-6 sm:items-center sm:p-6"
             onClick={onClose}
         >
             <div
-                className="bg-white rounded-lg shadow-xl max-w-lg w-full h-[82vh] overflow-y-auto relative p-6 pb-2"
+                className="relative w-full max-w-lg max-h-[calc(100dvh-1.5rem)] overflow-y-auto overscroll-contain rounded-lg bg-white p-6 pb-2 shadow-xl [-webkit-overflow-scrolling:touch] sm:max-h-[calc(100dvh-3rem)]"
                 onClick={(e) => e.stopPropagation()}
             >
                 <button
