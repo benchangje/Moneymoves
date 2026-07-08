@@ -143,7 +143,7 @@ export default function ContactUs() {
                                     aria-invalid={!!errors.name}
                                     aria-describedby={errors.name ? 'error-name' : undefined}
                                 />
-                                {errors.name && <p id="error-name" className="mt-1 text-sm text-red-600">{errors.name}</p>}
+                                {errors.name && <p id="error-name" className="mt-2 text-sm text-red-600">{errors.name}</p>}
                             </div>
 
                             <div>
@@ -158,7 +158,7 @@ export default function ContactUs() {
                                     aria-invalid={!!errors.email}
                                     aria-describedby={errors.email ? 'error-email' : undefined}
                                 />
-                                {errors.email && <p id="error-email" className="mt-1 text-sm text-red-600">{errors.email}</p>}
+                                {errors.email && <p id="error-email" className="mt-2 text-sm text-red-600">{errors.email}</p>}
                             </div>
 
                             <div>
@@ -171,7 +171,7 @@ export default function ContactUs() {
                                     onFocus={(e) => e.target.placeholder = "Enter your message here"}
                                     className={`mt-2 resize-none h-48 w-full rounded-xl border px-4 py-2 text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-200 hover:border-gray-300 ${errors.message ? 'border-red-300' : 'border-gray-200'}`}
                                 />
-                                {errors.message && <p id="error-message" className="mt-1 text-sm text-red-600">{errors.message}</p>}
+                                {errors.message && <p id="error-message" className="mt-2 text-sm text-red-600">{errors.message}</p>}
                             </div>
 
                             <div className="flex items-center gap-6">

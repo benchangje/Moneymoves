@@ -8,6 +8,8 @@ import { useListings } from '../hooks/useListings';
 import { useReviews } from '../hooks/useReviews';
 import { Star } from 'lucide-react';
 import ListingCard from './ListingCard';
+import { doc, deleteDoc } from 'firebase/firestore';
+import { db } from '../hooks/firebase';
 
 const DEFAULT_PROFILE_PICTURE = '/default-pfp.svg';
 const DEFAULT_BANNER_PICTURE = '/rentlalogonew.jpg'
@@ -17,7 +19,7 @@ export default function Profile() {
     const { profile, updateProfile } = useUserProfile(user);
     const { listings: userListings } = useListings({ ownerUid: user?.uid });
     const { reviews, loading: reviewsLoading, averageRating, ratedStars } = useReviews('user', user?.uid);
-    
+
     const [isEditing, setIsEditing] = useState(false);
     const [editName, setEditName] = useState('');
     const [editBio, setEditBio] = useState('');
@@ -31,6 +33,9 @@ export default function Profile() {
     const bannerInputRef = useRef(null);
     const [saving, setSaving] = useState(false);
     const [message, setMessage] = useState('');
+    const [deletingId, setDeletingId] = useState(null);
+    const [deletedIds, setDeletedIds] = useState(new Set());
+
 
     // Initialize form with profile data
     useEffect(() => {
@@ -72,16 +77,18 @@ export default function Profile() {
         bannerInputRef.current?.click();
     };
 
-    const normalizedListings = userListings.map((listing) => ({
-        ...listing,
-        pricePerDay: Number(listing.price ?? 0),
-        deposit: Number(listing.deposit ?? 0),
-        dateListed: listing.createdAt
-            ? new Date(listing.createdAt).toISOString().split('T')[0]
-            : new Date().toISOString().split('T')[0],
-        image: listing.image || listing.images?.[0] || '',
-        location: listing.location || 'Location not provided',
-    }));
+    const normalizedListings = userListings
+        .filter((listing) => !deletedIds.has(listing.id))
+        .map((listing) => ({
+            ...listing,
+            pricePerDay: Number(listing.price ?? 0),
+            deposit: Number(listing.deposit ?? 0),
+            dateListed: listing.createdAt
+                ? new Date(listing.createdAt).toISOString().split('T')[0]
+                : new Date().toISOString().split('T')[0],
+            image: listing.image || listing.images?.[0] || '',
+            location: listing.location || 'Location not provided',
+        }));
 
     // Handle profile save
     const handleSaveProfile = async () => {
@@ -93,7 +100,7 @@ export default function Profile() {
         try {
             setSaving(true);
             setMessage('');
-            
+
             await updateProfile({
                 displayName: editName.trim() || profile?.displayName,
                 bio: editBio.trim(),
@@ -101,7 +108,7 @@ export default function Profile() {
                 photoURL: editPhotoURL || profile?.photoURL || DEFAULT_PROFILE_PICTURE,
                 bannerURL: editBannerURL || profile?.bannerURL || DEFAULT_BANNER_PICTURE,
             });
-            
+
             setMessage('Profile updated successfully!');
             setIsEditing(false);
             setTimeout(() => setMessage(''), 3000);
@@ -109,6 +116,21 @@ export default function Profile() {
             setMessage('Error saving profile: ' + error.message);
         } finally {
             setSaving(false);
+        }
+    };
+
+    const handleDeleteListing = async (listingId) => {
+        const confirmed = window.confirm("Delete listing?")
+        if (!confirmed) return;
+
+        try {
+            setDeletingId(listingId);
+            await deleteDoc(doc(db, 'listings', listingId));
+            setDeletedIds((prev) => new Set(prev).add(listingId));
+        } catch (error) {
+            setMessage("Error deleting listing: " + error.message);
+        } finally {
+            setDeletingId(null);
         }
     };
 
@@ -125,7 +147,7 @@ export default function Profile() {
     };
 
     return (
-        <div className="min-h-screen bg-gray-50">
+        <div className="min-h-screen bg-white">
             {/* Banner */}
             <div
                 className="w-full h-64 bg-linear-to-r from-blue-500 to-purple-600 bg-cover bg-center"
@@ -133,8 +155,8 @@ export default function Profile() {
             ></div>
 
             {/* Profile Content */}
-            <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 -mt-32 relative z-10">
-                <div className="bg-white rounded-lg shadow-lg overflow-hidden">
+            <div className="max-w-6xl mx-auto p-4 sm:p-6 lg:p-8 -mt-32 relative z-10">
+                <div className="bg-gray-50 rounded-lg shadow-[0_0_10px_rgba(0,0,0,0.2)] overflow-hidden">
                     {/* Profile Header */}
                     <div className="px-8 py-8">
                         <div className="flex flex-col md:flex-row items-start md:items-center gap-8">
@@ -308,11 +330,13 @@ export default function Profile() {
                     </div>
 
                     {/* Listings Section */}
-                    <div className="border-t border-gray-200 px-6 py-8">
+                    <div className="border-t border-gray-200 px-8 py-8">
                         <h2 className="translate-x-1 text-2xl font-bold text-gray-900 mb-6">Your Listings</h2>
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                             {normalizedListings.map((listing) => (
-                                <ListingCard key={listing.id} item={listing} />
+                                <div key={listing.id} className={deletingId === listing.id ? "opacity-50 pointer-events-none" : ""}>
+                                    <ListingCard key={listing.id} item={listing} onDelete={handleDeleteListing} />
+                                </div>
                             ))}
                         </div>
                         {normalizedListings.length === 0 && (

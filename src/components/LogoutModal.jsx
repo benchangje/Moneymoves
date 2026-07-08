@@ -12,15 +12,17 @@ export default function LogoutModal({ onClose, onCancel, onLogout }) {
                     duration: 0.4,
                     ease: "easeInOut"
                 }}
-                className="bg-white rounded-lg p-6 pt-4 pb-6.5 flex flex-col items-start gap-4 mb-10 shadow-[0_0_10px_rgba(0,0,0,0.1)]"
+                className="relative bg-white rounded-lg p-3 pb-5 px-5 flex flex-col items-start gap-4 mb-10 shadow-[0_0_10px_rgba(0,0,0,0.1)]"
             >
-                <div className="flex flex-row items-start gap-20">
-                    <h2 className="text-2xl font-semibold text-gray-900">Confirm Logout</h2>
-                    <X 
-                        onClick={onClose} 
-                        className="h-6 w-6 text-gray-400 mt-1 cursor-pointer hover:text-gray-600 transition-colors" 
-                    />
-                </div>
+                <button
+                    onClick={onClose}
+                    className="absolute top-3.5 right-4 text-gray-400 cursor-pointer hover:text-gray-600 transition-colors"
+                    aria-label="Close logout modal"
+                >
+                    <X className="h-6 w-6" />
+                </button>
+
+                <h2 className="text-2xl font-semibold text-gray-900">Confirm Logout</h2>
                 <p className="text-base text-gray-900">
                     Are you sure you want to logout?
                 </p>
