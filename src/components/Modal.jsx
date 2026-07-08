@@ -1,8 +1,8 @@
-    import { createPortal } from "react-dom";
-    import { useEffect } from "react";
-    import { X } from "lucide-react";
+import { createPortal } from "react-dom";
+import { useEffect } from "react";
+import { X } from "lucide-react";
 
-    const Modal = ({ isOpen, onClose, children }) => {
+const Modal = ({ isOpen, onClose, children }) => {
     useEffect(() => {
         if (!isOpen) return;
         const handleEsc = (e) => e.key === "Escape" && onClose();
@@ -18,24 +18,27 @@
 
     return createPortal(
         <div
-            className="fixed inset-0 z-[100] bg-black/50 flex items-center justify-center overflow-y-auto p-6 sm:items-center sm:p-6"
+            className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 p-6"
             onClick={onClose}
         >
             <div
-                className="relative w-full max-w-lg max-h-[calc(100dvh-1.5rem)] overflow-y-auto overscroll-contain rounded-lg bg-white p-6 pb-2 shadow-xl [-webkit-overflow-scrolling:touch] sm:max-h-[calc(100dvh-3rem)]"
+                className="relative flex h-[700px] w-[600px] max-h-[82vh] max-w-[90vw] flex-col overflow-hidden rounded-lg bg-white shadow-xl"
                 onClick={(e) => e.stopPropagation()}
             >
                 <button
                     onClick={onClose}
-                    className="absolute rounded-[14px] bg-white top-2 right-2 text-gray-500 hover:text-gray-900 p-1.5"
+                    className="absolute top-3 right-4 z-10 rounded-[14px] rounded-br-none rounded-tl-none bg-white p-1.5 text-gray-500 hover:text-gray-900"
                 >
-                    <X className="w-7 h-7" />
+                    <X className="h-7 w-7" />
                 </button>
-                {children}
+
+                <div className="flex-1 overflow-y-auto p-6 pb-2">
+                    {children}
+                </div>
             </div>
         </div>,
         document.body
     );
-    };
+};
 
-    export default Modal;
+export default Modal;
