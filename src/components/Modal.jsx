@@ -22,12 +22,12 @@ const Modal = ({ isOpen, onClose, children }) => {
             onClick={onClose}
         >
             <div
-                className="relative flex h-[700px] w-[600px] max-h-[82vh] max-w-[90vw] flex-col overflow-hidden rounded-lg bg-white shadow-xl"
+                className="relative flex h-[508px] w-[600px] max-h-[82vh] max-w-[90vw] flex-col overflow-hidden rounded-lg bg-white shadow-xl"
                 onClick={(e) => e.stopPropagation()}
             >
                 <button
                     onClick={onClose}
-                    className="absolute top-3 right-4 z-10 rounded-[14px] rounded-br-none rounded-tl-none bg-white p-1.5 text-gray-500 hover:text-gray-900"
+                    className="absolute top-3 right-4 z-10 rounded-[14px] rounded-br-none rounded-tr-none bg-white p-1.5 text-gray-500 hover:text-gray-900"
                 >
                     <X className="h-7 w-7" />
                 </button>

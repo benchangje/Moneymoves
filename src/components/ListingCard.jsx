@@ -154,7 +154,7 @@ const ListingCard = ({ item, onCardClick = () => {}, onDelete = null }) => {
                 )
             )}
 
-            <p className="text-xs text-gray-700 mb-4">Listed: {dateListed}</p>
+            <p className="text-xs text-gray-700 mb-2">Listed: {dateListed}</p>
             <ReviewForm listing={item} />
         </Modal>
     </>

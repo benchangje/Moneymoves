@@ -51,7 +51,7 @@ export default function ReviewForm({ listing }) {
   };
 
   return (
-    <div className="mt-3 mb-2 border-t border-gray-200 pt-3" onClick={(e) => e.stopPropagation()}>
+    <div className="mt-4 mb-3 border-t border-gray-200 pt-3" onClick={(e) => e.stopPropagation()}>
       <button
         type="button"
         onClick={() => setIsOpen((open) => !open)}
