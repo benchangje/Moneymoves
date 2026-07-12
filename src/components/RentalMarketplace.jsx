@@ -51,7 +51,9 @@ export default function RentalMarketplace() {
         if (filters.maxPrice !== "") {
             list = list.filter((item) => item.pricePerDay <= Number(filters.maxPrice));
         }
-
+        if (filters.category) {
+            list = list.filter((item) => item.category === filters.category);
+        }
         if (filters.sortOption === "lowest") {
             list.sort((a, b) => (a.pricePerDay ?? 0) - (b.pricePerDay ?? 0));
         } else if (filters.sortOption === "highest") {
