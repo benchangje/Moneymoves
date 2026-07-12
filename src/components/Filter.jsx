@@ -65,10 +65,10 @@ export default function Filter({ onClose, onApply }) {
     };
 
     return (
-        <div className="fixed inset-0 z-60">
+        <div className="fixed inset-0 z-60 p-4">
             <div className="absolute inset-0 bg-black/40" />
             <div className="w-full h-full flex items-center justify-center">
-                <div className="absolute w-3/4 bg-white p-6 pt-4 shadow-2xl rounded-xl">
+                <div className="absolute w-5/6 md:w-3/4 bg-white p-6 pt-4 shadow-2xl rounded-xl">
                     <div className="relative flex justify-center items-center mb-6">
                         <button
                             onClick={onClose}
@@ -85,10 +85,10 @@ export default function Filter({ onClose, onApply }) {
                         className="space-y-6"
                     >
                         <div>
-                            <h3 className="text-sm font-medium text-gray-600 mb-3 ml-1 underline">
+                            <h3 className="text-sm md:text-base text-gray-600 mb-3 ml-1 underline">
                                 Sort By
                             </h3>
-                            <div className="flex flex-wrap gap-4 mb-3">
+                            <div className="flex flex-wrap gap-3 mb-3">
                                 {[
                                     {label: "Price: Low to High", value: "lowest"},
                                     {label: "Price: High to Low", value: "highest"},
@@ -97,7 +97,7 @@ export default function Filter({ onClose, onApply }) {
                                         key={option.value}
                                         type="button"
                                         onClick={() => setSortOption(option.value)}
-                                        className={`px-4 py-2 rounded-xl border transition-all duration-200
+                                        className={`px-3 py-2 text-sm md:text-base rounded-xl border transition-all duration-200
                                             ${sortOption === option.value
                                                 ? "bg-gray-800 text-white border-gray-900"
                                                 : "bg-white text-gray-700 border-gray-300 hover:border-gray-500"
@@ -109,10 +109,10 @@ export default function Filter({ onClose, onApply }) {
                                 ))}
                             </div>
                             <div>
-                                <h3 className="text-sm font-medium text-gray-600 mb-3 ml-1 underline">
+                                <h3 className="text-sm md:text-base text-gray-600 mb-3 ml-1 underline">
                                     Category
                                 </h3>
-                                <div className="flex flex-wrap gap-4 mb-3">
+                                <div className="flex flex-wrap gap-3 mb-3">
                                     {[
                                         "Electronics",
                                         "Clothing",
@@ -124,7 +124,7 @@ export default function Filter({ onClose, onApply }) {
                                             onClick={() =>
                                                 setCategory(category === cat ? "" : cat)
                                             }
-                                            className={`px-4 py-2 rounded-xl border transition-all duration-200
+                                            className={`px-3 py-2 text-sm md:text-base rounded-xl border transition-all duration-200
                                                 ${
                                                     category === cat
                                                         ? "bg-gray-800 text-white border-gray-900"
@@ -137,14 +137,14 @@ export default function Filter({ onClose, onApply }) {
                                 </div>
                             </div>
                             <div>
-                                <h3 className="text-sm font-medium text-gray-600 mb-3 ml-1 underline">
+                                <h3 className="text-sm md:text-base text-gray-600 mb-3 ml-1 underline">
                                     Deposit
                                 </h3>
                                 <button
                                     type="button"
                                     onClick={() => setDepositRequired(!depositRequired)}
                                     className={`
-                                        px-4 py-2 rounded-xl border transition-all duration-200
+                                        text-sm md:text-base px-4 py-2 rounded-xl border transition-all duration-200
                                         ${depositRequired
                                             ? "bg-gray-800 text-white border-gray-900"
                                             : "bg-white text-gray-700 border-gray-300 hover:border-gray-500"
@@ -155,8 +155,8 @@ export default function Filter({ onClose, onApply }) {
                                 </button>
                             </div>
                         </div>
-                        <div className="w-full hover:scale-101 transition-all duration-200 ease-out">
-                            <p className="absolute ml-5 mt-3 text-gray-400 text-base">
+                        <div className="text-sm md:text-base w-full hover:scale-101 transition-all duration-200 ease-out">
+                            <p className="absolute ml-5 mt-3 text-gray-400 text-sm md:text-base">
                                 S$
                             </p>
                             <input
@@ -165,11 +165,11 @@ export default function Filter({ onClose, onApply }) {
                                 onChange={(e) => setMinPrice(e.target.value)}
                                 placeholder="min. Price"
                                 onKeyDown={(e) => ["e", "E", "+", "-"].includes(e.key) && e.preventDefault()}
-                                className="w-full bg-[#eceef2] rounded-xl px-12 py-3 text-base text-gray-400 focus:text-gray-600 placeholder-gray-400 focus:outline-none focus:placeholder-gray-400 hover:bg-gray-200 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                                className="w-full bg-[#eceef2] rounded-xl px-12 py-3 text-gray-400 focus:text-gray-600 placeholder-gray-400 focus:outline-none focus:placeholder-gray-400 hover:bg-gray-200 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                             />
                         </div>
-                        <div className="w-full mt-6 hover:scale-101 transition-all duration-200 ease-out">
-                            <p className="absolute ml-5 mt-3 text-gray-400 text-base">
+                        <div className="text-sm md:text-base w-full mt-6 hover:scale-101 transition-all duration-200 ease-out">
+                            <p className="absolute ml-5 mt-3 text-gray-400 text-sm md:text-base">
                                 S$
                             </p>
                             <input
@@ -178,15 +178,15 @@ export default function Filter({ onClose, onApply }) {
                                 onChange={(e) => setMaxPrice(e.target.value)}
                                 placeholder="max. Price"
                                 onKeyDown={(e) => ["e", "E", "+", "-"].includes(e.key) && e.preventDefault()}
-                                className="w-full bg-[#eceef2] rounded-xl px-12 py-3 text-base text-gray-400 focus:text-gray-600 placeholder-gray-400 focus:outline-none focus:placeholder-gray-400 hover:bg-gray-200 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                                className="w-full bg-[#eceef2] rounded-xl px-12 py-3 text-gray-400 focus:text-gray-600 placeholder-gray-400 focus:outline-none focus:placeholder-gray-400 hover:bg-gray-200 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                             />
                         </div>
-                        <div className="flex gap-4">
+                        <div className="flex gap-3 text-sm md:text-base">
                             <button
                                 type="submit"
                                 disabled={!isFormValid || isApplying}
                                 className={`
-                                    px-5 py-3 rounded-xl text-white transition-all duration-200
+                                    px-4 py-2 rounded-xl text-white transition-all duration-200
                                     ${isFormValid
                                         ? "bg-gray-800 hover:bg-gray-700"
                                         : "bg-gray-400 cursor-not-allowed"
@@ -200,7 +200,7 @@ export default function Filter({ onClose, onApply }) {
                                 onClick={handleClearFilters}
                                 disabled={!isFormValid}
                                 className={`
-                                    px-5 py-3 rounded-xl border transition-all duration-200
+                                    px-4 py-2 rounded-xl border transition-all duration-200
                                     ${
                                         isFormValid
                                             ? "border-gray-300 text-gray-700 hover:bg-gray-100"
