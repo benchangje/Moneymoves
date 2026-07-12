@@ -1,15 +1,17 @@
 import { useState, useCallback } from "react";
 import { useDropzone } from "react-dropzone";
 import { X, Plus } from "lucide-react";
-import { resizeImage } from "./ImageDropzoneProfile";
+import { resizeImage } from "../hooks/imageUtils.js";
 
 {/* BANNER DROPZONE */}
 export default function BannerDropzoneProfile({ onImageSelect }) {
     const [preview, setPreview] = useState(null);
+    const [error, setError] = useState("");
 
     const handleClearImage = (event) => {
         event.stopPropagation();
         setPreview(null);
+        setError("");
         if (onImageSelect) onImageSelect('');
     };
     
@@ -17,13 +19,17 @@ export default function BannerDropzoneProfile({ onImageSelect }) {
         const file = acceptedFiles[0];
         if (!file) return;
 
-        resizeImage(file)
+        setError("");
+        // Banners are wide but short, so a taller max dimension keeps them sharp
+        // across full-width layouts without ballooning file size.
+        resizeImage(file, { maxDimension: 1200, quality: 0.8, format: "image/webp" })
             .then((imageDataUrl) => {
                 setPreview(imageDataUrl);
                 if (onImageSelect) onImageSelect(imageDataUrl);
             })
-            .catch((error) => {
-                console.error("Error resizing profile image:", error);
+            .catch((err) => {
+                console.error("Error resizing banner image:", err);
+                setError(err.message || "That image couldn't be processed.");
             });
     }, [onImageSelect]);
 
@@ -70,6 +76,10 @@ export default function BannerDropzoneProfile({ onImageSelect }) {
             </div>
             )}
         </div>
+
+        {error && (
+            <p className="mt-1 text-xs text-red-500">{error}</p>
+        )}
     </div>
     );
 }

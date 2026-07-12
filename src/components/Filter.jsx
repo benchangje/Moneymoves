@@ -13,14 +13,35 @@ export default function Filter({ onClose, onApply }) {
     // Deposit filter
     const [depositRequired, setDepositRequired] = useState(false);
 
+    // Category filter
+    const [category, setCategory] = useState("");
+
     // Check if form is valid
     const isFormValid = 
     sortOption !== "" ||
+    category !== "" ||
     minPrice !== "" ||
     maxPrice !== "" ||
     depositRequired 
 
     const [isApplying, setIsApplying] = useState(false);
+
+    const handleClearFilters = () => {
+        setSortOption("");
+        setCategory("");
+        setMinPrice("");
+        setMaxPrice("");
+        setDepositRequired(false);
+        if (onApply) {
+            onApply({
+                sortOption: "",
+                category: "",
+                minPrice: "",
+                maxPrice: "",
+                depositRequired: false,
+            });
+        }
+    };
 
     // Handle submit
     const handleSubmit = (e) => {
@@ -28,6 +49,7 @@ export default function Filter({ onClose, onApply }) {
         setIsApplying(true);
         const filters = {
             sortOption,
+            category,
             minPrice,
             maxPrice,
             depositRequired
@@ -52,7 +74,7 @@ export default function Filter({ onClose, onApply }) {
                             onClick={onClose}
                             className="absolute left-0"
                         >
-                            <X className="text-gray-900 hover:text-gray-400 transition-all duration-300 ease-in-out"/> 
+                            <X className="w-7 h-7 text-gray-900 hover:text-gray-400 transition-all duration-200 ease-in-out"/> 
                         </button>
                         <h2 className="text-2xl font-semibold text-gray-900">
                             Filter & Sort
@@ -66,7 +88,7 @@ export default function Filter({ onClose, onApply }) {
                             <h3 className="text-sm font-medium text-gray-600 mb-3 ml-1 underline">
                                 Sort By
                             </h3>
-                            <div className="flex flex-wrap gap-3 mb-3">
+                            <div className="flex flex-wrap gap-4 mb-3">
                                 {[
                                     {label: "Price: Low to High", value: "lowest"},
                                     {label: "Price: High to Low", value: "highest"},
@@ -75,7 +97,7 @@ export default function Filter({ onClose, onApply }) {
                                         key={option.value}
                                         type="button"
                                         onClick={() => setSortOption(option.value)}
-                                        className={`px-4 py-2 rounded-xl border transition-all duration-300
+                                        className={`px-4 py-2 rounded-xl border transition-all duration-200
                                             ${sortOption === option.value
                                                 ? "bg-gray-800 text-white border-gray-900"
                                                 : "bg-white text-gray-700 border-gray-300 hover:border-gray-500"
@@ -88,13 +110,41 @@ export default function Filter({ onClose, onApply }) {
                             </div>
                             <div>
                                 <h3 className="text-sm font-medium text-gray-600 mb-3 ml-1 underline">
+                                    Category
+                                </h3>
+                                <div className="flex flex-wrap gap-4 mb-3">
+                                    {[
+                                        "Electronics",
+                                        "Clothing",
+                                        "Lifestyle",
+                                    ].map((cat) => (
+                                        <button
+                                            key={cat}
+                                            type="button"
+                                            onClick={() =>
+                                                setCategory(category === cat ? "" : cat)
+                                            }
+                                            className={`px-4 py-2 rounded-xl border transition-all duration-200
+                                                ${
+                                                    category === cat
+                                                        ? "bg-gray-800 text-white border-gray-900"
+                                                        : "bg-white text-gray-700 border-gray-300 hover:border-gray-500"
+                                                }`}
+                                        >
+                                            {cat}
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+                            <div>
+                                <h3 className="text-sm font-medium text-gray-600 mb-3 ml-1 underline">
                                     Deposit
                                 </h3>
                                 <button
                                     type="button"
                                     onClick={() => setDepositRequired(!depositRequired)}
                                     className={`
-                                        px-4 py-2 rounded-xl border transition-all duration-300
+                                        px-4 py-2 rounded-xl border transition-all duration-200
                                         ${depositRequired
                                             ? "bg-gray-800 text-white border-gray-900"
                                             : "bg-white text-gray-700 border-gray-300 hover:border-gray-500"
@@ -105,7 +155,7 @@ export default function Filter({ onClose, onApply }) {
                                 </button>
                             </div>
                         </div>
-                        <div className="w-full hover:scale-101 transition-all duration-400 ease-out">
+                        <div className="w-full hover:scale-101 transition-all duration-200 ease-out">
                             <p className="absolute ml-5 mt-3 text-gray-400 text-base">
                                 S$
                             </p>
@@ -118,7 +168,7 @@ export default function Filter({ onClose, onApply }) {
                                 className="w-full bg-[#eceef2] rounded-xl px-12 py-3 text-base text-gray-400 focus:text-gray-600 placeholder-gray-400 focus:outline-none focus:placeholder-gray-400 hover:bg-gray-200 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                             />
                         </div>
-                        <div className="w-full mt-6 hover:scale-101 transition-all duration-400 ease-out">
+                        <div className="w-full mt-6 hover:scale-101 transition-all duration-200 ease-out">
                             <p className="absolute ml-5 mt-3 text-gray-400 text-base">
                                 S$
                             </p>
@@ -131,19 +181,36 @@ export default function Filter({ onClose, onApply }) {
                                 className="w-full bg-[#eceef2] rounded-xl px-12 py-3 text-base text-gray-400 focus:text-gray-600 placeholder-gray-400 focus:outline-none focus:placeholder-gray-400 hover:bg-gray-200 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                             />
                         </div>
-                        <button
-                            type="submit"
-                            disabled={!isFormValid || isApplying}
-                            className={`
-                                px-5 py-3 rounded-xl text-white transition-all duration-300
-                                ${isFormValid
-                                    ? "bg-gray-800 hover:bg-gray-700"
-                                    : "bg-gray-400 cursor-not-allowed"
-                                }
-                            `}
-                        >
-                            {isApplying ? "Applying..." : "Apply Filters"}
-                        </button>
+                        <div className="flex gap-4">
+                            <button
+                                type="submit"
+                                disabled={!isFormValid || isApplying}
+                                className={`
+                                    px-5 py-3 rounded-xl text-white transition-all duration-200
+                                    ${isFormValid
+                                        ? "bg-gray-800 hover:bg-gray-700"
+                                        : "bg-gray-400 cursor-not-allowed"
+                                    }
+                                `}
+                            >
+                                {isApplying ? "Applying..." : "Apply Filters"}
+                            </button>
+                            <button
+                                type="button"
+                                onClick={handleClearFilters}
+                                disabled={!isFormValid}
+                                className={`
+                                    px-5 py-3 rounded-xl border transition-all duration-200
+                                    ${
+                                        isFormValid
+                                            ? "border-gray-300 text-gray-700 hover:bg-gray-100"
+                                            : "border-gray-200 text-gray-400 cursor-not-allowed"
+                                    }
+                                `}
+                            >
+                                Clear Filters
+                            </button>
+                        </div>
                     </form>
                 </div>
             </div>

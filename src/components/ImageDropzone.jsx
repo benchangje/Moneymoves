@@ -1,40 +1,41 @@
 import { useState, useCallback } from "react";
 import { useDropzone } from "react-dropzone";
 import { UploadCloud, X } from "lucide-react";
-import { resizeImage } from "./ImageDropzoneProfile";
+import { generateImageVariants, dataUrlToFile } from "../hooks/imageUtils.js";
 
 export default function ImageDropzone({ onImageSelect }) {
-    
+
     const MAXFILES = 5;
     const [preview, setPreview] = useState([]);
     const [viewImage, setViewImage] = useState(null);
-    
+    const [error, setError] = useState("");
+
     const onDrop = useCallback(async (acceptedFiles) => {
         const slotsLeft = MAXFILES - preview.length;
         if (slotsLeft <= 0) return;
 
+        setError("");
         const allowedFiles = acceptedFiles.slice(0, slotsLeft);
 
-        const newFiles = await Promise.all(
+        const results = await Promise.all(
             allowedFiles.map(async (file) => {
                 try {
-                    const resizedDataUrl = await resizeImage(file);
-                    const blob = await fetch(resizedDataUrl).then((res) => res.blob());
-                    const baseName = file.name.replace(/\.[^/.]+$/, "");
-                    const compressedFile = new File([blob], `${baseName}.jpg`, { type: "image/jpeg" });
+                    const { full, thumbnail } = await generateImageVariants(file);
+                    const compressedFile = await dataUrlToFile(full, file.name);
 
                     return Object.assign(compressedFile, {
-                        preview: resizedDataUrl,
+                        preview: full,
+                        thumbnail, // small variant, used for the listing card grid
                     });
-                } catch (error) {
-                    console.error("Error resizing listing image:", error);
-                    return Object.assign(file, {
-                        preview: URL.createObjectURL(file),
-                    });
+                } catch (err) {
+                    console.error("Error resizing listing image:", err);
+                    setError(err.message || "One of your images couldn't be processed.");
+                    return null;
                 }
             })
         );
 
+        const newFiles = results.filter(Boolean);
         const updated = [...preview, ...newFiles];
         setPreview(updated);
         if (onImageSelect) onImageSelect(updated);
@@ -77,7 +78,7 @@ export default function ImageDropzone({ onImageSelect }) {
             <div className="flex flex-wrap content-start items-start gap-5 p-5">
                 {preview.map((file, index) => (
                     <div key={index} onClick={(e) => handleViewImage(e, file.preview)} className="flex items-center justify-center w-28 h-28 group relative">
-                        <img src={file.preview} alt="Preview" className="w-24 h-24 object-cover rounded-2xl group-hover:opacity-70 transition-opacity group-hover:scale-101 duration-300"/>
+                        <img src={file.thumbnail || file.preview} alt="Preview" className="w-24 h-24 object-cover rounded-2xl group-hover:opacity-70 transition-opacity group-hover:scale-101 duration-300"/>
                         <button onClick={(e) => removeImage(e, index)} className="absolute top-0 right-0 p-1 bg-[#b7bcc5] text-white rounded-full hover:bg-gray-300 opacity-100 transition-colors">
                             <X className="h-4 w-4" strokeWidth={2.6}/>
                         </button>
@@ -96,6 +97,10 @@ export default function ImageDropzone({ onImageSelect }) {
             </div>
             )}
         </div>
+
+        {error && (
+            <p className="mt-2 text-sm text-red-500">{error}</p>
+        )}
 
         {viewImage && (
         <div className="fixed w-full h-full inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm cursor-zoom-out" onClick={() => setViewImage(null)} >

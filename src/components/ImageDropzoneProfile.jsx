@@ -1,53 +1,20 @@
 import { useState, useCallback } from "react";
 import { useDropzone } from "react-dropzone";
 import { X, Plus } from "lucide-react";
+import { resizeImage } from "../hooks/imageUtils.js";
 
-const MAX_SIZE = 100;
-const QUALITY = 0.6;
-
-{/* IMAGE RESIZER */}
-export const resizeImage = (file) =>
-    new Promise((resolve, reject) => {
-        const reader = new FileReader();
-
-        reader.onload = () => {
-            const image = new Image();
-
-            image.onload = () => {
-                const canvas = document.createElement("canvas");
-                const context = canvas.getContext("2d");
-
-                if (!context) {
-                    reject(new Error("Unable to resize image."));
-                    return;
-                }
-
-                const scale = Math.min(1, MAX_SIZE / Math.max(image.width, image.height));
-                const width = Math.round(image.width * scale);
-                const height = Math.round(image.height * scale);
-
-                canvas.width = width;
-                canvas.height = height;
-                context.drawImage(image, 0, 0, width, height);
-
-                resolve(canvas.toDataURL("image/jpeg", QUALITY));
-            };
-
-            image.onerror = () => reject(new Error("Unable to load image."));
-            image.src = reader.result;
-        };
-
-        reader.onerror = () => reject(new Error("Unable to read image file."));
-        reader.readAsDataURL(file);
-    });
+// Re-exported for any other file still importing resizeImage from here.
+export { resizeImage };
 
 {/* IMAGE DROPZONE */}
 export default function ImageDropzoneProfile({ onImageSelect }) {
     const [preview, setPreview] = useState(null);
+    const [error, setError] = useState("");
 
     const handleClearImage = (event) => {
         event.stopPropagation();
         setPreview(null);
+        setError("");
         if (onImageSelect) onImageSelect('');
     };
     
@@ -55,13 +22,17 @@ export default function ImageDropzoneProfile({ onImageSelect }) {
         const file = acceptedFiles[0];
         if (!file) return;
 
-        resizeImage(file)
+        setError("");
+        // Avatars render small (a few dozen px), so 300px/WebP keeps these tiny
+        // while still looking crisp on retina displays.
+        resizeImage(file, { maxDimension: 300, quality: 0.8, format: "image/webp" })
             .then((imageDataUrl) => {
                 setPreview(imageDataUrl);
                 if (onImageSelect) onImageSelect(imageDataUrl);
             })
-            .catch((error) => {
-                console.error("Error resizing profile image:", error);
+            .catch((err) => {
+                console.error("Error resizing profile image:", err);
+                setError(err.message || "That image couldn't be processed.");
             });
     }, [onImageSelect]);
 
@@ -108,5 +79,9 @@ export default function ImageDropzoneProfile({ onImageSelect }) {
             </div>
             )}
         </div>
+
+        {error && (
+            <p className="absolute top-full left-1/2 -translate-x-1/2 mt-1 w-32 text-center text-xs text-red-500">{error}</p>
+        )}
     </div>
     );}

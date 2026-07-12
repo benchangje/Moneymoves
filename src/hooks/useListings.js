@@ -46,11 +46,14 @@ export const useListings = ({ ownerUid = null, publishedOnly = false } = {}) => 
     const unsubscribe = onSnapshot(
         q,
         (snapshot) => {
-                const items = snapshot.docs.map((doc) => ({
+        const items = snapshot.docs.map((doc) => {
+            const data = doc.data();
+            return {
                 id: doc.id,
-                ...doc.data(),
-                createdAt: doc.data().createdAt?.toDate?.() || null,
-            }));
+                ...data,
+                createdAt: data.createdAt?.toDate?.() || null,
+            };
+        });
 
             const filteredItems = (publishedOnly
                 ? items.filter((listing) => listing.status === 'published')
