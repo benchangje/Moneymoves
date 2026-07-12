@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Star, Send, Trash2 } from "lucide-react";
+import { Star, Send, Trash2, ChevronLeft, ChevronRight, X } from "lucide-react";
 import { useAuth } from "../contexts/AuthContext";
 import { useReviews } from "../hooks/useReviews";
 import { useOwnerProfile } from "../hooks/useOwnerProfile";
@@ -12,7 +12,10 @@ const ListingCard = ({ item, onCardClick = () => {}, onDelete = null }) => {
         `https://via.placeholder.com/640x360.png?text=${encodeURIComponent(item.title || "Listing")}`;
 
     const [imgSrc, setImgSrc] = useState(item.image || defaultPlaceholder);
+    const [imageLoaded, setImageLoaded] = useState(false);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [currentImageIndex, setCurrentImageIndex] = useState(0);
+    const [isImageExpanded, setIsImageExpanded] = useState(false);
     const { user } = useAuth();
     const { averageRating, reviewCount } = useReviews("listing", item.id, Boolean(item?.id));
     const { teleHandle, loading: loadingOwner } = useOwnerProfile(item.ownerUid);
@@ -22,8 +25,52 @@ const ListingCard = ({ item, onCardClick = () => {}, onDelete = null }) => {
         setImgSrc(item.image || defaultPlaceholder);
     }, [item.image, item.title]);
 
+    useEffect(() => {
+        setCurrentImageIndex(0);
+        setIsImageExpanded(false);
+    }, [item.id]);
+
+    // Close the expanded view with Escape, without also closing the modal underneath.
+    useEffect(() => {
+        if (!isImageExpanded) return;
+        const handleEsc = (e) => {
+            if (e.key === "Escape") {
+                e.stopPropagation();
+                setIsImageExpanded(false);
+            }
+        };
+        document.addEventListener("keydown", handleEsc, true);
+        return () => document.removeEventListener("keydown", handleEsc, true);
+    }, [isImageExpanded]);
+
     const handleImgError = () => {
         setImgSrc(defaultPlaceholder);
+    };
+
+    const toDataUrl = (img) => {
+        if (!img) return null;
+        if (img.base64?.startsWith("data:")) return img.base64;
+        return `data:${img.mimeType || "image/png"};base64,${img.base64}`;
+    };
+
+    const galleryImages =
+        item.images && item.images.length > 0
+            ? item.images.map(toDataUrl).filter(Boolean)
+            : [imgSrc];
+
+    const hasMultipleImages = galleryImages.length > 1;
+
+    const currentModalImage =
+        galleryImages[currentImageIndex] || galleryImages[0] || defaultPlaceholder;
+
+    const handleNextImage = (e) => {
+        e.stopPropagation();
+        setCurrentImageIndex((prev) => (prev + 1) % galleryImages.length);
+    };
+
+    const handlePrevImage = (e) => {
+        e.stopPropagation();
+        setCurrentImageIndex((prev) => (prev - 1 + galleryImages.length) % galleryImages.length);
     };
 
     const dateListed =
@@ -39,6 +86,8 @@ const ListingCard = ({ item, onCardClick = () => {}, onDelete = null }) => {
     const emptyStars = 5 - fullStars;
 
     const handleCardClick = () => {
+        setCurrentImageIndex(0);
+        setIsImageExpanded(false);
         setIsModalOpen(true);
         onCardClick(item.id);
     };
@@ -56,19 +105,23 @@ const ListingCard = ({ item, onCardClick = () => {}, onDelete = null }) => {
   return (
     <>
     <div className="relative w-full sm:w-1/2 md:w-64 cursor-pointer transition-all bg-white shadow-[0_0_8px_rgba(0,0,0,0.08)] hover:shadow-xl hover:scale-101 duration-300 ease-in-out hover:bg-gray-200 rounded-lg p-4 pb-3" onClick={handleCardClick}>
-        <img
-            src={imgSrc}
-            onError={handleImgError}
-            alt={item.title || "Listing image"}
-            className="w-full rounded-md"
-            style={{
-                display: "block",
-                height: "140px",
-                objectFit: "cover",
-                marginBottom: "10px",
-                backgroundColor: "#e5e5e5",
-          }}
-        />
+        <div className="relative w-full h-[140px] mb-[10px]">
+            {!imageLoaded && (
+                <div className="absolute inset-0 animate-pulse bg-gray-200 rounded-md" />
+            )}
+            <img
+                src={imgSrc}
+                loading="lazy"
+                decoding="async"
+                fetchPriority="low"
+                onLoad={() => setImageLoaded(true)}
+                onError={handleImgError}
+                alt={item.title || "Listing image"}
+                className={`w-full h-full rounded-md object-cover transition-opacity duration-300 ${
+                    imageLoaded ? "opacity-100" : "opacity-0"
+                }`}
+            />
+        </div>
         <h3 className="text-xl font-bold mb-1 text-gray-900 line-clamp-1">{item.title}</h3>
         <p className="text-lg font-bold mb-1.5 text-gray-900">${item.pricePerDay || item.price} / day</p>
         <p className="text-sm text-gray-700">Deposit: ${item.deposit}</p>
@@ -105,11 +158,56 @@ const ListingCard = ({ item, onCardClick = () => {}, onDelete = null }) => {
         </div>
 
         <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
-            <img
-                src={imgSrc}
-                alt={item.title || "Listing image"}
-                className="w-full h-48 object-cover rounded-lg mb-4"
-            />
+            <div className="relative w-full h-48 mb-4 group">
+                <img
+                    src={currentModalImage}
+                    onError={(e) => {
+                        e.currentTarget.src = defaultPlaceholder;
+                    }}
+                    alt={item.title || "Listing image"}
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        setIsImageExpanded(true);
+                    }}
+                    className="w-full h-48 object-cover rounded-lg cursor-zoom-in"
+                />
+                {hasMultipleImages && (
+                    <>
+                        <button
+                            type="button"
+                            onClick={handlePrevImage}
+                            aria-label="Previous image"
+                            className="absolute left-2 top-1/2 -translate-y-1/2 flex items-center justify-center w-8 h-8 rounded-full bg-black/50 text-white hover:bg-black/70 transition-colors"
+                        >
+                            <ChevronLeft className="w-6 h-6" />
+                        </button>
+                        <button
+                            type="button"
+                            onClick={handleNextImage}
+                            aria-label="Next image"
+                            className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center justify-center w-8 h-8 rounded-full bg-black/50 text-white hover:bg-black/70 transition-colors"
+                        >
+                            <ChevronRight className="w-6 h-6" />
+                        </button>
+                        <div className="mb-1 bg-black/40 px-2 py-1.5 rounded-full absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1.5">
+                            {galleryImages.map((_, i) => (
+                                <button
+                                    key={`dot-${i}`}
+                                    type="button"
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        setCurrentImageIndex(i);
+                                    }}
+                                    aria-label={`Go to image ${i + 1}`}
+                                    className={`w-1.5 h-1.5 rounded-full transition-colors ${
+                                        i === currentImageIndex ? "bg-white" : "bg-white/50"
+                                    }`}
+                                />
+                            ))}
+                        </div>
+                    </>
+                )}
+            </div>
             <h2 className="text-2xl font-bold text-gray-900 mb-4">{item.title}</h2>
             <p className="text-xl font-bold text-gray-900 mb-4">${item.pricePerDay || item.price}/day</p>
             <p className="text-md text-gray-700 mb-4">Deposit: ${item.deposit}</p>
@@ -157,6 +255,62 @@ const ListingCard = ({ item, onCardClick = () => {}, onDelete = null }) => {
             <p className="text-xs text-gray-700 mb-2">Listed: {dateListed}</p>
             <ReviewForm listing={item} />
         </Modal>
+
+        {isImageExpanded && (
+            <div
+                className="fixed inset-0 z-90 flex items-center justify-center bg-black/90 p-6 cursor-zoom-out"
+                onClick={(e) => {
+                    e.stopPropagation();
+                    setIsImageExpanded(false);
+                }}
+            >
+                <button
+                    type="button"
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        setIsImageExpanded(false);
+                    }}
+                    aria-label="Close expanded image"
+                    className="absolute top-5 right-5 z-10 rounded-full p-2 text-white transition-colors"
+                >
+                    <X className="h-8 w-8 hover:text-gray-400" />
+                </button>
+
+                {hasMultipleImages && (
+                    <>
+                        <button
+                            type="button"
+                            onClick={handlePrevImage}
+                            aria-label="Previous image"
+                            className="absolute left-4 top-1/2 -translate-y-1/2 flex items-center justify-center w-10 h-10 rounded-full bg-white/10 text-white hover:bg-white/20 transition-colors"
+                        >
+                            <ChevronLeft className="w-6 h-6" />
+                        </button>
+                        <button
+                            type="button"
+                            onClick={handleNextImage}
+                            aria-label="Next image"
+                            className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center justify-center w-10 h-10 rounded-full bg-white/10 text-white hover:bg-white/20 transition-colors"
+                        >
+                            <ChevronRight className="w-6 h-6" />
+                        </button>
+                        <span className="absolute bottom-5 left-1/2 -translate-x-1/2 text-sm text-white bg-white/10 px-3 py-1.5 rounded-full">
+                            {currentImageIndex + 1} / {galleryImages.length}
+                        </span>
+                    </>
+                )}
+
+                <img
+                    src={currentModalImage}
+                    onError={(e) => {
+                        e.currentTarget.src = defaultPlaceholder;
+                    }}
+                    alt={item.title || "Listing image"}
+                    className="max-w-full max-h-full object-contain rounded-md shadow-2xl cursor-default"
+                    onClick={(e) => e.stopPropagation()}
+                />
+            </div>
+        )}
     </>
   );
 };

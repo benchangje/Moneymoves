@@ -24,12 +24,14 @@ export default function RentalMarketplace() {
             ownerUid: listing.ownerUid,
             ownerName: listing.ownerName,
             title: listing.title,
+            category: listing.category || "",
             description: listing.description || "",
             pricePerDay: Number(listing.price ?? 0),
             dateListed: listing.createdAt
                 ? new Date(listing.createdAt).toISOString().split("T")[0]
                 : "",
-            image: listing.image || listing.images?.[0] || "",
+            image: listing.image || "",
+            images: listing.images || [],
             location: listing.location || "Location not provided",
             deposit: Number(listing.deposit ?? 0),
         })),
@@ -49,7 +51,9 @@ export default function RentalMarketplace() {
         if (filters.maxPrice !== "") {
             list = list.filter((item) => item.pricePerDay <= Number(filters.maxPrice));
         }
-
+        if (filters.category) {
+            list = list.filter((item) => item.category === filters.category);
+        }
         if (filters.sortOption === "lowest") {
             list.sort((a, b) => (a.pricePerDay ?? 0) - (b.pricePerDay ?? 0));
         } else if (filters.sortOption === "highest") {
