@@ -4,7 +4,7 @@ import { useRef, useState, useEffect } from 'react';
 import { resizeImage } from './ImageDropzoneProfile';
 import { useAuth } from '../contexts/AuthContext';
 import { useUserProfile } from '../hooks/useUserProfile';
-import { useListings } from '../hooks/useListings';
+import { useListings, updateListing } from '../hooks/useListings';
 import { useReviews } from '../hooks/useReviews';
 import { Star } from 'lucide-react';
 import ListingCard from './ListingCard';
@@ -88,6 +88,8 @@ export default function Profile() {
                 : new Date().toISOString().split('T')[0],
             image: listing.image || listing.images?.[0] || '',
             location: listing.location || 'Location not provided',
+            available: listing.available !== false,
+            renterTelegram: listing.renterTelegram || '',
         }));
 
     // Handle profile save
@@ -133,6 +135,24 @@ export default function Profile() {
             setDeletingId(null);
         }
     };
+
+    const handleToggleAvailability = async (listing, markingAsRented, renterHandle) => {
+    try {
+        if (markingAsRented) {
+            await updateListing(listing.id, {
+                available: false,
+                renterTelegram: renterHandle,
+            });
+        } else {
+            await updateListing(listing.id, {
+                available: true,
+                renterTelegram: "",
+            });
+        }
+    } catch (error) {
+        setMessage("Error updating listing: " + error.message);
+    }
+};
 
     // Handle cancel edit
     const handleCancel = () => {
@@ -335,7 +355,12 @@ export default function Profile() {
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                             {normalizedListings.map((listing) => (
                                 <div key={listing.id} className={deletingId === listing.id ? "opacity-50 pointer-events-none" : ""}>
-                                    <ListingCard key={listing.id} item={listing} onDelete={handleDeleteListing} />
+                                    <ListingCard
+                                        key={listing.id}
+                                        item={listing}
+                                        onDelete={handleDeleteListing}
+                                        onToggleAvailability={handleToggleAvailability}
+                                    />
                                 </div>
                             ))}
                         </div>

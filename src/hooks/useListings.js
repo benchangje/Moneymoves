@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback } from 'react';
-import { addDoc, collection, onSnapshot, query, serverTimestamp, where } from 'firebase/firestore';
+import { addDoc, collection, doc, onSnapshot, query, serverTimestamp, updateDoc, where } from 'firebase/firestore';
 import { db, hasFirebaseConfig } from './firebase';
 
 export const useListings = ({ ownerUid = null, publishedOnly = false } = {}) => {
@@ -89,4 +89,13 @@ export const createListing = async (listingData) => {
     });
 
     return docRef;
+};
+
+export const updateListing = async (listingId, updates) => {
+    if (!hasFirebaseConfig || !db) {
+        throw new Error('Firebase is not configured. Add a .env.local file before updating listings.');
+    }
+
+    const listingRef = doc(db, 'listings', listingId);
+    await updateDoc(listingRef, updates);
 };
