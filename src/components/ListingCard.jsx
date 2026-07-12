@@ -6,7 +6,7 @@ import { useOwnerProfile } from "../hooks/useOwnerProfile";
 import ReviewForm from "./ReviewForm";
 import Modal from "./Modal";
 
-const ListingCard = ({ item, onCardClick = () => {}, onDelete = null }) => {
+const ListingCard = ({ item, onCardClick = () => {}, onDelete = null, onToggleAvailability = null }) => {
     const defaultPlaceholder =
         item.imageFallback ||
         `https://via.placeholder.com/640x360.png?text=${encodeURIComponent(item.title || "Listing")}`;
@@ -16,10 +16,14 @@ const ListingCard = ({ item, onCardClick = () => {}, onDelete = null }) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
     const [isImageExpanded, setIsImageExpanded] = useState(false);
+    const [isToggling, setIsToggling] = useState(false);
+    const [showRentForm, setShowRentForm] = useState(false);
+    const [renterHandleInput, setRenterHandleInput] = useState("");
     const { user } = useAuth();
     const { averageRating, reviewCount } = useReviews("listing", item.id, Boolean(item?.id));
     const { teleHandle, loading: loadingOwner } = useOwnerProfile(item.ownerUid);
     const isOwnListing = Boolean(item.ownerUid && user?.uid && item.ownerUid === user.uid);
+    const isAvailable = item.available !== false;
 
     useEffect(() => {
         setImgSrc(item.image || defaultPlaceholder);
@@ -102,6 +106,42 @@ const ListingCard = ({ item, onCardClick = () => {}, onDelete = null }) => {
         window.open(telegramUrl, "_blank", "noopener,noreferrer");
     };
 
+    const handleMarkRentedClick = (e) => {
+        e.stopPropagation();
+        setShowRentForm(true);
+        setRenterHandleInput("");
+    };
+
+    const handleCancelRentForm = (e) => {
+        e.stopPropagation();
+        setShowRentForm(false);
+        setRenterHandleInput("");
+    };
+
+    const handleConfirmRentOut = async (e) => {
+        e.stopPropagation();
+        if (!renterHandleInput.trim() || !onToggleAvailability) return;
+        setIsToggling(true);
+        try {
+            await onToggleAvailability(item, true, renterHandleInput.trim());
+            setShowRentForm(false);
+            setRenterHandleInput("");
+        } finally {
+            setIsToggling(false);
+        }
+    };
+
+    const handleMarkAvailableClick = async (e) => {
+        e.stopPropagation();
+        if (!onToggleAvailability) return;
+        setIsToggling(true);
+        try {
+            await onToggleAvailability(item, false, "");
+        } finally {
+            setIsToggling(false);
+        }
+    };
+
   return (
     <>
     <div className="relative w-full sm:w-1/2 md:w-64 cursor-pointer transition-all bg-white shadow-[0_0_8px_rgba(0,0,0,0.08)] hover:shadow-xl hover:scale-101 duration-300 ease-in-out hover:bg-gray-200 rounded-lg p-4 pb-3" onClick={handleCardClick}>
@@ -122,6 +162,32 @@ const ListingCard = ({ item, onCardClick = () => {}, onDelete = null }) => {
                 }`}
             />
         </div>
+
+        <div className="flex items-center justify-between mb-2">
+            <span
+                className={`inline-block text-xs font-semibold px-2 py-1 rounded-full ${
+                    isAvailable ? "bg-green-100 text-green-700" : "bg-gray-200 text-gray-600"
+                }`}
+            >
+                {isAvailable ? "Available" : "Rented Out"}
+            </span>
+
+            {onDelete && (
+                <button
+                    type="button"
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        onDelete(item.id);
+                    }}
+                    className="text-gray-500 hover:text-red-600 transition-colors duration-400 ease-in-out"
+                    aria-label="Delete listing"
+                    title="Delete listing"
+                >
+                    <Trash2 className="w-5 h-5" />
+                </button>
+            )}
+        </div>
+
         <h3 className="text-xl font-bold mb-1 text-gray-900 line-clamp-1">{item.title}</h3>
         <p className="text-lg font-bold mb-1.5 text-gray-900">${item.pricePerDay || item.price} / day</p>
         <p className="text-sm text-gray-700">Deposit: ${item.deposit}</p>
@@ -139,23 +205,53 @@ const ListingCard = ({ item, onCardClick = () => {}, onDelete = null }) => {
                 {rating > 0 ? rating.toFixed(1) : "No rating"}
             </span>
             {reviewCount > 0 && <span className="text-xs text-gray-600">({reviewCount})</span>}
-            </div>
-            <p className="text-[10px] text-gray-700 mt-2.5">Listed: {dateListed}</p>
-            {onDelete && (
-			<button
-				type="button"
-				onClick={(e) => {
-					e.stopPropagation();
-					onDelete(item.id);
-				}}
-                className="absolute bottom-3.5 right-3 text-gray-500 hover:text-red-600 transition-colors duration-400 ease-in-out"
-				aria-label="Delete listing"
-				title="Delete listing"
-			>
-				<Trash2 className="w-6 h-6" />
-			</button>
-        )}
         </div>
+        <p className="text-[10px] text-gray-700 mt-2.5">Listed: {dateListed}</p>
+
+        {onToggleAvailability && !showRentForm && (
+            <button
+                type="button"
+                onClick={isAvailable ? handleMarkRentedClick : handleMarkAvailableClick}
+                disabled={isToggling}
+                className={`w-full mt-3 text-sm font-medium py-2 rounded-lg transition-colors disabled:opacity-50 ${
+                    isAvailable
+                        ? "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                        : "bg-green-100 text-green-700 hover:bg-green-200"
+                }`}
+            >
+                {isToggling ? "Updating..." : isAvailable ? "Mark as Rented Out" : "Mark as Available"}
+            </button>
+        )}
+
+        {onToggleAvailability && showRentForm && (
+            <div className="mt-3" onClick={(e) => e.stopPropagation()}>
+                <input
+                    type="text"
+                    value={renterHandleInput}
+                    onChange={(e) => setRenterHandleInput(e.target.value)}
+                    placeholder="Renter's Telegram handle"
+                    className="w-full text-sm px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 mb-2"
+                />
+                <div className="flex gap-2">
+                    <button
+                        type="button"
+                        onClick={handleConfirmRentOut}
+                        disabled={isToggling || !renterHandleInput.trim()}
+                        className="flex-1 text-sm font-medium py-2 rounded-lg bg-blue-500 text-white hover:bg-blue-600 transition-colors disabled:opacity-50"
+                    >
+                        {isToggling ? "Saving..." : "Confirm"}
+                    </button>
+                    <button
+                        type="button"
+                        onClick={handleCancelRentForm}
+                        className="flex-1 text-sm font-medium py-2 rounded-lg bg-gray-200 text-gray-700 hover:bg-gray-300 transition-colors"
+                    >
+                        Cancel
+                    </button>
+                </div>
+            </div>
+        )}
+    </div>
 
         <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
             <div className="relative w-full h-48 mb-4 group">
@@ -208,6 +304,15 @@ const ListingCard = ({ item, onCardClick = () => {}, onDelete = null }) => {
                     </>
                 )}
             </div>
+
+            <span
+                className={`inline-block text-xs font-semibold px-2 py-1 rounded-full mb-3 ${
+                    isAvailable ? "bg-green-100 text-green-700" : "bg-gray-200 text-gray-600"
+                }`}
+            >
+                {isAvailable ? "Available" : "Rented Out"}
+            </span>
+
             <h2 className="text-2xl font-bold text-gray-900 mb-4">{item.title}</h2>
             <p className="text-xl font-bold text-gray-900 mb-4">${item.pricePerDay || item.price}/day</p>
             <p className="text-md text-gray-700 mb-4">Deposit: ${item.deposit}</p>
@@ -233,6 +338,13 @@ const ListingCard = ({ item, onCardClick = () => {}, onDelete = null }) => {
                 </span>
                 {reviewCount > 0 && <span className="text-sm text-gray-600">({reviewCount})</span>}
             </div>
+
+            {isOwnListing && !isAvailable && item.renterTelegram && (
+                <div className="mb-4 bg-blue-50 border border-blue-100 rounded-lg p-3">
+                    <p className="text-xs font-semibold text-blue-900 mb-1">Rented to (visible only to you)</p>
+                    <p className="text-sm text-blue-800">@{item.renterTelegram.replace(/^@/, "")}</p>
+                </div>
+            )}
 
             {!isOwnListing && (
                 loadingOwner ? (

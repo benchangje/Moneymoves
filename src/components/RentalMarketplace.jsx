@@ -18,24 +18,24 @@ export default function RentalMarketplace() {
     const navigate = useNavigate();
 
     const normalizedListings = useMemo(
-    () =>
-        marketplaceListings.map((listing) => ({
-            id: listing.id,
-            ownerUid: listing.ownerUid,
-            ownerName: listing.ownerName,
-            title: listing.title,
-            category: listing.category || "",
-            description: listing.description || "",
-            pricePerDay: Number(listing.price ?? 0),
-            dateListed: listing.createdAt
-                ? new Date(listing.createdAt).toISOString().split("T")[0]
-                : "",
-            image: listing.image || "",
-            images: listing.images || [],
-            location: listing.location || "Location not provided",
-            deposit: Number(listing.deposit ?? 0),
-        })),
-    [marketplaceListings]
+        () =>
+            marketplaceListings.map((listing) => ({
+                id: listing.id,
+                ownerUid: listing.ownerUid,
+                ownerName: listing.ownerName,
+                title: listing.title,
+                description: listing.description || "",
+                pricePerDay: Number(listing.price ?? 0),
+                dateListed: listing.createdAt
+                    ? new Date(listing.createdAt).toISOString().split("T")[0]
+                    : "",
+                image: listing.image || listing.images?.[0] || "",
+                location: listing.location || "Location not provided",
+                deposit: Number(listing.deposit ?? 0),
+                available: listing.available !== false,
+                renterTelegram: listing.renterTelegram || "",
+            })),
+        [marketplaceListings]
     );
 
     const filteredListings = normalizedListings.filter((item) =>
@@ -88,7 +88,7 @@ export default function RentalMarketplace() {
     }, [normalizedListings, query]);
 
     return (
-        <div className="min-h-screen max-w-7xl mx-auto p-6 lg:p-8">
+        <div className="min-h-screen max-w-7xl mx-auto p-6 px-8 lg:p-8 lg:px-10">
             <h1 className="text-3xl font-semibold mb-6 text-gray-900">Marketplace</h1>
             <div className="mb-6 flex flex-row items-center gap-4">
                 <div className="group relative flex-1 hover:scale-101 transition-all duration-300 md:w-1/2">

@@ -88,7 +88,9 @@ export default function CreateListing() {
                 description,
                 image: primaryImage,
                 images: processedImages,
-                location: ""
+                location: "",
+                available: true,
+                renterTelegram: "",
             });
 
             setSubmit(true);
