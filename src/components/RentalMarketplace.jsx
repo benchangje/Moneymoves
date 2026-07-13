@@ -13,6 +13,7 @@ export default function RentalMarketplace() {
         sortOption: "",
         minPrice: "",
         maxPrice: "",
+        category: "",
         depositRequired: false,
     });
     const navigate = useNavigate();
@@ -29,8 +30,9 @@ export default function RentalMarketplace() {
                 dateListed: listing.createdAt
                     ? new Date(listing.createdAt).toISOString().split("T")[0]
                     : "",
-                image: listing.image || listing.images?.[0] || "",
-                location: listing.location || "Location not provided",
+                image: listing.image || "",
+                images: listing.images || [],
+                category: listing.category || "",
                 deposit: Number(listing.deposit ?? 0),
                 available: listing.available !== false,
                 renterTelegram: listing.renterTelegram || "",
@@ -125,7 +127,7 @@ export default function RentalMarketplace() {
                     ) : (
                         <div className="w-full">
                             <p className="text-slate-500 mb-4">No listings match your search.</p>
-                            <h2 className="text-xl font-semibold mb-3 text-gray-800">Recommended for you</h2>
+                            <h2 className="text-xl font-semibold mb-4 text-gray-800">Recommended for you</h2>
                             <div className="flex flex-wrap gap-6">
                                 {recommendedListings.length > 0 ? (
                                     recommendedListings.map((rec) => <ListingCard key={`rec-${rec.id}`} item={rec} />)
