@@ -22,7 +22,7 @@ export default function BannerDropzoneProfile({ onImageSelect }) {
         setError("");
         // Banners are wide but short, so a taller max dimension keeps them sharp
         // across full-width layouts without ballooning file size.
-        resizeImage(file, { maxDimension: 1200, quality: 0.8, format: "image/webp" })
+        resizeImage(file, { maxDimension: 1000, quality: 0.6, format: "image/webp" })
             .then((imageDataUrl) => {
                 setPreview(imageDataUrl);
                 if (onImageSelect) onImageSelect(imageDataUrl);

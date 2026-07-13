@@ -29,7 +29,7 @@ const loadImage = (file) =>
  * @param {string} options.format - "image/webp" | "image/jpeg" | "image/png"
  * @returns {Promise<string>} data URL
  */
-export const resizeImage = async (file, { maxDimension = 1440, quality = 0.82, format = "image/webp" } = {}) => {
+export const resizeImage = async (file, { maxDimension = 1080, quality = 0.65, format = "image/webp" } = {}) => {
     if (file.size > MAX_UPLOAD_BYTES) {
         throw new Error(`File "${file.name}" is larger than 5MB. Please choose a smaller image.`);
     }
@@ -75,8 +75,8 @@ export const generateImageVariants = async (file) => {
     };
  
     return {
-        full: render(1280, 0.70, "image/webp"),      // for the modal carousel / detail view
-        thumbnail: render(320, 0.65, "image/webp"),  // for the homepage listing card
+        full: render(1080, 0.60, "image/webp"),      // for the modal carousel / detail view
+        thumbnail: render(320, 0.50, "image/webp"),  // for the homepage listing card
     };
 };
  

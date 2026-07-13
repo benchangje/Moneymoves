@@ -92,7 +92,7 @@ export default function ImageDropzone({ onImageSelect }) {
                     <span className="text-blue-400 hover:underline">Click to upload</span> or drag and drop
                 </p>
                 <p className="text-sm text-gray-400">
-                    PNG, JPG, or WEBP (MAX. 5MB)
+                    PNG, JPG, JPEG or WEBP (MAX. 1MB)
                 </p>
             </div>
             )}
