@@ -38,7 +38,11 @@ export default function ImageDropzoneProfile({ onImageSelect }) {
 
     const { getRootProps, getInputProps, isDragActive } = useDropzone({
         onDrop,
-        accept: {'image/*': ['.jpeg', '.jpg', '.png', '.webp'] },
+        accept: {
+            "image/jpeg": [".jpeg", ".jpg"],
+            "image/png": [".png"],
+            "image/webp": [".webp"],
+        },
         maxFiles: 1,
         multiple: false
     });

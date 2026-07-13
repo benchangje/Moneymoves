@@ -3,7 +3,7 @@ import { useDropzone } from "react-dropzone";
 import { UploadCloud, X } from "lucide-react";
 import { generateImageVariants, dataUrlToFile } from "../hooks/imageUtils.js";
 
-export default function ImageDropzone({ onImageSelect }) {
+export default function ImageDropzone({ onImageSelect, onExceedsLimitChange }) {
 
     const MAXFILES = 3;
     const [preview, setPreview] = useState([]);
@@ -38,12 +38,19 @@ export default function ImageDropzone({ onImageSelect }) {
         const newFiles = results.filter(Boolean);
         const updated = [...preview, ...newFiles];
         setPreview(updated);
+        if (onExceedsLimitChange) {
+            onExceedsLimitChange(updated.some((file) => (file.originalSize || file.size) > 1024 * 1024));
+        }
         if (onImageSelect) onImageSelect(updated);
-    }, [onImageSelect, preview]);
+    }, [onExceedsLimitChange, onImageSelect, preview]);
 
     const { getRootProps, getInputProps, isDragActive } = useDropzone({
         onDrop,
-        accept: {'image/*': ['.jpeg', '.jpg', '.png', '.webp'] },
+        accept: {
+            "image/jpeg": [".jpeg", ".jpg"],
+            "image/png": [".png"],
+            "image/webp": [".webp"],
+        },
         disabled: preview.length >= MAXFILES,
         maxFiles: MAXFILES
     });
@@ -58,10 +65,17 @@ export default function ImageDropzone({ onImageSelect }) {
         const newPreview = [...preview];
         newPreview.splice(index, 1);
         setPreview(newPreview);
+        if (onExceedsLimitChange) {
+            onExceedsLimitChange(newPreview.some((file) => (file.originalSize || file.size) > 1024 * 1024));
+        }
         if (onImageSelect) {
             onImageSelect(newPreview);
     }
     };
+
+    const totalSize = preview.reduce((sum, file) => sum + file.size, 0);
+    const totalSizeMB = totalSize / (1024 * 1024);
+    const exceedsLimit = totalSize > 1024 * 1024;
 
     return (
     <div className="w-full h-full">
@@ -102,6 +116,16 @@ export default function ImageDropzone({ onImageSelect }) {
             <p className="mt-2 text-sm text-red-500">{error}</p>
         )}
 
+        {preview.length > 0 && (
+            <p
+                className={`mt-2 text-sm text-center font-medium ${
+                    exceedsLimit ? "text-red-500" : "text-gray-500"
+                }`}
+            >
+                Total uploaded size: {totalSizeMB.toFixed(2)} MB / 1.00 MB
+            </p>
+        )}
+
         {viewImage && (
         <div className="fixed w-full h-full inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm cursor-zoom-out" onClick={() => setViewImage(null)} >
             <div className="relative w-4/5 h-4/5 flex p-10 justify-center items-center">
@@ -118,4 +142,5 @@ export default function ImageDropzone({ onImageSelect }) {
         </div>
         )}
     </div>
-    );}
+    );
+}

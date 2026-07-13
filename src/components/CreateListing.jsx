@@ -29,11 +29,13 @@ export default function CreateListing() {
     const [price, setPrice] = useState("");
     const [deposit, setDeposit] = useState("");
     const [description, setDescription] = useState("");
+    const [imageSizeExceeded, setImageSizeExceeded] = useState(false);
 
     const isFormValid = 
         listingTitle.trim() !== "" &&
         selectedCategory !== "Select a category" &&
         imageFile && imageFile.length > 0 &&
+        !imageSizeExceeded &&
         selectedLendingInterval !== "Lending interval" &&
         price.trim() !== "";
 
@@ -54,6 +56,12 @@ export default function CreateListing() {
 
     const handleUpload = async (e) => {
         e.preventDefault(); 
+
+        if (imageSizeExceeded) {
+            alert("One or more images exceed the 1MB limit. Please remove or replace them before uploading.");
+            return;
+        }
+
         setIsUploading(true);
 
         try {
@@ -180,7 +188,10 @@ export default function CreateListing() {
 
                         {/*IMAGE UPLOAD*/}
                         <div className="w-full h-64 transition-all duration-400 ease-out w-full h-full flex items-center justify-center rounded-xl">
-                            <ImageDropzone onImageSelect={(file) => setImageFile(file)} />
+                            <ImageDropzone
+                                onImageSelect={(file) => setImageFile(file)}
+                                onExceedsLimitChange={(exceedsLimit) => setImageSizeExceeded(exceedsLimit)}
+                            />
                         </div>
 
                         {/*LENDING DURATION*/}
