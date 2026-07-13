@@ -1,3 +1,4 @@
+import { createPortal } from "react-dom";
 import { useState, useEffect } from "react";
 import { Star, Send, Trash2, ChevronLeft, ChevronRight, X } from "lucide-react";
 import { useAuth } from "../contexts/AuthContext";
@@ -368,9 +369,9 @@ const ListingCard = ({ item, onCardClick = () => {}, onDelete = null, onToggleAv
                 <ReviewForm listing={item} />
             </Modal>
 
-            {isImageExpanded && (
+            {isImageExpanded && createPortal(
                 <div
-                    className="fixed inset-0 z-[100] flex items-center justify-center bg-black/90 p-6 cursor-zoom-out"
+                    className="fixed inset-0 z-[120] flex items-center justify-center bg-black/90 p-6 cursor-zoom-out"
                     onClick={(e) => {
                         e.stopPropagation();
                         setIsImageExpanded(false);
@@ -421,7 +422,8 @@ const ListingCard = ({ item, onCardClick = () => {}, onDelete = null, onToggleAv
                         className="max-w-full max-h-full object-contain rounded-md shadow-2xl cursor-default"
                         onClick={(e) => e.stopPropagation()}
                     />
-                </div>
+                </div>,
+                document.body
             )}
         </>
     );
