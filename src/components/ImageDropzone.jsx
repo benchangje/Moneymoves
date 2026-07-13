@@ -5,7 +5,7 @@ import { generateImageVariants, dataUrlToFile } from "../hooks/imageUtils.js";
 
 export default function ImageDropzone({ onImageSelect }) {
 
-    const MAXFILES = 5;
+    const MAXFILES = 3;
     const [preview, setPreview] = useState([]);
     const [viewImage, setViewImage] = useState(null);
     const [error, setError] = useState("");

@@ -29,7 +29,7 @@ const loadImage = (file) =>
  * @param {string} options.format - "image/webp" | "image/jpeg" | "image/png"
  * @returns {Promise<string>} data URL
  */
-export const resizeImage = async (file, { maxDimension = 1080, quality = 0.65, format = "image/webp" } = {}) => {
+export const resizeImage = async (file, { maxDimension = 1440, quality = 0.65, format = "image/webp" } = {}) => {
     if (file.size > MAX_UPLOAD_BYTES) {
         throw new Error(`File "${file.name}" is larger than 5MB. Please choose a smaller image.`);
     }
