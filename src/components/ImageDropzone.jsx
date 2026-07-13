@@ -5,10 +5,20 @@ import { generateImageVariants, dataUrlToFile } from "../hooks/imageUtils.js";
 
 export default function ImageDropzone({ onImageSelect, onExceedsLimitChange }) {
 
+    const calculateBase64Size = (files) =>
+        files.reduce(
+            (sum, file) => sum + Math.ceil(file.size * 4 / 3),
+            0
+        );
+
     const MAXFILES = 3;
     const [preview, setPreview] = useState([]);
     const [viewImage, setViewImage] = useState(null);
     const [error, setError] = useState("");
+    
+    const totalBase64Size = calculateBase64Size(preview);
+    const totalSizeMB = totalBase64Size / (1024 * 1024);
+    const exceedsLimit = totalBase64Size > 1024 * 1024;
 
     const onDrop = useCallback(async (acceptedFiles) => {
         const slotsLeft = MAXFILES - preview.length;
@@ -38,8 +48,11 @@ export default function ImageDropzone({ onImageSelect, onExceedsLimitChange }) {
         const newFiles = results.filter(Boolean);
         const updated = [...preview, ...newFiles];
         setPreview(updated);
+
+        // Calculate the approximate Base64 size that will be stored in Firestore
+        const totalBase64Bytes = calculateBase64Size(updated);
         if (onExceedsLimitChange) {
-            onExceedsLimitChange(updated.some((file) => (file.originalSize || file.size) > 1024 * 1024));
+            onExceedsLimitChange(totalBase64Bytes > 1024 * 1024);
         }
         if (onImageSelect) onImageSelect(updated);
     }, [onExceedsLimitChange, onImageSelect, preview]);
@@ -65,17 +78,14 @@ export default function ImageDropzone({ onImageSelect, onExceedsLimitChange }) {
         const newPreview = [...preview];
         newPreview.splice(index, 1);
         setPreview(newPreview);
+        const newTotalBase64Bytes = calculateBase64Size(newPreview);
         if (onExceedsLimitChange) {
-            onExceedsLimitChange(newPreview.some((file) => (file.originalSize || file.size) > 1024 * 1024));
+            onExceedsLimitChange(newTotalBase64Bytes > 1024 * 1024);
         }
         if (onImageSelect) {
             onImageSelect(newPreview);
     }
     };
-
-    const totalSize = preview.reduce((sum, file) => sum + file.size, 0);
-    const totalSizeMB = totalSize / (1024 * 1024);
-    const exceedsLimit = totalSize > 1024 * 1024;
 
     return (
     <div className="w-full h-full">
@@ -103,7 +113,7 @@ export default function ImageDropzone({ onImageSelect, onExceedsLimitChange }) {
             <div className="group flex flex-col items-center transition-all duration-400 ease-in-out justify-center w-full h-full pt-5 pb-6 ">
                 <UploadCloud className={`h-18 w-18 mb-4 ${isDragActive ? "text-blue-400" : "text-[#b7bcc5] group-hover:text-blue-400 transition-all duration-400"}`} />
                 <p className="mb-2 text-base text-gray-400">
-                    <span className="text-blue-400 hover:underline">Click to upload</span> or drag and drop
+                    <span className="text-blue-400 hover:underline">Click to upload</span>
                 </p>
                 <p className="text-sm text-gray-400">
                     PNG, JPG, JPEG or WEBP (MAX. 1MB)

@@ -21,6 +21,8 @@ export default function ProfileSetup() {
     const [bannerURL, setBannerURL] = useState('');
     const [submitLoading, setSubmitLoading] = useState(false);
     const [error, setError] = useState('');
+    const [profileImageTooLarge, setProfileImageTooLarge] = useState(false);
+    const [bannerImageTooLarge, setBannerImageTooLarge] = useState(false);
 
     const [formData, setFormData] = useState({
         displayName: user?.displayName || '',
@@ -51,7 +53,9 @@ export default function ProfileSetup() {
     const isFormValid = 
         formData.displayName.trim() !== "" &&
         formData.tele_handle.trim() !== "" &&
-        telegramVerified
+        telegramVerified &&
+        !profileImageTooLarge &&
+        !bannerImageTooLarge;
 
     const handleChange = (e) => {
         let { name, value } = e.target;
@@ -139,7 +143,7 @@ export default function ProfileSetup() {
                         <label htmlFor="profilePicture" className="translate-x-1 block text-sm font-medium text-gray-700 mb-3">
                             Set Profile Picture 
                         </label>
-                        <ImageDropzoneProfile className="ml-1" onImageSelect={setPhotoURL} />
+                        <ImageDropzoneProfile className="ml-1" onImageSelect={setPhotoURL} onExceedsLimitChange={setProfileImageTooLarge}/>
                     </div>
 
                     {/* Banner */}
@@ -147,7 +151,7 @@ export default function ProfileSetup() {
                         <label htmlFor="bannerPicture" className="translate-x-1 block text-sm font-medium text-gray-700 mb-3">
                             Set Banner
                         </label>
-                        <BannerDropzoneProfile className="ml-1" onImageSelect={setBannerURL} />
+                        <BannerDropzoneProfile className="ml-1" onImageSelect={setBannerURL} onExceedsLimitChange={setBannerImageTooLarge}/>
                     </div>
 
                     {/* Display Name */}

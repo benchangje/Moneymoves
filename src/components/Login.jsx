@@ -125,19 +125,6 @@ export default function Login() {
                                 <p className="text-red-500 ml-1">{errorMessage}</p>
                             </div>
                         }
-                        <div className="w-full flex items-center gap-3">
-                            <div className="flex-grow border-t-1 border-gray-400 opacity-60 h-px"></div>
-                            <span className="text-gray-400 text-base pb-0.5">
-                                or
-                            </span>
-                            <div className="flex-grow border-t-1 border-gray-400 opacity-60 h-px"></div>
-                        </div>
-                        <div className="w-full rounded-2xl bg-white border-1 border-gray-300 text-gray-600 hover:bg-gray-100 hover:scale-101 transition-all duration-300">
-                            <button onClick={handleGoogleSignIn} className=" font-medium w-full px-5 py-3 flex flex-row justify-center rounded-2xl gap-2">
-                                <FcGoogle className="h-6 w-6 shrink-0 mr-1"/>
-                                <p className="text-medium">Sign in with Google</p>
-                            </button>
-                        </div>
                         <p className="text-sm text-gray-600 ml-1">
                             Don't have an account? 
                             <button onClick={handleGoToSignUp} className="text-blue-500 hover:underline font-medium ml-1">

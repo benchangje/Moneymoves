@@ -90,3 +90,9 @@ export const dataUrlToFile = async (dataUrl, filename) => {
     const baseName = filename.replace(/\.[^/.]+$/, "");
     return new File([blob], `${baseName}.${ext}`, { type: blob.type });
 };
+
+export const calculateBase64Size = (dataUrl) => {
+    if (!dataUrl) return 0;
+    const base64 = dataUrl.split(",")[1] ?? "";
+    return Math.ceil(base64.length * 3 / 4);
+};

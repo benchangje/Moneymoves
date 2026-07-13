@@ -1,7 +1,6 @@
 import ImageDropzoneProfile from "./ImageDropzoneProfile";
 import BannerDropzoneProfile from './BannerDropzoneProfile';
-import { useRef, useState, useEffect } from 'react';
-import { resizeImage } from './ImageDropzoneProfile';
+import { useState, useEffect } from "react";
 import { useAuth } from '../contexts/AuthContext';
 import { useUserProfile } from '../hooks/useUserProfile';
 import { useListings, updateListing } from '../hooks/useListings';
@@ -29,13 +28,10 @@ export default function Profile() {
     const [editPhotoPreview, setEditPhotoPreview] = useState('');
     const [editBannerPreview, setEditBannerPreview] = useState('');
     const [avatarError, setAvatarError] = useState(false);
-    const photoInputRef = useRef(null);
-    const bannerInputRef = useRef(null);
     const [saving, setSaving] = useState(false);
     const [message, setMessage] = useState('');
     const [deletingId, setDeletingId] = useState(null);
     const [deletedIds, setDeletedIds] = useState(new Set());
-
 
     // Initialize form with profile data
     useEffect(() => {
@@ -48,34 +44,6 @@ export default function Profile() {
             setAvatarError(false);
         }
     }, [profile]);
-
-    const handlePhotoChange = async (e) => {
-        const file = e.target.files?.[0];
-        if (!file) return;
-
-        const imageDataUrl = await resizeImage(file);
-
-        setEditPhotoURL(imageDataUrl);
-        setEditPhotoPreview(imageDataUrl);
-    };
-
-    const handleBannerChange = async (e) => {
-        const file = e.target.files?.[0];
-        if (!file) return;
-
-        const imageDataUrl = await resizeImage(file);
-
-        setEditBannerURL(imageDataUrl);
-        setEditBannerPreview(imageDataUrl);
-    };
-
-    const openPhotoPicker = () => {
-        photoInputRef.current?.click();
-    };
-
-    const openBannerPicker = () => {
-        bannerInputRef.current?.click();
-    };
 
     const normalizedListings = userListings
         .filter((listing) => !deletedIds.has(listing.id))
@@ -137,22 +105,22 @@ export default function Profile() {
     };
 
     const handleToggleAvailability = async (listing, markingAsRented, renterHandle) => {
-    try {
-        if (markingAsRented) {
-            await updateListing(listing.id, {
-                available: false,
-                renterTelegram: renterHandle,
-            });
-        } else {
-            await updateListing(listing.id, {
-                available: true,
-                renterTelegram: "",
-            });
+        try {
+            if (markingAsRented) {
+                await updateListing(listing.id, {
+                    available: false,
+                    renterTelegram: renterHandle,
+                });
+            } else {
+                await updateListing(listing.id, {
+                    available: true,
+                    renterTelegram: "",
+                });
+            }
+        } catch (error) {
+            setMessage("Error updating listing: " + error.message);
         }
-    } catch (error) {
-        setMessage("Error updating listing: " + error.message);
-    }
-};
+    };
 
     // Handle cancel edit
     const handleCancel = () => {
@@ -181,7 +149,7 @@ export default function Profile() {
                     <div className="px-8 py-8">
                         <div className="flex flex-col md:flex-row items-start md:items-center gap-8">
                             {/* Avatar */}
-                            <div className="w-32 h-32 rounded-full bg-linear-to-br from-blue-400 to-purple-500 shrink-0 overflow-hidden border border-white/20">
+                            <div className="w-32 h-32 rounded-full bg-gray-400 shrink-0 overflow-hidden border-2 border-white/20">
                                 <img
                                     src={avatarError ? DEFAULT_PROFILE_PICTURE : (profile?.photoURL || DEFAULT_PROFILE_PICTURE)}
                                     alt="Profile avatar"
@@ -192,20 +160,19 @@ export default function Profile() {
 
                             {/* Profile Info */}
                             {!isEditing && (
-                                <div className="flex-1 w-full">
-                                    <h1 className="text-3xl font-bold text-gray-900 mb-2">
+                                <div className="ml-1 flex-1 w-full">
+                                    <h1 className="text-3xl font-bold text-gray-900 mb-3">
                                         {profile?.displayName || 'User Profile'}
                                     </h1>
-                                    <p className="text-gray-600 mb-4">{profile?.email}</p>
-                                    <p className="text-gray-700 mb-6 max-w-2xl">
+                                    <p className="text-gray-700 text-lg mb-3 max-w-2xl">
                                         {profile?.bio || 'No bio added yet'}
                                     </p>
-                                    <div className="flex gap-4 flex-wrap">
+                                    <div className="flex gap-3 text-lg flex-wrap -ml-1">
                                         {profile?.location && <span className="text-gray-600">📍 {profile.location}</span>}
                                     </div>
                                     <button
                                         onClick={() => setIsEditing(true)}
-                                        className="mt-6 px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+                                        className="mt-5 px-5 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
                                     >
                                         Edit Profile
                                     </button>
@@ -216,16 +183,16 @@ export default function Profile() {
                             {isEditing && (
                                 <div className="flex-1 w-full space-y-4">
                                     <div>
-                                        <label htmlFor="profilePicture" className="translate-x-1 block text-sm font-medium text-gray-700 mb-2">
+                                        <label htmlFor="profilePicture" className="translate-x-1 block text-sm font-medium text-gray-700 mb-3">
                                             Profile Picture
                                         </label>
-                                        <ImageDropzoneProfile className="ml-1" onImageSelect={setEditPhotoURL} />
+                                        <ImageDropzoneProfile className="ml-1" initialImage={profile?.photoURL} onImageSelect={setEditPhotoURL} />
                                     </div>
                                     <div>
                                         <label htmlFor="profilePicture" className="translate-x-1 block text-sm font-medium text-gray-700 mb-2">
                                             Banner
                                         </label>
-                                        <BannerDropzoneProfile className="ml-1" onImageSelect={setEditBannerURL} />
+                                        <BannerDropzoneProfile className="ml-1" initialImage={profile?.bannerURL} onImageSelect={setEditBannerURL} />
                                     </div>
                                     <div>
                                         <label htmlfor="displayName" className="translate-x-1 block text-sm font-medium text-gray-700 mb-2">

@@ -145,7 +145,7 @@ const ListingCard = ({ item, onCardClick = () => {}, onDelete = null, onToggleAv
 
     return (
         <>
-        <div className="relative w-full sm:w-1/2 md:w-64 cursor-pointer transition-all bg-white shadow-[0_0_8px_rgba(0,0,0,0.08)] hover:shadow-xl hover:scale-101 duration-300 ease-in-out hover:bg-gray-200 rounded-lg p-4 pb-3" onClick={handleCardClick}>
+        <div className="relative w-full sm:w-1/2 md:w-64 cursor-pointer transition-all bg-white shadow-[0_0_8px_rgba(0,0,0,0.08)] hover:shadow-xl hover:scale-101 duration-300 ease-in-out hover:bg-gray-200 rounded-lg p-4" onClick={handleCardClick}>
             <div className="relative w-full h-[140px] mb-3">
                 {!imageLoaded && (
                     <div className="absolute inset-0 animate-pulse bg-gray-200 rounded-md" />
@@ -164,7 +164,7 @@ const ListingCard = ({ item, onCardClick = () => {}, onDelete = null, onToggleAv
                 />
             </div>
 
-            <div className="flex items-center justify-between mb-1.5">
+            <div className="flex items-center justify-between mb-1.5 -ml-0.5">
                 <span
                     className={`inline-block text-xs font-semibold px-2 py-1 rounded-full ${
                         isAvailable ? "bg-green-100 text-green-700" : "bg-gray-200 text-gray-600"
@@ -184,7 +184,7 @@ const ListingCard = ({ item, onCardClick = () => {}, onDelete = null, onToggleAv
                         aria-label="Delete listing"
                         title="Delete listing"
                     >
-                        <Trash2 className="w-5 h-5" />
+                        <Trash2 className="w-5.5 h-5.5" />
                     </button>
                 )}
             </div>
@@ -210,18 +210,30 @@ const ListingCard = ({ item, onCardClick = () => {}, onDelete = null, onToggleAv
             <p className="text-[10px] text-gray-700 mt-2.5">Listed: {dateListed}</p>
 
             {onToggleAvailability && !showRentForm && (
-                <button
-                    type="button"
-                    onClick={isAvailable ? handleMarkRentedClick : handleMarkAvailableClick}
-                    disabled={isToggling}
-                    className={`w-full mt-3 text-sm font-medium py-2 rounded-lg transition-colors disabled:opacity-50 ${
-                        isAvailable
-                            ? "bg-gray-200 text-gray-700 hover:bg-gray-300"
-                            : "bg-green-100 text-green-700 hover:bg-green-200"
-                    }`}
-                >
-                    {isToggling ? "Updating..." : isAvailable ? "Mark as Rented Out" : "Mark as Available"}
-                </button>
+                <>
+                    <button
+                        type="button"
+                        onClick={isAvailable ? handleMarkRentedClick : handleMarkAvailableClick}
+                        disabled={isToggling}
+                        className={`w-full mt-3 text-sm font-medium py-2 rounded-lg transition-colors disabled:opacity-50 ${
+                            isAvailable
+                                ? "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                                : "bg-green-100 text-green-700 hover:bg-green-200"
+                        }`}
+                    >
+                        {isToggling
+                            ? "Updating..."
+                            : isAvailable
+                                ? "Mark as Rented Out"
+                                : "Mark as Available"}
+                    </button>
+
+                    {!isAvailable && (
+                        <p className="mt-2 -mb-1 text-xs text-gray-500">
+                            Renter can no longer review once marked available.
+                        </p>
+                    )}
+                </>
             )}
 
             {onToggleAvailability && showRentForm && (
@@ -231,9 +243,9 @@ const ListingCard = ({ item, onCardClick = () => {}, onDelete = null, onToggleAv
                         value={renterHandleInput}
                         onChange={(e) => setRenterHandleInput(e.target.value)}
                         placeholder="Renter's Telegram handle"
-                        className="w-full text-sm px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 mb-2"
+                        className="w-full text-sm px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 mb-3"
                     />
-                    <div className="flex gap-2">
+                    <div className="flex gap-3">
                         <button
                             type="button"
                             onClick={handleConfirmRentOut}
