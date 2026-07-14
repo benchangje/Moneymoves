@@ -144,5 +144,20 @@ export const processImage = async (
 
     context.drawImage(image, 0, 0, canvas.width, canvas.height);
 
-    return canvas.toDataURL(format, quality);
-};
+    let currentQuality = quality;
+
+    while (true) {
+        const dataUrl = canvas.toDataURL(format, currentQuality);
+
+        if (calculateBase64Size(dataUrl) <= 250 * 1024) {
+            return dataUrl;
+        }
+
+        currentQuality -= 0.05;
+
+        // Stop before quality gets unusably low
+        if (currentQuality < 0.1) {
+            return dataUrl;
+        }
+    }
+}
