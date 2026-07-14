@@ -121,8 +121,8 @@ export default function ImageDropzone({ onImageSelect, onExceedsLimitChange }) {
                 <p className="mb-2 text-base text-gray-400">
                     <span className="text-blue-400 hover:underline">Click to upload</span>
                 </p>
-                <p className="text-xs text-gray-400">
-                    PNG, JPG, WEBP or HEIC (MAX. 1MB) (MAX. 3 FILES)
+                <p className="text-xs text-center leading-5 text-gray-400">
+                    PNG, JPG, WEBP or HEIC<br/>(MAX. 1MB) (MAX. 3 FILES)
                 </p>
             </div>
             )}
