@@ -386,7 +386,7 @@ const ListingCard = ({ item, onCardClick = () => {}, onDelete = null, onToggleAv
                             Contact via Telegram
                         </button>
                     ) : (
-                        <p className="text-xs text-gray-500 mb-4">Sign in to contact Owner via Telegram.</p>
+                        <p className="text-xs text-gray-500 mb-4">Sign in to contact Owner via Telegram</p>
                     )
                 )}
 
