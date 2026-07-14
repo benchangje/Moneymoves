@@ -127,37 +127,49 @@ export const processImage = async (
         throw new Error("Image resolution is too large.");
     }
 
-    const canvas = document.createElement("canvas");
-    const context = canvas.getContext("2d");
-
-    if (!context) {
-        throw new Error("Unable to resize image.");
-    }
-
-    const scale = Math.min(
-        1,
-        maxDimension / Math.max(image.width, image.height)
-    );
-
-    canvas.width = Math.round(image.width * scale);
-    canvas.height = Math.round(image.height * scale);
-
-    context.drawImage(image, 0, 0, canvas.width, canvas.height);
-
+    let currentDimension = maxDimension;
     let currentQuality = quality;
 
     while (true) {
+        const canvas = document.createElement("canvas");
+        const context = canvas.getContext("2d");
+
+        if (!context) {
+            throw new Error("Unable to resize image.");
+        }
+
+        const scale = Math.min(
+            1,
+            currentDimension / Math.max(image.width, image.height)
+        );
+
+        canvas.width = Math.round(image.width * scale);
+        canvas.height = Math.round(image.height * scale);
+
+        context.drawImage(image, 0, 0, canvas.width, canvas.height);
+
         const dataUrl = canvas.toDataURL(format, currentQuality);
+        const size = calculateBase64Size(dataUrl);
 
-        if (calculateBase64Size(dataUrl) <= 250 * 1024) {
+        // Fits within Firestore budget
+        if (size <= 330 * 1024) {
             return dataUrl;
         }
 
-        currentQuality -= 0.05;
-
-        // Stop before quality gets unusably low
-        if (currentQuality < 0.1) {
-            return dataUrl;
+        // Reduce quality first
+        if (currentQuality > 0.15) {
+            currentQuality -= 0.05;
+            continue;
         }
+
+        // Then reduce dimensions
+        if (currentDimension > 300) {
+            currentDimension = Math.round(currentDimension * 0.9);
+            currentQuality = quality; // Reset quality for the smaller image
+            continue;
+        }
+
+        // Give up once we hit minimum size
+        return dataUrl;
     }
 }
