@@ -1,24 +1,14 @@
 import { useState, useCallback } from "react";
 import { useDropzone } from "react-dropzone";
 import { UploadCloud, X } from "lucide-react";
-import { generateImageVariants, dataUrlToFile } from "../hooks/imageUtils.js";
+import { generateImageVariants, dataUrlToFile, calculateBase64Size } from "../hooks/imageUtils.js";
 
 export default function ImageDropzone({ onImageSelect, onExceedsLimitChange }) {
-
-    const calculateBase64Size = (files) =>
-        files.reduce(
-            (sum, file) => sum + Math.ceil(file.size * 4 / 3),
-            0
-        );
 
     const MAXFILES = 3;
     const [preview, setPreview] = useState([]);
     const [viewImage, setViewImage] = useState(null);
     const [error, setError] = useState("");
-    
-    const totalBase64Size = calculateBase64Size(preview);
-    const totalSizeMB = totalBase64Size / (1024 * 1024);
-    const exceedsLimit = totalBase64Size > 1024 * 1024;
 
     const onDrop = useCallback(async (acceptedFiles) => {
         const slotsLeft = MAXFILES - preview.length;
@@ -49,12 +39,24 @@ export default function ImageDropzone({ onImageSelect, onExceedsLimitChange }) {
         setPreview(updated);
 
         // Calculate the approximate Base64 size that will be stored in Firestore
-        const totalBase64Bytes = calculateBase64Size(updated);
+        const totalBase64Bytes = updated.reduce(
+            (sum, file) => sum + calculateBase64Size(file.preview),
+            0
+        );
+
         if (onExceedsLimitChange) {
             onExceedsLimitChange(totalBase64Bytes > 1024 * 1024);
         }
         if (onImageSelect) onImageSelect(updated);
     }, [onExceedsLimitChange, onImageSelect, preview]);
+
+    const totalBase64Size = preview.reduce(
+        (sum, file) => sum + calculateBase64Size(file.preview),
+        0
+    );
+
+    const totalSizeMB = totalBase64Size / (1024 * 1024);
+    const exceedsLimit = totalBase64Size > 1024 * 1024;
 
     const { getRootProps, getInputProps, isDragActive } = useDropzone({
         onDrop,
@@ -79,7 +81,10 @@ export default function ImageDropzone({ onImageSelect, onExceedsLimitChange }) {
         const newPreview = [...preview];
         newPreview.splice(index, 1);
         setPreview(newPreview);
-        const newTotalBase64Bytes = calculateBase64Size(newPreview);
+        const newTotalBase64Bytes = newPreview.reduce(
+            (sum, file) => sum + calculateBase64Size(file.preview),
+            0
+        );
         if (onExceedsLimitChange) {
             onExceedsLimitChange(newTotalBase64Bytes > 1024 * 1024);
         }
@@ -117,7 +122,7 @@ export default function ImageDropzone({ onImageSelect, onExceedsLimitChange }) {
                     <span className="text-blue-400 hover:underline">Click to upload</span>
                 </p>
                 <p className="text-xs text-gray-400">
-                    PNG, JPG, JPEG, WEBP or HEIC (MAX. 1MB)
+                    PNG, JPG, WEBP or HEIC (MAX. 1MB) (MAX. 3 FILES)
                 </p>
             </div>
             )}

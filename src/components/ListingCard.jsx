@@ -6,13 +6,15 @@ import { useReviews } from "../hooks/useReviews";
 import { useOwnerProfile } from "../hooks/useOwnerProfile";
 import ReviewForm from "./ReviewForm";
 import Modal from "./Modal";
+import { toRenderableImageSrc } from "../hooks/imageUtils.js";
 
 const ListingCard = ({ item, onCardClick = () => {}, onDelete = null, onToggleAvailability = null }) => {
     const defaultPlaceholder =
         item.imageFallback ||
         `https://via.placeholder.com/640x360.png?text=${encodeURIComponent(item.title || "Listing")}`;
+    const primaryImage = toRenderableImageSrc(item.images?.[0] || item.image) || defaultPlaceholder;
 
-    const [imgSrc, setImgSrc] = useState(item.image || defaultPlaceholder);
+    const [imgSrc, setImgSrc] = useState(primaryImage);
     const [imageLoaded, setImageLoaded] = useState(false);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
@@ -28,8 +30,8 @@ const ListingCard = ({ item, onCardClick = () => {}, onDelete = null, onToggleAv
     const [rentFormError, setRentFormError] = useState("");
 
     useEffect(() => {
-        setImgSrc(item.image || defaultPlaceholder);
-    }, [item.image, item.title]);
+        setImgSrc(toRenderableImageSrc(item.images?.[0] || item.image) || defaultPlaceholder);
+    }, [item.image, item.images, item.title]);
 
     useEffect(() => {
         setCurrentImageIndex(0);
@@ -54,15 +56,13 @@ const ListingCard = ({ item, onCardClick = () => {}, onDelete = null, onToggleAv
     };
 
     const toDataUrl = (img) => {
-        if (!img) return null;
-        if (img.base64?.startsWith("data:")) return img.base64;
-        return `data:${img.mimeType || "image/png"};base64,${img.base64}`;
+        return toRenderableImageSrc(img);
     };
 
     const galleryImages =
         item.images && item.images.length > 0
             ? item.images.map(toDataUrl).filter(Boolean)
-            : [imgSrc];
+            : [primaryImage];
 
     const hasMultipleImages = galleryImages.length > 1;
 

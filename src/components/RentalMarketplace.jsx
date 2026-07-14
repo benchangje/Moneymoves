@@ -4,6 +4,7 @@ import Filter from "./Filter.jsx";
 import { Search, SlidersHorizontal, X } from "lucide-react";
 import ListingCard from "./ListingCard.jsx";
 import { useListings } from "../hooks/useListings";
+import { toRenderableImageSrc } from "../hooks/imageUtils.js";
 
 export default function RentalMarketplace() {
     const [showFilter, setShowFilter] = useState(false);
@@ -30,8 +31,8 @@ export default function RentalMarketplace() {
                 dateListed: listing.createdAt
                     ? new Date(listing.createdAt).toISOString().split("T")[0]
                     : "",
-                image: listing.image || "",
                 images: listing.images || [],
+                image: toRenderableImageSrc(listing.images?.[0] || listing.image),
                 category: listing.category || "",
                 deposit: Number(listing.deposit ?? 0),
                 available: listing.available !== false,

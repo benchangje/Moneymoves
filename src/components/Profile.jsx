@@ -9,6 +9,7 @@ import { Star } from 'lucide-react';
 import ListingCard from './ListingCard';
 import { doc, deleteDoc } from 'firebase/firestore';
 import { db } from '../hooks/firebase';
+import { toRenderableImageSrc } from '../hooks/imageUtils.js';
 
 const DEFAULT_PROFILE_PICTURE = '/default-pfp.svg';
 const DEFAULT_BANNER_PICTURE = '/rentlalogonew.jpg'
@@ -59,7 +60,7 @@ export default function Profile() {
             dateListed: listing.createdAt
                 ? new Date(listing.createdAt).toISOString().split('T')[0]
                 : new Date().toISOString().split('T')[0],
-            image: listing.image || listing.images?.[0] || '',
+            image: toRenderableImageSrc(listing.images?.[0] || listing.image),
             location: listing.location || 'Location not provided',
             available: listing.available !== false,
             renterTelegram: listing.renterTelegram || '',
@@ -72,7 +73,7 @@ export default function Profile() {
         dateListed: listing.createdAt
             ? new Date(listing.createdAt).toISOString().split("T")[0]
             : new Date().toISOString().split("T")[0],
-        image: listing.image || listing.images?.[0] || "",
+        image: toRenderableImageSrc(listing.images?.[0] || listing.image),
         location: listing.location || "Location not provided",
         available: listing.available !== false,
         renterTelegram: listing.renterTelegram || "",

@@ -94,7 +94,6 @@ export default function CreateListing() {
                 price: Number(price),
                 deposit: Number(deposit || 0),
                 description,
-                image: primaryImage,
                 images: processedImages,
                 location: "",
                 available: true,

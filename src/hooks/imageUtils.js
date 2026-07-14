@@ -70,6 +70,16 @@ export const calculateBase64Size = (dataUrl) => {
     return Math.ceil(base64.length * 3 / 4);
 };
 
+export const toRenderableImageSrc = (image) => {
+    if (!image) return "";
+    if (typeof image === "string") return image;
+    if (image.base64?.startsWith("data:")) return image.base64;
+    if (image.base64) {
+        return `data:${image.mimeType || "image/png"};base64,${image.base64}`;
+    }
+    return "";
+};
+
 /**
  * Detects HEIC/HEIF files (iPhone's default photo format) and converts them
  * to JPEG so the rest of the pipeline (loadImage, canvas, etc.) can handle them.
