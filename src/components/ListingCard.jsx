@@ -346,7 +346,7 @@ const ListingCard = ({ item, onCardClick = () => {}, onDelete = null, onToggleAv
                 {item.description && item.description.trim() !== "" && (
                     <div className="mb-4">
                         <h4 className="text-sm font-bold text-gray-900 mb-1">Description</h4>
-                        <p className="text-sm text-gray-700 whitespace-pre-wrap">{item.description}</p>
+                        <p className="text-sm text-gray-700 whitespace-pre-wrap break-words">{item.description}</p>
                     </div>
                 )}
 
@@ -386,7 +386,7 @@ const ListingCard = ({ item, onCardClick = () => {}, onDelete = null, onToggleAv
                             Contact via Telegram
                         </button>
                     ) : (
-                        <p className="text-xs text-gray-500 mb-4">Owner has not verified Telegram contact.</p>
+                        <p className="text-xs text-gray-500 mb-4">Sign in to contact Owner via Telegram.</p>
                     )
                 )}
 
