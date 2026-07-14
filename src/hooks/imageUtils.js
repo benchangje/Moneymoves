@@ -152,7 +152,7 @@ export const processImage = async (
         const size = calculateBase64Size(dataUrl);
 
         // Fits within Firestore budget
-        if (size <= 330 * 1024) {
+        if (size <= 200 * 1024) {
             return dataUrl;
         }
 
