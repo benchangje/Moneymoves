@@ -25,6 +25,7 @@ const ListingCard = ({ item, onCardClick = () => {}, onDelete = null, onToggleAv
     const { teleHandle, loading: loadingOwner } = useOwnerProfile(item.ownerUid);
     const isOwnListing = Boolean(item.ownerUid && user?.uid && item.ownerUid === user.uid);
     const isAvailable = item.available !== false;
+    const [rentFormError, setRentFormError] = useState("");
 
     useEffect(() => {
         setImgSrc(item.image || defaultPlaceholder);
@@ -111,17 +112,26 @@ const ListingCard = ({ item, onCardClick = () => {}, onDelete = null, onToggleAv
         e.stopPropagation();
         setShowRentForm(true);
         setRenterHandleInput("");
+        setRentFormError("");
     };
 
     const handleCancelRentForm = (e) => {
         e.stopPropagation();
         setShowRentForm(false);
         setRenterHandleInput("");
+        setRentFormError("");
     };
 
     const handleConfirmRentOut = async (e) => {
         e.stopPropagation();
         if (!renterHandleInput.trim() || !onToggleAvailability) return;
+        const cleanRenter = renterHandleInput.trim().replace(/^@/, "").toLowerCase();
+        const cleanOwner = teleHandle?.trim().replace(/^@/, "").toLowerCase();
+
+        if (cleanOwner && cleanRenter === cleanOwner) {
+            setRentFormError("You cannot rent to yourself.");
+            return;
+        }
         setIsToggling(true);
         try {
             await onToggleAvailability(item, true, renterHandleInput.trim());
@@ -243,8 +253,11 @@ const ListingCard = ({ item, onCardClick = () => {}, onDelete = null, onToggleAv
                         value={renterHandleInput}
                         onChange={(e) => setRenterHandleInput(e.target.value)}
                         placeholder="Renter's Telegram handle"
-                        className="w-full text-sm px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 mb-3"
+                        className="w-full text-sm px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 mb-2"
                     />
+                    {rentFormError && (
+                        <p className="text-xs text-red-600 mb-3 ml-0.5">{rentFormError}</p>
+                    )}
                     <div className="flex gap-3">
                         <button
                             type="button"
@@ -378,7 +391,7 @@ const ListingCard = ({ item, onCardClick = () => {}, onDelete = null, onToggleAv
                 )}
 
                 <p className="text-xs text-gray-700 mb-2">Listed: {dateListed}</p>
-                <ReviewForm listing={item} renterTelegram={item.renterTelegram}/>
+                <ReviewForm listing={item} telehandle={item.renterTelegram}/>
             </Modal>
 
             {isImageExpanded && createPortal(

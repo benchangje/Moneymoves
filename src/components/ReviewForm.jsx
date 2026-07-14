@@ -5,14 +5,25 @@ import { useReviews } from '../hooks/useReviews';
 
 export default function ReviewForm({ listing, telehandle }) {
     const { user } = useAuth();
+    const { profile } = useUserProfile(user);
     const { createReview } = useReviews();
     const [isOpen, setIsOpen] = useState(false);
     const [rating, setRating] = useState(0);
     const [comment, setComment] = useState('');
     const [saving, setSaving] = useState(false);
     const [message, setMessage] = useState('');
+    const myHandle = profile?.tele_handle?.toLowerCase().trim();
+    const renterHandle = listing?.renterTelegram?.toLowerCase().trim();
 
-    const canReview = Boolean(user && listing?.id && listing?.ownerUid && user.uid !== listing.ownerUid && telehandle === listing.renterTelegram);
+    const canReview = Boolean(
+        user && 
+        listing?.id && 
+        listing?.ownerUid && 
+        user.uid !== listing.ownerUid && 
+        myHandle &&
+        renterHandle &&
+        myHandle === renterHandle
+    );
 
     if (!canReview) {
         return null;
