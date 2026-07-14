@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Star } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useReviews } from '../hooks/useReviews';
+import { useUserProfile } from '../hooks/useUserProfile';
 
 export default function ReviewForm({ listing, telehandle }) {
     const { user } = useAuth();
