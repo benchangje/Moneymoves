@@ -46,7 +46,7 @@ export default function ReviewForm({ listing, telehandle }) {
         listingId: listing.id,
         receiverId: listing.ownerUid,
         reviewerId: user.uid,
-        reviewerName: user?.displayName || "Anonymous",
+        reviewerName: profile?.displayName || user?.email || "Anonymous",
         rating,
         comment,
     });

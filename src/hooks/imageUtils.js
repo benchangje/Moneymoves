@@ -75,8 +75,8 @@ export const generateImageVariants = async (file) => {
     };
  
     return {
-        full: render(1080, 0.60, "image/webp"),      // for the modal carousel / detail view
-        thumbnail: render(320, 0.65, "image/webp"),  // for the homepage listing card
+        full: render(720, 0.40, "image/webp"),      // for the modal carousel / detail view
+        thumbnail: render(320, 0.35, "image/webp"),  // for the homepage listing card
     };
 };
  
