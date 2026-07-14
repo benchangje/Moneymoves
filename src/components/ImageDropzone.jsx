@@ -30,12 +30,11 @@ export default function ImageDropzone({ onImageSelect, onExceedsLimitChange }) {
         const results = await Promise.all(
             allowedFiles.map(async (file) => {
                 try {
-                    const { full, thumbnail } = await generateImageVariants(file);
+                    const { full } = await generateImageVariants(file);
                     const compressedFile = await dataUrlToFile(full, file.name);
 
                     return Object.assign(compressedFile, {
                         preview: full,
-                        thumbnail, // small variant, used for the listing card grid
                     });
                 } catch (err) {
                     console.error("Error resizing listing image:", err);
@@ -63,6 +62,8 @@ export default function ImageDropzone({ onImageSelect, onExceedsLimitChange }) {
             "image/jpeg": [".jpeg", ".jpg"],
             "image/png": [".png"],
             "image/webp": [".webp"],
+            "image/heic": [".heic"],
+            "image/heif": [".heif"],
         },
         disabled: preview.length >= MAXFILES,
         maxFiles: MAXFILES
@@ -102,7 +103,7 @@ export default function ImageDropzone({ onImageSelect, onExceedsLimitChange }) {
             <div className="flex flex-wrap content-start items-start gap-5 p-5">
                 {preview.map((file, index) => (
                     <div key={index} onClick={(e) => handleViewImage(e, file.preview)} className="flex items-center justify-center w-28 h-28 group relative">
-                        <img src={file.thumbnail || file.preview} alt="Preview" className="w-24 h-24 object-cover rounded-2xl group-hover:opacity-70 transition-opacity group-hover:scale-101 duration-300"/>
+                        <img src={file.preview} alt="Preview" className="w-24 h-24 object-cover rounded-2xl group-hover:opacity-70 transition-opacity group-hover:scale-101 duration-300"/>
                         <button onClick={(e) => removeImage(e, index)} className="absolute top-0 right-0 p-1 bg-[#b7bcc5] text-white rounded-full hover:bg-gray-300 opacity-100 transition-colors">
                             <X className="h-4 w-4" strokeWidth={2.6}/>
                         </button>
@@ -116,19 +117,19 @@ export default function ImageDropzone({ onImageSelect, onExceedsLimitChange }) {
                     <span className="text-blue-400 hover:underline">Click to upload</span>
                 </p>
                 <p className="text-sm text-gray-400">
-                    PNG, JPG, JPEG or WEBP (MAX. 1MB)
+                    PNG, JPG, JPEG, WEBP or HEIC (MAX. 1MB)
                 </p>
             </div>
             )}
         </div>
 
         {error && (
-            <p className="mt-2 text-sm text-red-500">{error}</p>
+            <p className="mt-3 text-sm text-red-500">{error}</p>
         )}
 
         {preview.length > 0 && (
             <p
-                className={`mt-2 text-sm text-center font-medium ${
+                className={`mt-3 text-sm text-center font-medium ${
                     exceedsLimit ? "text-red-500" : "text-gray-500"
                 }`}
             >

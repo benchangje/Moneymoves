@@ -32,7 +32,7 @@ export default function BannerDropzoneProfile({ onImageSelect, onExceedsLimitCha
         setError("");
         // Banners are wide but short, so a taller max dimension keeps them sharp
         // across full-width layouts without ballooning file size.
-        resizeImage(file, { maxDimension: 1000, quality: 0.6, format: "image/webp" })
+        resizeImage(file, { maxDimension: 1000, quality: 0.75, format: "image/webp" })
             .then((imageDataUrl) => {
                 const imageSize = calculateBase64Size(imageDataUrl);
                 if (onExceedsLimitChange) {
@@ -57,6 +57,8 @@ export default function BannerDropzoneProfile({ onImageSelect, onExceedsLimitCha
             "image/jpeg": [".jpeg", ".jpg"],
             "image/png": [".png"],
             "image/webp": [".webp"],
+            "image/heic": [".heic"],
+            "image/heif": [".heif"],
         },
         maxFiles: 1,
         multiple: false

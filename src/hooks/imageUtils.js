@@ -1,8 +1,8 @@
+import { heicTo } from "heic-to";
+
 // Shared image resize/compress utilities.
 // Used by ImageDropzone (listings), ImageDropzoneProfile (avatar), and BannerDropzoneProfile (banner).
- 
-const MAX_UPLOAD_BYTES = 5 * 1024 * 1024; // 5MB, matches the dropzone UI copy
- 
+
 /**
  * Reads a File and returns an HTMLImageElement once loaded.
  */
@@ -29,25 +29,11 @@ const loadImage = (file) =>
  * @param {string} options.format - "image/webp" | "image/jpeg" | "image/png"
  * @returns {Promise<string>} data URL
  */
-export const resizeImage = async (file, { maxDimension = 1440, quality = 0.82, format = "image/webp" } = {}) => {
-    if (file.size > MAX_UPLOAD_BYTES) {
-        throw new Error(`File "${file.name}" is larger than 5MB. Please choose a smaller image.`);
-    }
- 
-    const image = await loadImage(file);
-    const canvas = document.createElement("canvas");
-    const context = canvas.getContext("2d");
- 
-    if (!context) {
-        throw new Error("Unable to resize image.");
-    }
- 
-    const scale = Math.min(1, maxDimension / Math.max(image.width, image.height));
-    canvas.width = Math.round(image.width * scale);
-    canvas.height = Math.round(image.height * scale);
-    context.drawImage(image, 0, 0, canvas.width, canvas.height);
- 
-    return canvas.toDataURL(format, quality);
+export const resizeImage = async (
+    file,
+    options = {}
+) => {
+    return processImage(file, options);
 };
  
 /**
@@ -58,25 +44,12 @@ export const resizeImage = async (file, { maxDimension = 1440, quality = 0.82, f
  * @returns {Promise<{ full: string, thumbnail: string }>}
  */
 export const generateImageVariants = async (file) => {
-    if (file.size > MAX_UPLOAD_BYTES) {
-        throw new Error(`File "${file.name}" is larger than 5MB. Please choose a smaller image.`);
-    }
- 
-    const image = await loadImage(file);
- 
-    const render = (maxDimension, quality, format) => {
-        const canvas = document.createElement("canvas");
-        const context = canvas.getContext("2d");
-        const scale = Math.min(1, maxDimension / Math.max(image.width, image.height));
-        canvas.width = Math.round(image.width * scale);
-        canvas.height = Math.round(image.height * scale);
-        context.drawImage(image, 0, 0, canvas.width, canvas.height);
-        return canvas.toDataURL(format, quality);
-    };
- 
     return {
-        full: render(720, 0.40, "image/webp"),      // for the modal carousel / detail view
-        thumbnail: render(320, 0.35, "image/webp"),  // for the homepage listing card
+        full: await processImage(file, {
+            maxDimension: 720,
+            quality: 0.4,
+            format: "image/webp",
+        }),
     };
 };
  
@@ -95,4 +68,81 @@ export const calculateBase64Size = (dataUrl) => {
     if (!dataUrl) return 0;
     const base64 = dataUrl.split(",")[1] ?? "";
     return Math.ceil(base64.length * 3 / 4);
+};
+
+/**
+ * Detects HEIC/HEIF files (iPhone's default photo format) and converts them
+ * to JPEG so the rest of the pipeline (loadImage, canvas, etc.) can handle them.
+ * Browsers generally cannot decode HEIC natively via <img>/canvas.
+ */
+const isHeic = (file) => {
+    const type = file.type?.toLowerCase() || "";
+    const name = file.name?.toLowerCase() || "";
+    return (
+        type === "image/heic" ||
+        type === "image/heif" ||
+        name.endsWith(".heic") ||
+        name.endsWith(".heif")
+    );
+};
+
+export const normalizeToJpegIfHeic = async (file) => {
+    if (!isHeic(file)) return file;
+
+    const jpegBlob = await heicTo({
+        blob: file,
+        type: "image/jpeg",
+        quality: 0.8,
+    });
+
+    const baseName = file.name.replace(/\.[^/.]+$/, "");
+
+    return new File(
+        [jpegBlob],
+        `${baseName}.jpg`,
+        { type: "image/jpeg" }
+    );
+};
+
+export const processImage = async (
+    file,
+    {
+        maxDimension = 1440,
+        quality = 0.82,
+        format = "image/webp",
+    } = {}
+) => {
+    const normalizedFile = await normalizeToJpegIfHeic(file);
+
+    const image = await loadImage(normalizedFile);
+
+    const MAX_DIMENSION = 12000;
+    const MAX_PIXELS = 100_000_000;
+
+    if (
+        image.width > MAX_DIMENSION ||
+        image.height > MAX_DIMENSION ||
+        image.width * image.height > MAX_PIXELS
+    ) {
+        throw new Error("Image resolution is too large.");
+    }
+
+    const canvas = document.createElement("canvas");
+    const context = canvas.getContext("2d");
+
+    if (!context) {
+        throw new Error("Unable to resize image.");
+    }
+
+    const scale = Math.min(
+        1,
+        maxDimension / Math.max(image.width, image.height)
+    );
+
+    canvas.width = Math.round(image.width * scale);
+    canvas.height = Math.round(image.height * scale);
+
+    context.drawImage(image, 0, 0, canvas.width, canvas.height);
+
+    return canvas.toDataURL(format, quality);
 };

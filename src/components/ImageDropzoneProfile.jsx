@@ -2,7 +2,6 @@ import { useState, useCallback, useEffect } from "react";
 import { useDropzone } from "react-dropzone";
 import { X, Plus } from "lucide-react";
 import { resizeImage, calculateBase64Size } from "../hooks/imageUtils.js";
-import { div } from "framer-motion/client";
 
 // Re-exported for any other file still importing resizeImage from here.
 export { resizeImage };
@@ -36,13 +35,14 @@ export default function ImageDropzoneProfile({ onImageSelect, onExceedsLimitChan
         setError("");
         // Avatars render small (a few dozen px), so 300px/WebP keeps these tiny
         // while still looking crisp on retina displays.
-        resizeImage(file, { maxDimension: 300, quality: 0.8, format: "image/webp" })
+        resizeImage(file, { maxDimension: 300, quality: 0.60, format: "image/webp" })
             .then((imageDataUrl) => {
                 const imageSize = calculateBase64Size(imageDataUrl);
                 if (onExceedsLimitChange) {
                     onExceedsLimitChange(imageSize > MAX_BASE64_BYTES);
                 }
                 if (imageSize > MAX_BASE64_BYTES) {
+                    setError("Image is too large. Please choose a smaller image.");
                     return;
                 }
                 setPreview(imageDataUrl);
@@ -53,7 +53,7 @@ export default function ImageDropzoneProfile({ onImageSelect, onExceedsLimitChan
             .catch((err) => {
                 setError(err.message || "That image couldn't be processed.");
             });
-    }, [onImageSelect]);
+    }, [onImageSelect, onExceedsLimitChange]);
 
     const { getRootProps, getInputProps, isDragActive } = useDropzone({
         onDrop,
@@ -61,6 +61,8 @@ export default function ImageDropzoneProfile({ onImageSelect, onExceedsLimitChan
             "image/jpeg": [".jpeg", ".jpg"],
             "image/png": [".png"],
             "image/webp": [".webp"],
+            "image/heic": [".heic"],
+            "image/heif": [".heif"],
         },
         maxFiles: 1,
         multiple: false
