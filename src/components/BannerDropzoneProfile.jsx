@@ -96,7 +96,7 @@ export default function BannerDropzoneProfile({ onImageSelect, onExceedsLimitCha
                 <img
                     src={preview}
                     alt="Profile preview"
-                    className="absolute inset-0 h-full w-full object-contain"
+                    className="absolute inset-0 h-full w-full object-cover"
                 />
                 ) : (
                 <div className="group flex flex-col items-center justify-center w-full h-full p-2 text-center transition-all duration-400 ease-in-out">

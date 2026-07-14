@@ -354,7 +354,7 @@ const ListingCard = ({ item, onCardClick = () => {}, onDelete = null, onToggleAv
 
                 {isOwnListing && !isAvailable && item.renterTelegram && (
                     <div className="mb-4 bg-blue-50 border border-blue-100 rounded-lg p-3">
-                        <p className="text-xs font-semibold text-blue-900 mb-1">Rented to (visible only to you)</p>
+                        <p className="text-sm font-semibold text-blue-900 mb-1.5 ml-0.5">Rented to (visible only to you)</p>
                         <p className="text-sm text-blue-800">@{item.renterTelegram.replace(/^@/, "")}</p>
                     </div>
                 )}
@@ -378,7 +378,7 @@ const ListingCard = ({ item, onCardClick = () => {}, onDelete = null, onToggleAv
                 )}
 
                 <p className="text-xs text-gray-700 mb-2">Listed: {dateListed}</p>
-                <ReviewForm listing={item} />
+                <ReviewForm listing={item} renterTelegram={item.renterTelegram}/>
             </Modal>
 
             {isImageExpanded && createPortal(

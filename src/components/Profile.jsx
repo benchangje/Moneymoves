@@ -19,6 +19,11 @@ export default function Profile() {
     const { listings: userListings } = useListings({ ownerUid: user?.uid });
     const { reviews, loading: reviewsLoading, averageRating, ratedStars } = useReviews('user', user?.uid);
 
+    const { listings: borrowedListings } = useListings({
+        renterTelegram: profile?.tele_handle ? profile.tele_handle.toLowerCase() : null,
+        skip: !profile?.tele_handle,
+    });
+
     const [isEditing, setIsEditing] = useState(false);
     const [editName, setEditName] = useState('');
     const [editBio, setEditBio] = useState('');
@@ -59,6 +64,19 @@ export default function Profile() {
             available: listing.available !== false,
             renterTelegram: listing.renterTelegram || '',
         }));
+
+    const normalizedBorrowedListings = borrowedListings.map((listing) => ({
+        ...listing,
+        pricePerDay: Number(listing.price ?? 0),
+        deposit: Number(listing.deposit ?? 0),
+        dateListed: listing.createdAt
+            ? new Date(listing.createdAt).toISOString().split("T")[0]
+            : new Date().toISOString().split("T")[0],
+        image: listing.image || listing.images?.[0] || "",
+        location: listing.location || "Location not provided",
+        available: listing.available !== false,
+        renterTelegram: listing.renterTelegram || "",
+    }));
 
     // Handle profile save
     const handleSaveProfile = async () => {
@@ -182,13 +200,13 @@ export default function Profile() {
                             {/* Edit Mode */}
                             {isEditing && (
                                 <div className="flex-1 w-full space-y-4">
-                                    <div>
+                                    <div className="mb-3">
                                         <label htmlFor="profilePicture" className="translate-x-1 block text-sm font-medium text-gray-700 mb-3">
                                             Profile Picture
                                         </label>
                                         <ImageDropzoneProfile className="ml-1" initialImage={profile?.photoURL} onImageSelect={setEditPhotoURL} />
                                     </div>
-                                    <div>
+                                    <div className="mb-3">
                                         <label htmlFor="profilePicture" className="translate-x-1 block text-sm font-medium text-gray-700 mb-2">
                                             Banner
                                         </label>
@@ -313,6 +331,26 @@ export default function Profile() {
                                     </div>
                                 ))}
                             </div>
+                        )}
+                    </div>
+
+                    {/* Borrowed Listings Section */}
+                    <div className="border-t border-gray-200 px-8 py-8">
+                        <h2 className="translate-x-1 text-2xl font-bold text-gray-900 mb-6">
+                            Currently Borrowing
+                        </h2>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            {normalizedBorrowedListings.map((listing) => (
+                                <ListingCard
+                                    key={listing.id}
+                                    item={listing}
+                                />
+                            ))}
+                        </div>
+                        {normalizedBorrowedListings.length === 0 && (
+                            <p className="text-gray-600 translate-x-1">
+                                You're not currently borrowing any items.
+                            </p>
                         )}
                     </div>
 

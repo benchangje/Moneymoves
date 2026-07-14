@@ -2,7 +2,7 @@ import { useEffect, useState, useCallback } from 'react';
 import { addDoc, collection, doc, onSnapshot, query, serverTimestamp, updateDoc, where } from 'firebase/firestore';
 import { db, hasFirebaseConfig } from './firebase';
 
-export const useListings = ({ ownerUid = null, publishedOnly = false } = {}) => {
+export const useListings = ({ ownerUid = null, renterTelegram = null, publishedOnly = false, skip = false } = {}) => {
     const [listings, setListings] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -11,27 +11,22 @@ export const useListings = ({ ownerUid = null, publishedOnly = false } = {}) => 
         if (!hasFirebaseConfig || !db) {
             return null;
         }
-
-        const listingsRef = collection(db, 'listings');
-
-    if (ownerUid && publishedOnly) {
-        return query(
-            listingsRef,
-            where('ownerUid', '==', ownerUid),
-            where('status', '==', 'published')
-        );
-    }
-
-    if (ownerUid) {
-        return query(listingsRef, where('ownerUid', '==', ownerUid));
-    }
-
-    if (publishedOnly) {
-        return query(listingsRef, where('status', '==', 'published'));
-    }
-
-    return query(listingsRef);
-    }, [ownerUid, publishedOnly]);
+        if (skip) {
+            return null;
+        }
+        const listingsRef = collection(db, "listings");
+        const constraints = [];
+        if (ownerUid) {
+            constraints.push(where("ownerUid", "==", ownerUid));
+        }
+        if (renterTelegram != null) {
+            constraints.push(where("renterTelegram", "==", renterTelegram.toLowerCase()));
+        }
+        if (publishedOnly) {
+            constraints.push(where("status", "==", "published"));
+        }
+        return query(listingsRef, ...constraints);
+    }, [ownerUid, renterTelegram, publishedOnly]);
 
     useEffect(() => {
         const q = buildQuery();
