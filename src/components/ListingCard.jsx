@@ -134,7 +134,7 @@ const ListingCard = ({ item, onCardClick = () => {}, onDelete = null, onToggleAv
         }
         setIsToggling(true);
         try {
-            await onToggleAvailability(item, true, renterHandleInput.trim());
+            await onToggleAvailability(item, true, cleanRenter);
             setShowRentForm(false);
             setRenterHandleInput("");
         } finally {
