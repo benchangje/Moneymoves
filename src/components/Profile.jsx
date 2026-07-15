@@ -5,7 +5,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { useUserProfile } from '../hooks/useUserProfile';
 import { useListings, updateListing } from '../hooks/useListings';
 import { useReviews } from '../hooks/useReviews';
-import { Star } from 'lucide-react';
+import { Star, ChevronDown } from 'lucide-react';
 import ListingCard from './ListingCard';
 import { doc, deleteDoc } from 'firebase/firestore';
 import { db } from '../hooks/firebase';
@@ -19,6 +19,7 @@ export default function Profile() {
     const { profile, updateProfile } = useUserProfile(user);
     const { listings: userListings } = useListings({ ownerUid: user?.uid });
     const { reviews, loading: reviewsLoading, averageRating, ratedStars } = useReviews('user', user?.uid);
+    const [showReviews, setShowReviews] = useState(false);
 
     const { listings: borrowedListings } = useListings({
         renterTelegram: profile?.tele_handle ? profile.tele_handle.toLowerCase() : null,
@@ -191,7 +192,7 @@ export default function Profile() {
                                     </div>
                                     <button
                                         onClick={() => setIsEditing(true)}
-                                        className="mt-5 px-5 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+                                        className="mt-5 px-5 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 hover:scale-101 transition-all duration-400"
                                     >
                                         Edit Profile
                                     </button>
@@ -287,7 +288,7 @@ export default function Profile() {
                     {/* Ratings Section */}
                     <div className="border-t border-gray-200 px-8 py-8">
                         <h2 className="translate-x-1 text-2xl font-bold text-gray-900 mb-6">Ratings</h2>
-                        <div className="bg-linear-to-br from-yellow-50 to-orange-50 p-6 rounded-lg mb-8">
+                        <div className="bg-yellow-100/80 p-6 rounded-lg mb-8">
                             <p className="text-sm text-gray-600 mb-2">Average Rating</p>
                             <div className="flex items-center gap-3">
                                 <p className="text-4xl font-bold text-gray-900">{averageRating}</p>
@@ -302,37 +303,54 @@ export default function Profile() {
                             </div>
                         </div>
 
+                        {/* Reviews Toggle */}
+                        <button
+                            onClick={() => setShowReviews((prev) => !prev)}
+                            className="ml-0.5 flex items-center gap-2 px-5 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 hover:scale-101 transition-all duration-400 ease-out"
+                        >
+                            {showReviews ? 'Hide Reviews' : 'Show Reviews'}
+                            <ChevronDown
+                                className={`w-5 h-5 transition-transform duration-400 ease-out ${showReviews ? 'rotate-180' : 'rotate-0'}`}
+                            />
+                        </button>
+
                         {/* Reviews */}
-                        {reviewsLoading ? (
-                            <div className="text-center py-8">
-                                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto"></div>
-                                <p className="text-gray-600 mt-4">Loading reviews...</p>
-                            </div>
-                        ) : reviews.length === 0 ? (
-                            <p className="text-gray-600 text-center py-8">No reviews yet</p>
-                        ) : (
-                            <div className="space-y-4">
-                                {reviews.map((review) => (
-                                    <div key={review.id} className="border border-gray-200 rounded-lg p-4">
-                                        <div className="flex justify-between items-start mb-2">
-                                            <p className="font-semibold text-gray-900">{review.reviewerName || 'Anonymous'}</p>
-                                            <span className="text-sm text-gray-500">
-                                                {review.createdAt ? new Date(review.createdAt).toLocaleDateString() : 'Recently'}
-                                            </span>
+                        <div
+                            className={`overflow-hidden transition-all duration-400 ease-out ${
+                                showReviews ? 'max-h-[3000px] opacity-100 mt-6' : 'max-h-0 opacity-0 mt-0'
+                            }`}
+                        >
+                            {reviewsLoading ? (
+                                <div className="text-center py-8">
+                                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto"></div>
+                                    <p className="text-gray-600 mt-4">Loading reviews...</p>
+                                </div>
+                            ) : reviews.length === 0 ? (
+                                <p className="text-gray-600 text-center py-8">No reviews yet</p>
+                            ) : (
+                                <div className="space-y-4">
+                                    {reviews.map((review) => (
+                                        <div key={review.id} className="border border-gray-200 rounded-lg p-4">
+                                            <div className="flex justify-between items-start mb-2">
+                                                <p className="font-semibold text-gray-900">{review.reviewerName || 'Anonymous'}</p>
+                                                <span className="text-sm text-gray-500">
+                                                    {review.createdAt ? new Date(review.createdAt).toLocaleDateString() : 'Recently'}
+                                                </span>
+                                            </div>
+                                            <div className="flex gap-1 mb-2">
+                                                {[...Array(5)].map((_, i) => (
+                                                    <Star
+                                                        key={i}
+                                                        className={`w-4 h-4 ${i < review.rating ? 'fill-yellow-400 text-yellow-400' : 'text-gray-300'}`}
+                                                    />
+                                                ))}
+                                            </div>
+                                            <p className="text-gray-700">{review.comment}</p>
                                         </div>
-                                        <div className="flex gap-1 mb-2">
-                                            {[...Array(5)].map((_, i) => (
-                                                <Star
-                                                    key={i}
-                                                    className={`w-4 h-4 ${i < review.rating ? 'fill-yellow-400 text-yellow-400' : 'text-gray-300'}`}
-                                                />
-                                            ))}
-                                        </div>
-                                        <p className="text-gray-700">{review.comment}</p>
-                                    </div>
-                                ))}
-                            </div>
-                        )}
+                                    ))}
+                                </div>
+                            )}
+                        </div>
                     </div>
 
                     {/* Borrowed Listings Section */}
@@ -340,7 +358,7 @@ export default function Profile() {
                         <h2 className="translate-x-1 text-2xl font-bold text-gray-900 mb-6">
                             Currently Borrowing
                         </h2>
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                             {normalizedBorrowedListings.map((listing) => (
                                 <ListingCard
                                     key={listing.id}
@@ -358,7 +376,7 @@ export default function Profile() {
                     {/* Listings Section */}
                     <div className="border-t border-gray-200 px-8 py-8">
                         <h2 className="translate-x-1 text-2xl font-bold text-gray-900 mb-6">Your Listings</h2>
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                             {normalizedListings.map((listing) => (
                                 <div key={listing.id} className={deletingId === listing.id ? "opacity-50 pointer-events-none" : ""}>
                                     <ListingCard

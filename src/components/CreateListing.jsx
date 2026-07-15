@@ -1,4 +1,4 @@
-import { ChevronDown, ChevronRight, Plug2, Shirt, Handbag, CalendarDays, MapPinPen } from "lucide-react";
+import { ChevronRight, Plug2, Shirt, Handbag, CalendarDays, MapPinPen } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 import ImageDropzone from "./ImageDropzone";
 import Confetti from "react-confetti";
@@ -163,7 +163,9 @@ export default function CreateListing() {
                                         {selectedCategory}
                                     </div>
                                 </div>
-                                {categoryIsOpen ? (<ChevronDown className="h-5 w-5 sm:h-6 sm:w-6 text-gray-600"/>) : (<ChevronRight className="h-5 w-5 sm:h-6 sm:w-6 text-gray-400"/>)}
+                                <ChevronRight
+                                    className={`ml-2 h-6 w-6 transition-transform duration-400 ease-out ${categoryIsOpen ? "rotate-90 text-gray-600" : "rotate-0 text-gray-400"}`}
+                                />
                             </button>
                             <div className={`absolute top-full left-0  w-full mt-2 bg-gray-300 rounded-xl overflow-hidden transition-all shadow-md duration-400 ease-out
                                 ${categoryIsOpen ? "opacity-100 translate-y-0 pointer-events-auto" : "opacity-0 -translate-y-2 pointer-events-none"}`}>
@@ -209,7 +211,9 @@ export default function CreateListing() {
                                             {selectedLendingInterval}
                                         </div>
                                     </div>
-                                    {lendingIntervalIsOpen ? (<ChevronDown className="h-5 w-5 sm:h-6 sm:w-6 text-gray-600"/>) : (<ChevronRight className="h-5 w-5 sm:h-6 sm:w-6 text-gray-400"/>)}
+                                    <ChevronRight
+                                        className={`ml-2 h-6 w-6 transition-transform duration-400 ease-out ${lendingIntervalIsOpen ? "rotate-90 text-gray-600" : "rotate-0 text-gray-400"}`}
+                                    />
                                 </button>
                                 <div className={`absolute top-full left-0 z-10 w-full mt-2 bg-gray-300 rounded-xl overflow-hidden transition-all shadow-md duration-400 
                                     ${lendingIntervalIsOpen ? "opacity-100 translate-y-0 pointer-events-auto" : "opacity-0 -translate-y-2 pointer-events-none"}`}>

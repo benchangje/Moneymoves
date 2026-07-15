@@ -93,37 +93,29 @@ export default function ContactUs() {
                 {/* Compact priority panel shown under the header when urgent is ON */}
                 {urgent && (
                     <div className="mt-6 mb-6">
-                        <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
-                            <a href="mailto:rentla.management@gmail.com" className="group flex items-center gap-3 rounded-xl bg-white shadow-[0_0_8px_rgba(0,0,0,0.08)] hover:shadow-lg p-3 pl-4 transform transition-all duration-400 hover:scale-102">
-                                <Mail className="h-4 w-4 text-gray-800 flex-shrink-0" />
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+                            <a href="#message-form" className="group flex items-center gap-3.5 rounded-xl bg-white shadow-[0_0_8px_rgba(0,0,0,0.08)] hover:shadow-lg p-3 pl-4 transform transition-all duration-400 hover:scale-102">
+                                <Mail className="ml-0.5 h-5 w-5 text-gray-800 flex-shrink-0" />
                                 <div>
                                     <div className="text-sm font-medium text-gray-800">Email</div>
                                     <div className="text-sm text-gray-600">rentla.management@gmail.com</div>
                                 </div>
                             </a>
 
-                            <a href="#" className="group flex items-center gap-3 rounded-xl bg-white shadow-[0_0_8px_rgba(0,0,0,0.08)] hover:shadow-lg p-3 pl-4 transform transition-all duration-400 hover:scale-102">
-                                <MessageCircle className="h-4 w-4 text-gray-800 flex-shrink-0" />
+                            <a href="https://t.me/Rent_La_sg" target="_blank" rel="noopener noreferrer" className="group flex items-center gap-3.5 rounded-xl bg-white shadow-[0_0_8px_rgba(0,0,0,0.08)] hover:shadow-lg p-3 pl-4 transform transition-all duration-400 hover:scale-102">
+                                <MessageCircle className="ml-0.5 h-5 w-5 text-gray-800 flex-shrink-0" />
                                 <div>
                                     <div className="text-sm font-medium text-gray-800">Telegram</div>
-                                    <div className="text-sm text-gray-600">@yourhandle</div>
+                                    <div className="text-sm text-gray-600">@Rent_La_sg</div>
                                 </div>
                             </a>
-
-                            <div className="group flex items-center gap-3 rounded-xl bg-white shadow-[0_0_8px_rgba(0,0,0,0.08)] hover:shadow-lg p-3 pl-4 transform transition-all duration-400 hover:scale-102">
-                                <Clock className="h-4 w-4 text-gray-800 flex-shrink-0" />
-                                <div>
-                                    <div className="text-sm font-medium text-gray-800">Response time</div>
-                                    <div className="text-sm text-gray-600">Typically within 8 hours</div>
-                                </div>
-                            </div>
                         </div>
                     </div>
                 )}
 
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-start">
-                    <div className="bg-white rounded-2xl shadow-[0_0_8px_rgba(0,0,0,0.08)] p-8">
-                        <p className="text-sm text-gray-500">{urgent ? 'You are requesting priority support — use this for urgent issues only.' : 'Fill out the form and we will respond within 24 hours.'}</p>
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
+                    <div id="message-form" className="bg-white rounded-2xl shadow-[0_0_8px_rgba(0,0,0,0.08)] p-8">
+                        <p className="ml-0.5 text-sm text-gray-500">{urgent ? 'You are requesting priority support. This should be used this for urgent issues only.' : 'Fill out the form and we will respond within 24 hours.'}</p>
 
                         {submitted && (
                             <div className="mt-6 rounded-lg bg-emerald-50 border border-emerald-100 p-4 text-emerald-700" role="status" aria-live="polite">
@@ -131,11 +123,11 @@ export default function ContactUs() {
                             </div>
                         )}
 
-                        <form onSubmit={handleSubmit} noValidate className="mt-6 space-y-4">
+                        <form onSubmit={handleSubmit} noValidate className="mt-4 space-y-4">
                             <div>
-                                <label className="block text-sm font-medium text-gray-700">Name</label>
+                                <label className="ml-0.5 block text-sm font-medium text-gray-700">Name</label>
                                 <input
-                                    className={`mt-2 block w-full rounded-xl border px-4 py-2 text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-200 hover:border-gray-300 ${errors.name ? 'border-red-300' : 'border-gray-200'}`}
+                                    className={`mt-2.5 block w-full rounded-xl border px-4 py-2 text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-200 hover:border-gray-300 ${errors.name ? 'border-red-300' : 'border-gray-200'}`}
                                     value={name}
                                     onChange={(e) => setName(e.target.value)}
                                     onBlur={() => handleBlur('name')}
@@ -147,10 +139,10 @@ export default function ContactUs() {
                             </div>
 
                             <div>
-                                <label className="block text-sm font-medium text-gray-700">Email</label>
+                                <label className="ml-0.5 block text-sm font-medium text-gray-700">Email</label>
                                 <input
                                     type="email"
-                                    className={`mt-2 block w-full rounded-xl border px-4 py-2 text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-200 hover:border-gray-300 ${errors.email ? 'border-red-300' : 'border-gray-200'}`}
+                                    className={`mt-2.5 block w-full rounded-xl border px-4 py-2 text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-200 hover:border-gray-300 ${errors.email ? 'border-red-300' : 'border-gray-200'}`}
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}
                                     onBlur={() => handleBlur('email')}
@@ -162,14 +154,14 @@ export default function ContactUs() {
                             </div>
 
                             <div>
-                                <label className="block text-sm font-medium text-gray-700">Message</label>
+                                <label className="ml-0.5 block text-sm font-medium text-gray-700">Message</label>
                                 <textarea
                                     placeholder="Tell us your needs"
                                     value={message}
                                     onChange={(e) => setMessage(e.target.value)}
                                     maxLength={2000}
                                     onFocus={(e) => e.target.placeholder = "Enter your message here"}
-                                    className={`mt-2 resize-none h-48 w-full rounded-xl border px-4 py-2 text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-200 hover:border-gray-300 ${errors.message ? 'border-red-300' : 'border-gray-200'}`}
+                                    className={`mt-2.5 resize-none h-48 w-full rounded-xl border px-4 py-2 text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-200 hover:border-gray-300 ${errors.message ? 'border-red-300' : 'border-gray-200'}`}
                                 />
                                 {errors.message && <p id="error-message" className="mt-2 text-sm text-red-600">{errors.message}</p>}
                             </div>
@@ -214,31 +206,30 @@ export default function ContactUs() {
                         </div>
 
                         <div className="mt-4 border-t border-gray-100 pt-4 space-y-3">
-                            <a href="mailto:rentla.management@gmail.com" className="flex items-center gap-4 rounded-lg px-3 py-2 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-200">
-                                <Mail className="h-4 w-4 text-gray-800" />
+                            <a href="#message-form" className="flex items-center gap-3.5 rounded-lg px-3 py-2 hover:bg-gray-100 transition-all duration-300">
+                                <Mail className="h-5 w-5 text-gray-800" />
                                 <div>
                                     <div className="text-sm font-medium text-gray-800">Email</div>
                                     <div className="text-sm text-gray-600">rentla.management@gmail.com</div>
                                 </div>
                             </a>
 
-                            <a href="#" className="flex items-center gap-4 rounded-lg px-3 py-2 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-200">
-                                <MessageCircle className="h-4 w-4 text-gray-800" />
+                            <a href="https://t.me/Rent_La_sg" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3.5 rounded-lg px-3 py-2 hover:bg-gray-100 transition-all duration-300">
+                                <MessageCircle className="h-5 w-5 text-gray-800" />
                                 <div>
                                     <div className="text-sm font-medium text-gray-800">Telegram</div>
-                                    <div className="text-sm text-gray-600">@yourhandle</div>
+                                    <div className="text-sm text-gray-600">@Rent_La_sg</div>
                                 </div>
                             </a>
 
-                            <div className="flex items-center gap-4 rounded-lg px-3 py-2">
-                                <Clock className="h-4 w-4 text-gray-800" />
+                            <div className="flex items-center gap-3.5 rounded-lg px-3 py-2">
+                                <Clock className="h-5 w-5 text-gray-800" />
                                 <div>
                                     <div className="text-sm font-medium text-gray-800">Response time</div>
                                     <div className="text-sm text-gray-600">Typically within 8 hours</div>
                                 </div>
                             </div>
                         </div>
-
                     </aside>
                 </div>
             </div>
