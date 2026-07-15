@@ -303,31 +303,28 @@ export default function Profile() {
                             </div>
                         </div>
 
-                        {/* Reviews Toggle */}
-                        <button
-                            onClick={() => setShowReviews((prev) => !prev)}
-                            className="ml-0.5 flex items-center gap-2 px-5 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 hover:scale-101 transition-all duration-400 ease-out"
-                        >
-                            {showReviews ? 'Hide Reviews' : 'Show Reviews'}
-                            <ChevronDown
-                                className={`w-5 h-5 transition-transform duration-400 ease-out ${showReviews ? 'rotate-180' : 'rotate-0'}`}
-                            />
-                        </button>
+                       {/* Reviews Toggle / Empty State */}
+                        {reviewsLoading ? null : reviews.length > 0 ? (
+                            <button
+                                onClick={() => setShowReviews((prev) => !prev)}
+                                className="ml-0.5 flex items-center gap-2 px-5 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 hover:scale-101 transition-all duration-400 ease-out"
+                            >
+                                {showReviews ? 'Hide Reviews' : 'Show Reviews'}
+                                <ChevronDown
+                                    className={`w-5 h-5 transition-transform duration-400 ease-out ${showReviews ? 'rotate-180' : 'rotate-0'}`}
+                                />
+                            </button>
+                        ) : (
+                            <p className="ml-1 text-gray-600">You have no reviews</p>
+                        )}
 
                         {/* Reviews */}
-                        <div
-                            className={`overflow-hidden transition-all duration-400 ease-out ${
-                                showReviews ? 'max-h-[3000px] opacity-100 mt-6' : 'max-h-0 opacity-0 mt-0'
-                            }`}
-                        >
-                            {reviewsLoading ? (
-                                <div className="text-center py-8">
-                                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto"></div>
-                                    <p className="text-gray-600 mt-4">Loading reviews...</p>
-                                </div>
-                            ) : reviews.length === 0 ? (
-                                <p className="text-gray-600 text-center py-8">No reviews yet</p>
-                            ) : (
+                        {reviews.length > 0 && (
+                            <div
+                                className={`overflow-hidden transition-all duration-400 ease-out ${
+                                    showReviews ? 'max-h-[3000px] opacity-100 mt-6' : 'max-h-0 opacity-0 mt-0'
+                                }`}
+                            >
                                 <div className="space-y-4">
                                     {reviews.map((review) => (
                                         <div key={review.id} className="border border-gray-200 rounded-lg p-4">
@@ -349,8 +346,13 @@ export default function Profile() {
                                         </div>
                                     ))}
                                 </div>
-                            )}
-                        </div>
+                            </div>
+                        )}
+                        {reviewsLoading && (
+                            <div className="text-center py-8">
+                                <p className="text-gray-600 mt-4">Loading reviews...</p>
+                            </div>
+                        )}
                     </div>
 
                     {/* Borrowed Listings Section */}
