@@ -25,7 +25,9 @@ export default function SignUp() {
         return password.length <= 128;
     };
     const isValidPasswordConfig = (password) => {
-        return /\d/.test(password) && /[!@#$%^&*]/.test(password);
+        const hasNumber = /\d/.test(password);
+        const hasSpecialChar = /[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?~`]/.test(password);
+        return hasNumber && hasSpecialChar;
     };
     const isPasswordConfirm = (password) => {
         return password == confirmPassword;
