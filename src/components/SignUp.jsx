@@ -87,7 +87,7 @@ export default function SignUp() {
 
     return (
         <div className="bg-gray-50 min-h-screen">
-            <div className="flex flex-col items-center max-w-7xl mx-auto p-6 px-8 lg:p-8 lg:px-10">
+            <div className="flex flex-col items-center max-w-7xl mx-auto p-4 px-6 md:p-6 md:px-8 lg:p-8 lg:px-10">
                 <h1 className="text-3xl font-semibold text-gray-900 mb-3">Create an Account</h1>
                 <div className="max-w-lg w-full mx-auto mt-6 bg-white p-6 pb-5 rounded-lg shadow-[0_0_8px_rgba(0,0,0,0.08)]">
                     <div className="relative hover:scale-101 transition-all duration-300 mt-1">

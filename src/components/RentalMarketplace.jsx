@@ -27,7 +27,8 @@ export default function RentalMarketplace() {
                 ownerName: listing.ownerName,
                 title: listing.title,
                 description: listing.description || "",
-                pricePerDay: Number(listing.price ?? 0),
+                price: Number(listing.price ?? 0),
+                interval: listing.interval || "Day",
                 dateListed: listing.createdAt
                     ? new Date(listing.createdAt).toISOString().split("T")[0]
                     : "",
@@ -49,18 +50,18 @@ export default function RentalMarketplace() {
         let list = [...filteredListings];
 
         if (filters.minPrice !== "") {
-            list = list.filter((item) => item.pricePerDay >= Number(filters.minPrice));
+            list = list.filter((item) => item.price >= Number(filters.minPrice));
         }
         if (filters.maxPrice !== "") {
-            list = list.filter((item) => item.pricePerDay <= Number(filters.maxPrice));
+            list = list.filter((item) => item.price <= Number(filters.maxPrice));
         }
         if (filters.category) {
             list = list.filter((item) => item.category === filters.category);
         }
         if (filters.sortOption === "lowest") {
-            list.sort((a, b) => (a.pricePerDay ?? 0) - (b.pricePerDay ?? 0));
+            list.sort((a, b) => (a.price ?? 0) - (b.price ?? 0));
         } else if (filters.sortOption === "highest") {
-            list.sort((a, b) => (b.pricePerDay ?? 0) - (a.pricePerDay ?? 0));
+            list.sort((a, b) => (b.price ?? 0) - (a.price ?? 0));
         } else if (filters.sortOption === "recent") {
             list.sort((a, b) => {
                 const da = a.dateListed ? new Date(a.dateListed).getTime() : 0;
@@ -86,12 +87,12 @@ export default function RentalMarketplace() {
         if (similar.length > 0) return similar;
 
         return [...normalizedListings]
-            .sort((a, b) => (a.pricePerDay ?? 0) - (b.pricePerDay ?? 0))
+            .sort((a, b) => (a.price ?? 0) - (b.price ?? 0))
             .slice(0, 3);
     }, [normalizedListings, query]);
 
     return (
-        <div className="min-h-screen max-w-7xl mx-auto p-6 px-8 lg:p-8 lg:px-10">
+        <div className="min-h-screen max-w-7xl mx-auto p-4 px-6 md:p-6 md:px-8 lg:p-8 lg:px-10">
             <h1 className="text-3xl font-semibold mb-6 text-gray-900">Marketplace</h1>
             <div className="mb-6 flex flex-row items-center gap-4">
                 <div className="group relative flex-1 hover:scale-101 transition-all duration-300 md:w-1/2">
@@ -100,7 +101,7 @@ export default function RentalMarketplace() {
                         placeholder="Search listings..."
                         value={query}
                         onChange={(e) => setQuery(e.target.value)}
-                        className="peer w-full pl-10 pr-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-1 focus:ring-gray-600 transition-all duration-300 ease-out [&::-webkit-search-cancel-button]:appearance-none"
+                        className="peer w-full pl-10 pr-8 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-1 focus:ring-gray-600 transition-all duration-300 ease-out [&::-webkit-search-cancel-button]:appearance-none"
                     />
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 peer-focus:text-gray-600 transition-all duration-300 ease-out" />
                     {query && (
@@ -122,14 +123,14 @@ export default function RentalMarketplace() {
             {listingsLoading ? (
                 <div className="text-slate-500">Loading listings...</div>
             ) : (
-                <div className="flex flex-wrap gap-6 items-stretch justify-center">
+                <div className="flex flex-wrap gap-2 sm:gap-4 items-stretch justify-center">
                     {displayedListings.length > 0 ? (
                         displayedListings.map((item) => <ListingCard key={item.id} item={item} />)
                     ) : (
                         <div className="w-full">
                             <p className="text-slate-500 mb-4">No listings match your search.</p>
                             <h2 className="text-xl font-semibold mb-4 text-gray-800">Recommended for you</h2>
-                            <div className="flex flex-wrap gap-6">
+                            <div className="flex flex-wrap gap-2 sm:gap-4">
                                 {recommendedListings.length > 0 ? (
                                     recommendedListings.map((rec) => <ListingCard key={`rec-${rec.id}`} item={rec} />)
                                 ) : (

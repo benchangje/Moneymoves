@@ -155,7 +155,7 @@ const ListingCard = ({ item, onCardClick = () => {}, onDelete = null, onToggleAv
 
     return (
         <>
-        <div className="relative w-full sm:w-1/2 md:w-64 cursor-pointer transition-all bg-white shadow-[0_0_8px_rgba(0,0,0,0.08)] hover:shadow-xl hover:scale-101 duration-300 ease-in-out hover:bg-gray-200 rounded-lg p-4" onClick={handleCardClick}>
+        <div className="relative w-[calc(50%-0.25rem)] sm:w-[calc(50%-0.5rem)] md:w-64 cursor-pointer transition-all bg-white shadow-[0_0_8px_rgba(0,0,0,0.08)] hover:shadow-xl hover:scale-101 duration-300 ease-in-out hover:bg-gray-200 rounded-lg p-3 sm:p-4" onClick={handleCardClick}>
             <div className="relative w-full h-[140px] mb-3">
                 {!imageLoaded && (
                     <div className="absolute inset-0 animate-pulse bg-gray-200 rounded-md" />
@@ -176,7 +176,7 @@ const ListingCard = ({ item, onCardClick = () => {}, onDelete = null, onToggleAv
 
             <div className="flex items-center justify-between mb-1.5 -ml-0.5">
                 <span
-                    className={`inline-block text-xs font-semibold px-2 py-1 rounded-full ${
+                    className={`inline-block text-[10px]sm: text-xs font-semibold px-2 py-1 rounded-full ${
                         isAvailable ? "bg-green-100 text-green-700" : "bg-gray-200 text-gray-600"
                     }`}
                 >
@@ -199,25 +199,25 @@ const ListingCard = ({ item, onCardClick = () => {}, onDelete = null, onToggleAv
                 )}
             </div>
 
-            <h3 className="text-xl font-bold mb-1 text-gray-900 line-clamp-1">{item.title}</h3>
-            <p className="text-lg font-bold mb-1.5 text-gray-900">${item.pricePerDay || item.price} / day</p>
-            <p className="text-sm text-gray-700">Deposit: ${item.deposit}</p>
+            <h3 className="text-lg sm:text-xl font-bold mb-1 text-gray-900 line-clamp-1">{item.title}</h3>
+            <p className="text-md sm:text-lg font-bold mb-1.5 text-gray-900">${item.price} / {item.interval}</p>
+            <p className="text-xs sm:text-sm text-gray-700">Deposit: ${item.deposit}</p>
 
             <div className="flex items-center gap-2 mt-2.5">
                 <div className="flex gap-1 items-center">
                     {Array.from({ length: fullStars }).map((_, i) => (
-                    <Star key={`f-${i}`} className="w-4 h-4 fill-yellow-400 stroke-yellow-400" />
+                    <Star key={`f-${i}`} className="w-3 h-3 sm:w-4 sm:h-4 fill-yellow-400 stroke-yellow-400" />
                     ))}
                     {Array.from({ length: emptyStars }).map((_, i) => (
-                    <Star key={`e-${i}`} className="w-4 h-4 fill-gray-300 stroke-gray-300" />
+                    <Star key={`e-${i}`} className="w-3 h-3 sm:w-4 sm:h-4 fill-gray-300 stroke-gray-300" />
                     ))}
                 </div>
-                <span className="text-xs text-gray-900">
+                <span className="text-[9px] sm:text-xs text-gray-900">
                     {rating > 0 ? rating.toFixed(1) : "No rating"}
                 </span>
-                {reviewCount > 0 && <span className="text-xs text-gray-600">({reviewCount})</span>}
+                {reviewCount > 0 && <span className="text-[10px] sm:text-xs text-gray-600">({reviewCount})</span>}
             </div>
-            <p className="text-[10px] text-gray-700 mt-2.5">Listed: {dateListed}</p>
+            <p className="text-[9px] sm:text-[10px] text-gray-700 mt-2.5">Listed: {dateListed}</p>
 
             {onToggleAvailability && !showRentForm && (
                 <>
@@ -340,7 +340,7 @@ const ListingCard = ({ item, onCardClick = () => {}, onDelete = null, onToggleAv
                 </span>
 
                 <h2 className="text-2xl font-bold text-gray-900 mb-4">{item.title}</h2>
-                <p className="text-xl font-bold text-gray-900 mb-4">${item.pricePerDay || item.price}/day</p>
+                <p className="text-xl font-bold text-gray-900 mb-4">${item.price} / {item.interval}</p>
                 <p className="text-md text-gray-700 mb-4">Deposit: ${item.deposit}</p>
 
                 {item.description && item.description.trim() !== "" && (
